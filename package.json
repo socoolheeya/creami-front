@@ -3,24 +3,13 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev",
-    "build": "next build",
-    "start": "next start",
-    "lint": "eslint"
-  },
-  "dependencies": {
-    "next": "16.2.4",
-    "react": "19.2.4",
-    "react-dom": "19.2.4"
-  },
-  "devDependencies": {
-    "@tailwindcss/postcss": "^4",
-    "@types/node": "^20",
-    "@types/react": "^19",
-    "@types/react-dom": "^19",
-    "eslint": "^9",
-    "eslint-config-next": "16.2.4",
-    "tailwindcss": "^4",
-    "typescript": "^5"
+    "dev:accommodation": "pnpm --filter accommodation dev",
+    "dev:ari": "pnpm --filter ari dev",
+    "dev:discount": "pnpm --filter discount dev",
+    "build:accommodation": "pnpm --filter accommodation build",
+    "build:ari": "pnpm --filter ari build",
+    "build:discount": "pnpm --filter discount build",
+    "build:all": "pnpm -r build",
+    "lint:all": "pnpm -r lint"
   }
 }
