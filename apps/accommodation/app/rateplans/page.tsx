@@ -1,15 +1,32 @@
 'use client'
 
 import Link from 'next/link'
+import { useState, useMemo } from 'react'
 import { mockRatePlans } from '@/lib/data/mock-rateplans'
+import { mockRooms } from '@/lib/data/mock-rooms'
+import { mockAccommodations } from '@/lib/data/mock-accommodations'
 import {
   RATE_PLAN_TYPE_LABELS,
   MEAL_PLAN_LABELS,
   RATE_PLAN_STATUS_LABELS
 } from '@/lib/types/rateplan'
+import { AccommodationSelector } from './components/AccommodationSelector'
 
 export default function RatePlansPage() {
-  const ratePlans = mockRatePlans
+  const [selectedAccommodationId, setSelectedAccommodationId] = useState<string | null>(null)
+
+  // Filter rooms by selected accommodation
+  const filteredRooms = useMemo(() => {
+    if (!selectedAccommodationId) return mockRooms
+    return mockRooms.filter(room => room.accommodationId === selectedAccommodationId)
+  }, [selectedAccommodationId])
+
+  // Filter rateplans by filtered rooms
+  const ratePlans = useMemo(() => {
+    if (!selectedAccommodationId) return mockRatePlans
+    const roomIds = new Set(filteredRooms.map(room => room.id))
+    return mockRatePlans.filter(rp => rp.roomId && roomIds.has(rp.roomId))
+  }, [selectedAccommodationId, filteredRooms])
 
   return (
     <div className="container">
@@ -24,6 +41,13 @@ export default function RatePlansPage() {
           요금제 추가
         </Link>
       </div>
+
+      {/* Accommodation Selector */}
+      <AccommodationSelector
+        accommodations={mockAccommodations}
+        selectedId={selectedAccommodationId}
+        onSelect={setSelectedAccommodationId}
+      />
 
       <div className="stats-grid">
         <div className="stat-card">
@@ -51,8 +75,15 @@ export default function RatePlansPage() {
       </div>
 
       <div className="content-section">
-        <div className="rateplans-grid">
-          {ratePlans.map((ratePlan) => (
+        {ratePlans.length === 0 && selectedAccommodationId ? (
+          <div className="empty-state">
+            <p className="empty-text">
+              선택한 숙소에 등록된 요금제가 없습니다
+            </p>
+          </div>
+        ) : (
+          <div className="rateplans-grid">
+            {ratePlans.map((ratePlan) => (
             <Link
               key={ratePlan.id}
               href={`/rateplans/${ratePlan.id}`}
@@ -149,7 +180,8 @@ export default function RatePlansPage() {
               )}
             </Link>
           ))}
-        </div>
+          </div>
+        )}
       </div>
 
       <style jsx>{`
@@ -407,6 +439,17 @@ export default function RatePlansPage() {
           font-size: var(--font-size-xs);
           color: var(--text-primary);
           font-weight: 500;
+        }
+
+        .empty-state {
+          text-align: center;
+          padding: var(--spacing-xl);
+        }
+
+        .empty-text {
+          font-size: var(--font-size-base);
+          color: var(--text-secondary);
+          margin: 0;
         }
 
         @media (max-width: 768px) {
