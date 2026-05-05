@@ -6,7 +6,6 @@ export interface RatePlan {
   roomId?: string
   roomName?: string
   description?: string
-  basePrice: number
   isActive: boolean
 }
 

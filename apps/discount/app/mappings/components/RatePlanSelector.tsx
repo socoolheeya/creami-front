@@ -130,11 +130,6 @@ export function RatePlanSelector({ ratePlans, selectedIds, onSelectionChange }: 
                   {ratePlan.roomName}
                 </p>
               )}
-              <div className="mt-2 pt-2 border-t" style={{ borderColor: isSelected ? 'rgba(255, 255, 255, 0.3)' : 'var(--border-color)' }}>
-                <span className="text-sm" style={{ fontWeight: 'var(--font-medium)' }}>
-                  ₩{ratePlan.basePrice.toLocaleString()}
-                </span>
-              </div>
             </button>
           )
         })}

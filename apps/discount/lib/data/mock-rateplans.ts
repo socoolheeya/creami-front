@@ -9,7 +9,6 @@ export const mockRatePlans: RatePlan[] = [
     roomId: '1',
     roomName: '101호 - 디럭스 더블',
     description: '기본 요금제',
-    basePrice: 150000,
     isActive: true
   },
   {
@@ -20,7 +19,6 @@ export const mockRatePlans: RatePlan[] = [
     roomId: '1',
     roomName: '101호 - 디럭스 더블',
     description: '금-일요일 적용',
-    basePrice: 200000,
     isActive: true
   },
   {
@@ -31,7 +29,6 @@ export const mockRatePlans: RatePlan[] = [
     roomId: '2',
     roomName: '201호 - 스위트',
     description: '30일 전 예약',
-    basePrice: 250000,
     isActive: true
   },
   {
@@ -42,7 +39,6 @@ export const mockRatePlans: RatePlan[] = [
     roomId: '2',
     roomName: '201호 - 스위트',
     description: '7박 이상',
-    basePrice: 220000,
     isActive: true
   },
   {
@@ -53,7 +49,6 @@ export const mockRatePlans: RatePlan[] = [
     roomId: '4',
     roomName: 'A동 - 오션뷰',
     description: '7-8월 적용',
-    basePrice: 180000,
     isActive: true
   },
   {
@@ -64,7 +59,6 @@ export const mockRatePlans: RatePlan[] = [
     roomId: '4',
     roomName: 'A동 - 오션뷰',
     description: '11-2월 적용',
-    basePrice: 120000,
     isActive: true
   },
   {
@@ -75,7 +69,6 @@ export const mockRatePlans: RatePlan[] = [
     roomId: '5',
     roomName: 'B동 - 가든뷰',
     description: '가족 단위 할인',
-    basePrice: 280000,
     isActive: true
   },
   {
@@ -86,7 +79,6 @@ export const mockRatePlans: RatePlan[] = [
     roomId: '6',
     roomName: '101호 - 도미토리',
     description: '1인당 요금',
-    basePrice: 35000,
     isActive: true
   }
 ]

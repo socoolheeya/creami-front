@@ -4,13 +4,28 @@ import { Link2, Save, ChevronRight, ChevronLeft } from 'lucide-react'
 import { useState, useMemo } from 'react'
 import { mockRatePlans, mockDiscountRatePlanMappings } from '@/lib/data/mock-rateplans'
 import { mockDiscounts } from '@/lib/data/mock-discounts'
+import { mockAccommodations } from '@/lib/data/mock-accommodations'
 import { DiscountRatePlanMapping } from '@/lib/types/rateplan'
+import { AccommodationSelector } from './components/AccommodationSelector'
 import { RatePlanSelector } from './components/RatePlanSelector'
 import { DiscountList } from './components/DiscountList'
 
 export default function MappingsPage() {
+  const [selectedAccommodationId, setSelectedAccommodationId] = useState<string | null>(null)
   const [selectedRatePlanIds, setSelectedRatePlanIds] = useState<string[]>([])
   const [mappings, setMappings] = useState<DiscountRatePlanMapping[]>(mockDiscountRatePlanMappings)
+
+  // 선택된 숙소의 요금제만 필터링
+  const filteredRatePlans = useMemo(() => {
+    if (!selectedAccommodationId) return []
+    return mockRatePlans.filter(rp => rp.accommodationId === selectedAccommodationId)
+  }, [selectedAccommodationId])
+
+  // 숙소 변경 시 요금제 선택 초기화
+  const handleAccommodationChange = (accommodationId: string | null) => {
+    setSelectedAccommodationId(accommodationId)
+    setSelectedRatePlanIds([])
+  }
 
   // 현재 선택된 요금제들의 매핑된 할인 ID 집합
   const mappedDiscountIds = useMemo(() => {
@@ -93,14 +108,14 @@ export default function MappingsPage() {
 
         <button
           onClick={handleSave}
-          disabled={selectedRatePlanIds.length === 0}
+          disabled={!selectedAccommodationId || selectedRatePlanIds.length === 0}
           className="flex items-center gap-2 px-4 py-2 rounded-lg transition-colors"
           style={{
-            backgroundColor: selectedRatePlanIds.length === 0 ? 'var(--bg-tertiary)' : 'var(--primary)',
-            color: selectedRatePlanIds.length === 0 ? 'var(--text-tertiary)' : '#ffffff',
+            backgroundColor: (!selectedAccommodationId || selectedRatePlanIds.length === 0) ? 'var(--bg-tertiary)' : 'var(--primary)',
+            color: (!selectedAccommodationId || selectedRatePlanIds.length === 0) ? 'var(--text-tertiary)' : '#ffffff',
             borderRadius: 'var(--radius-sm)',
             fontWeight: 'var(--font-medium)',
-            cursor: selectedRatePlanIds.length === 0 ? 'not-allowed' : 'pointer'
+            cursor: (!selectedAccommodationId || selectedRatePlanIds.length === 0) ? 'not-allowed' : 'pointer'
           }}
         >
           <Save className="w-5 h-5" />
@@ -108,17 +123,45 @@ export default function MappingsPage() {
         </button>
       </div>
 
-      {/* Rate Plan Selector */}
+      {/* Accommodation Selector */}
       <div className="mb-6">
-        <RatePlanSelector
-          ratePlans={mockRatePlans}
-          selectedIds={selectedRatePlanIds}
-          onSelectionChange={setSelectedRatePlanIds}
+        <AccommodationSelector
+          accommodations={mockAccommodations}
+          selectedId={selectedAccommodationId}
+          onSelect={handleAccommodationChange}
         />
       </div>
 
+      {/* Rate Plan Selector - 숙소 선택 시에만 표시 */}
+      {selectedAccommodationId && (
+        <div className="mb-6">
+          <RatePlanSelector
+            ratePlans={filteredRatePlans}
+            selectedIds={selectedRatePlanIds}
+            onSelectionChange={setSelectedRatePlanIds}
+          />
+        </div>
+      )}
+
       {/* Mapping Area */}
-      {selectedRatePlanIds.length === 0 ? (
+      {!selectedAccommodationId ? (
+        <div
+          className="flex flex-col items-center justify-center py-16 rounded-lg"
+          style={{
+            backgroundColor: 'var(--bg-primary)',
+            borderRadius: 'var(--radius)',
+            border: '2px dashed var(--border-color)'
+          }}
+        >
+          <Link2 className="w-16 h-16 mb-4" style={{ color: 'var(--text-tertiary)' }} />
+          <h3 className="text-xl mb-2" style={{ fontWeight: 'var(--font-bold)', color: 'var(--text-primary)' }}>
+            숙소를 먼저 선택해주세요
+          </h3>
+          <p style={{ color: 'var(--text-secondary)', fontWeight: 'var(--font-light)' }}>
+            위에서 숙소를 선택하면 해당 숙소의 요금제를 볼 수 있습니다
+          </p>
+        </div>
+      ) : selectedRatePlanIds.length === 0 ? (
         <div
           className="flex flex-col items-center justify-center py-16 rounded-lg"
           style={{
