@@ -1,14 +1,16 @@
 'use client'
 
-import { Home, Settings, LayoutDashboard, Calendar, Users, ChevronLeft, ChevronRight } from 'lucide-react'
+import { Home, Settings, LayoutDashboard, Calendar, Users, ChevronLeft, ChevronRight, Building2, DoorOpen, CreditCard } from 'lucide-react'
 import { useState } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 
 const menuItems = [
   { icon: LayoutDashboard, label: '대시보드', href: '/' },
+  { icon: Building2, label: '숙소 관리', href: '/accommodations' },
+  { icon: DoorOpen, label: '객실 관리', href: '/rooms' },
+  { icon: CreditCard, label: '요금제 관리', href: '/pricing' },
   { icon: Calendar, label: '예약 관리', href: '/reservations' },
-  { icon: Home, label: '객실 관리', href: '/rooms' },
   { icon: Users, label: '고객 관리', href: '/customers' },
   { icon: Settings, label: '설정', href: '/settings' }
 ]
