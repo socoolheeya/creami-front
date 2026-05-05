@@ -1,6 +1,7 @@
-/* Pretendard Font */
+/* Pretendard Font - @import must be at the top */
 @import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.min.css');
 
+/* CSS Variables */
 :root {
   /* Primary Color */
   --primary: #fa8383;
