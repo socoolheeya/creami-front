@@ -26,17 +26,17 @@ export default function RoomsPage() {
   return (
     <div>
       {/* Header */}
-      <div className="flex items-center justify-between mb-6">
+      <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-3">
-          <DoorOpen className="w-8 h-8" style={{ color: 'var(--primary)' }} />
-          <h1 className="text-3xl" style={{ fontWeight: 'var(--font-bold)', color: 'var(--text-primary)' }}>
+          <DoorOpen className="w-6 h-6" style={{ color: 'var(--primary)' }} />
+          <h1 className="text-2xl" style={{ fontWeight: 'var(--font-bold)', color: 'var(--text-primary)' }}>
             객실 관리
           </h1>
         </div>
 
         <Link href="/rooms/new">
           <button
-            className="flex items-center gap-2 px-4 py-2 rounded-lg transition-colors"
+            className="flex items-center gap-2 px-3 py-1.5 text-sm rounded-lg transition-colors"
             style={{
               backgroundColor: 'var(--primary)',
               color: '#ffffff',
@@ -44,20 +44,20 @@ export default function RoomsPage() {
               fontWeight: 'var(--font-medium)'
             }}
           >
-            <Plus className="w-5 h-5" />
+            <Plus className="w-4 h-4" />
             신규 등록
           </button>
         </Link>
       </div>
 
       {/* Search and View Toggle */}
-      <div className="mb-6 flex gap-4">
+      <div className="mb-4 flex gap-3">
         <input
           type="text"
           placeholder="객실명 또는 숙소명으로 검색..."
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
-          className="flex-1 px-4 py-2 rounded-lg"
+          className="flex-1 px-3 py-2 text-sm rounded-lg"
           style={{
             backgroundColor: 'var(--bg-primary)',
             border: '1px solid var(--border-color)',
@@ -80,18 +80,18 @@ export default function RoomsPage() {
             border: '2px dashed var(--border-color)'
           }}
         >
-          <DoorOpen className="w-16 h-16 mb-4" style={{ color: 'var(--text-tertiary)' }} />
-          <h3 className="text-xl mb-2" style={{ fontWeight: 'var(--font-bold)', color: 'var(--text-primary)' }}>
+          <DoorOpen className="w-16 h-16 mb-3" style={{ color: 'var(--text-tertiary)' }} />
+          <h3 className="text-lg mb-1.5" style={{ fontWeight: 'var(--font-bold)', color: 'var(--text-primary)' }}>
             {searchQuery ? '검색 결과가 없습니다' : '등록된 객실이 없습니다'}
           </h3>
           {!searchQuery && (
             <>
-              <p className="mb-6" style={{ color: 'var(--text-secondary)', fontWeight: 'var(--font-light)' }}>
+              <p className="text-sm mb-4" style={{ color: 'var(--text-secondary)', fontWeight: 'var(--font-light)' }}>
                 첫 번째 객실을 등록해보세요
               </p>
               <Link href="/rooms/new">
                 <button
-                  className="flex items-center gap-2 px-4 py-2 rounded-lg"
+                  className="flex items-center gap-2 px-3 py-1.5 text-sm rounded-lg"
                   style={{
                     backgroundColor: 'var(--primary)',
                     color: '#ffffff',
@@ -99,7 +99,7 @@ export default function RoomsPage() {
                     fontWeight: 'var(--font-medium)'
                   }}
                 >
-                  <Plus className="w-5 h-5" />
+                  <Plus className="w-4 h-4" />
                   객실 등록하기
                 </button>
               </Link>
@@ -107,7 +107,7 @@ export default function RoomsPage() {
           )}
         </div>
       ) : viewMode === 'grid' ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
           {filteredRooms.map((room) => (
             <RoomCard key={room.id} room={room} />
           ))}

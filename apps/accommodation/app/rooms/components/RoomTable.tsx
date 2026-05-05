@@ -17,6 +17,7 @@ export function RoomTable({ rooms }: RoomTableProps) {
   const [sortOrder, setSortOrder] = useState<SortOrder>('asc')
   const [typeFilter, setTypeFilter] = useState<RoomType | 'all'>('all')
   const [statusFilter, setStatusFilter] = useState<RoomStatus | 'all'>('all')
+  const [idSearch, setIdSearch] = useState('')
   const [nameSearch, setNameSearch] = useState('')
   const [accommodationSearch, setAccommodationSearch] = useState('')
 
@@ -33,6 +34,11 @@ export function RoomTable({ rooms }: RoomTableProps) {
     let result = [...rooms]
 
     // 검색 필터 적용
+    if (idSearch) {
+      result = result.filter(room =>
+        room.id.toLowerCase().includes(idSearch.toLowerCase())
+      )
+    }
     if (nameSearch) {
       result = result.filter(room =>
         room.name.toLowerCase().includes(nameSearch.toLowerCase())
@@ -70,13 +76,13 @@ export function RoomTable({ rooms }: RoomTableProps) {
     }
 
     return result
-  }, [rooms, sortField, sortOrder, typeFilter, statusFilter, nameSearch, accommodationSearch])
+  }, [rooms, sortField, sortOrder, typeFilter, statusFilter, idSearch, nameSearch, accommodationSearch])
 
   const SortableHeader = ({ field, children }: { field: SortField; children: React.ReactNode }) => (
-    <th className="px-6 py-4 text-left">
+    <th className="px-3 py-2 text-left">
       <button
         onClick={() => handleSort(field)}
-        className="flex items-center gap-2 transition-colors"
+        className="flex items-center gap-2 text-sm transition-colors"
         style={{ color: 'var(--text-primary)', fontWeight: 'var(--font-bold)' }}
       >
         {children}
@@ -104,30 +110,50 @@ export function RoomTable({ rooms }: RoomTableProps) {
       <table className="w-full">
         <thead>
           <tr style={{ backgroundColor: 'var(--bg-tertiary)', borderBottom: '1px solid var(--border-color)' }}>
+            <th className="px-2 py-2 text-left text-sm" style={{ color: 'var(--text-primary)', fontWeight: 'var(--font-bold)', width: '80px' }}>
+              ID
+            </th>
             <SortableHeader field="name">객실명</SortableHeader>
-            <th className="px-6 py-4 text-left" style={{ color: 'var(--text-primary)', fontWeight: 'var(--font-bold)' }}>
+            <th className="px-3 py-2 text-left text-sm" style={{ color: 'var(--text-primary)', fontWeight: 'var(--font-bold)' }}>
               숙소명
             </th>
             <SortableHeader field="type">타입</SortableHeader>
             <SortableHeader field="size">크기</SortableHeader>
-            <th className="px-6 py-4 text-left" style={{ color: 'var(--text-primary)', fontWeight: 'var(--font-bold)' }}>
+            <th className="px-3 py-2 text-left text-sm" style={{ color: 'var(--text-primary)', fontWeight: 'var(--font-bold)' }}>
               수용인원
             </th>
-            <th className="px-6 py-4 text-left" style={{ color: 'var(--text-primary)', fontWeight: 'var(--font-bold)' }}>
+            <th className="px-3 py-2 text-left text-sm" style={{ color: 'var(--text-primary)', fontWeight: 'var(--font-bold)' }}>
               침대
             </th>
             <SortableHeader field="status">상태</SortableHeader>
           </tr>
           {/* Filter Row */}
           <tr style={{ backgroundColor: 'var(--bg-primary)', borderBottom: '1px solid var(--border-color)' }}>
+            {/* ID 검색 */}
+            <th className="px-2 py-2">
+              <input
+                type="text"
+                placeholder="ID"
+                value={idSearch}
+                onChange={(e) => setIdSearch(e.target.value)}
+                className="w-full px-2 py-1 text-xs"
+                style={{
+                  backgroundColor: 'var(--bg-secondary)',
+                  border: '1px solid var(--border-color)',
+                  borderRadius: 'var(--radius-sm)',
+                  color: 'var(--text-primary)',
+                  width: '70px'
+                }}
+              />
+            </th>
             {/* 객실명 검색 */}
-            <th className="px-6 py-3">
+            <th className="px-3 py-2">
               <input
                 type="text"
                 placeholder="검색..."
                 value={nameSearch}
                 onChange={(e) => setNameSearch(e.target.value)}
-                className="w-full px-3 py-1.5 text-sm"
+                className="w-full px-2 py-1 text-xs"
                 style={{
                   backgroundColor: 'var(--bg-secondary)',
                   border: '1px solid var(--border-color)',
@@ -137,13 +163,13 @@ export function RoomTable({ rooms }: RoomTableProps) {
               />
             </th>
             {/* 숙소명 검색 */}
-            <th className="px-6 py-3">
+            <th className="px-3 py-2">
               <input
                 type="text"
                 placeholder="검색..."
                 value={accommodationSearch}
                 onChange={(e) => setAccommodationSearch(e.target.value)}
-                className="w-full px-3 py-1.5 text-sm"
+                className="w-full px-2 py-1 text-xs"
                 style={{
                   backgroundColor: 'var(--bg-secondary)',
                   border: '1px solid var(--border-color)',
@@ -153,11 +179,11 @@ export function RoomTable({ rooms }: RoomTableProps) {
               />
             </th>
             {/* 타입 필터 */}
-            <th className="px-6 py-3">
+            <th className="px-3 py-2">
               <select
                 value={typeFilter}
                 onChange={(e) => setTypeFilter(e.target.value as RoomType | 'all')}
-                className="w-full px-3 py-1.5 text-sm"
+                className="w-full px-2 py-1 text-xs"
                 style={{
                   backgroundColor: 'var(--bg-secondary)',
                   border: '1px solid var(--border-color)',
@@ -172,17 +198,17 @@ export function RoomTable({ rooms }: RoomTableProps) {
               </select>
             </th>
             {/* 크기 - 필터 없음 */}
-            <th className="px-6 py-3"></th>
+            <th className="px-3 py-2"></th>
             {/* 수용인원 - 필터 없음 */}
-            <th className="px-6 py-3"></th>
+            <th className="px-3 py-2"></th>
             {/* 침대 - 필터 없음 */}
-            <th className="px-6 py-3"></th>
+            <th className="px-3 py-2"></th>
             {/* 상태 필터 */}
-            <th className="px-6 py-3">
+            <th className="px-3 py-2">
               <select
                 value={statusFilter}
                 onChange={(e) => setStatusFilter(e.target.value as RoomStatus | 'all')}
-                className="w-full px-3 py-1.5 text-sm"
+                className="w-full px-2 py-1 text-xs"
                 style={{
                   backgroundColor: 'var(--bg-secondary)',
                   border: '1px solid var(--border-color)',
@@ -211,17 +237,24 @@ export function RoomTable({ rooms }: RoomTableProps) {
                 e.currentTarget.style.backgroundColor = 'transparent'
               }}
             >
+              {/* ID */}
+              <td className="px-2 py-2">
+                <span className="text-xs font-mono" style={{ color: 'var(--text-tertiary)' }}>
+                  {room.id}
+                </span>
+              </td>
+
               {/* 객실명 */}
-              <td className="px-6 py-4">
+              <td className="px-3 py-2">
                 <Link href={`/rooms/${room.id}`}>
                   <div className="flex flex-col cursor-pointer">
                     <span
-                      className="hover:underline"
+                      className="text-sm hover:underline"
                       style={{ fontWeight: 'var(--font-bold)', color: 'var(--text-primary)' }}
                     >
                       {room.name}
                     </span>
-                    <span className="text-xs mt-1" style={{ color: 'var(--text-tertiary)' }}>
+                    <span className="text-xs mt-0.5" style={{ color: 'var(--text-tertiary)' }}>
                       {room.images.length}장 사진 • {room.amenities.length}개 편의시설
                     </span>
                   </div>
@@ -229,14 +262,14 @@ export function RoomTable({ rooms }: RoomTableProps) {
               </td>
 
               {/* 숙소명 */}
-              <td className="px-6 py-4">
+              <td className="px-3 py-2">
                 <span className="text-sm" style={{ color: 'var(--text-secondary)' }}>
                   {room.accommodationName}
                 </span>
               </td>
 
               {/* 타입 */}
-              <td className="px-6 py-4">
+              <td className="px-3 py-2">
                 <span
                   className="px-2 py-1 rounded text-xs"
                   style={{
@@ -250,14 +283,14 @@ export function RoomTable({ rooms }: RoomTableProps) {
               </td>
 
               {/* 크기 */}
-              <td className="px-6 py-4">
+              <td className="px-3 py-2">
                 <span className="text-sm" style={{ color: 'var(--text-secondary)' }}>
                   {room.size}{room.sizeUnit === 'sqm' ? '㎡' : '평'}
                 </span>
               </td>
 
               {/* 수용인원 */}
-              <td className="px-6 py-4">
+              <td className="px-3 py-2">
                 <div className="flex flex-col text-sm" style={{ color: 'var(--text-secondary)' }}>
                   <span>기준: {room.standardOccupancy}명</span>
                   <span>최대: {room.maxOccupancy}명</span>
@@ -265,7 +298,7 @@ export function RoomTable({ rooms }: RoomTableProps) {
               </td>
 
               {/* 침대 */}
-              <td className="px-6 py-4">
+              <td className="px-3 py-2">
                 <div className="flex flex-col gap-1">
                   {room.bedConfiguration.map((bed, index) => (
                     <div key={index} className="flex items-center gap-1 text-xs" style={{ color: 'var(--text-secondary)' }}>
@@ -277,9 +310,9 @@ export function RoomTable({ rooms }: RoomTableProps) {
               </td>
 
               {/* 상태 */}
-              <td className="px-6 py-4">
+              <td className="px-3 py-2">
                 <span
-                  className="px-3 py-1 rounded-full text-sm"
+                  className="px-2 py-1 rounded-full text-xs"
                   style={{
                     backgroundColor: room.status === 'available' ? '#d1fae5' : room.status === 'maintenance' ? '#fef3c7' : '#fee2e2',
                     color: room.status === 'available' ? '#065f46' : room.status === 'maintenance' ? '#92400e' : '#991b1b',

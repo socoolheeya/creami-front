@@ -1,26 +1,37 @@
 'use client'
 
-import { ReactNode, useState } from 'react'
+import { ReactNode } from 'react'
 import { Header } from './Header'
 import { Sidebar } from './Sidebar'
+import { SidebarProvider, useSidebar } from './SidebarContext'
 
-export function MainLayout({ children }: { children: ReactNode }) {
-  const [isSidebarCollapsed] = useState(false)
+function MainLayoutContent({ children }: { children: ReactNode }) {
+  const { isCollapsed } = useSidebar()
 
   return (
     <div className="min-h-screen" style={{ backgroundColor: 'var(--bg-secondary)' }}>
       <Header />
       <Sidebar />
       <main
-        className="pt-16 transition-all duration-300"
         style={{
-          marginLeft: isSidebarCollapsed ? '64px' : '240px'
+          marginLeft: isCollapsed ? '80px' : '288px',
+          paddingTop: 'var(--main-padding-top)',
+          paddingLeft: 'var(--main-padding-x)',
+          paddingRight: 'var(--main-padding-x)',
+          paddingBottom: 'var(--main-padding-x)',
+          transition: 'all 300ms'
         }}
       >
-        <div className="p-6">
-          {children}
-        </div>
+        {children}
       </main>
     </div>
+  )
+}
+
+export function MainLayout({ children }: { children: ReactNode }) {
+  return (
+    <SidebarProvider>
+      <MainLayoutContent>{children}</MainLayoutContent>
+    </SidebarProvider>
   )
 }

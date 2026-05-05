@@ -78,17 +78,17 @@ export function Step3Images({ data, onChange }: Step3ImagesProps) {
   }
 
   return (
-    <div className="space-y-6">
-      <h2 className="text-2xl mb-6" style={{ fontWeight: 'var(--font-bold)', color: 'var(--text-primary)' }}>
+    <div className="space-y-4">
+      <h2 className="text-xl mb-1" style={{ fontWeight: 'var(--font-bold)', color: 'var(--text-primary)' }}>
         숙소 이미지를 추가해주세요
       </h2>
 
       {/* 이미지 URL 입력 */}
       <div>
-        <label className="block mb-2" style={{ fontWeight: 'var(--font-medium)', color: 'var(--text-primary)' }}>
+        <label className="block mb-1.5 text-sm" style={{ fontWeight: 'var(--font-medium)', color: 'var(--text-primary)' }}>
           이미지 URL 추가
         </label>
-        <div className="flex gap-2">
+        <div className="flex gap-3">
           <input
             type="url"
             value={imageUrl}
@@ -98,7 +98,7 @@ export function Step3Images({ data, onChange }: Step3ImagesProps) {
             }}
             onKeyPress={(e) => e.key === 'Enter' && addImage()}
             placeholder="https://example.com/image.jpg"
-            className="flex-1 px-4 py-3 rounded-lg"
+            className="flex-1 px-3 py-2 text-sm rounded-lg max-w-md"
             style={{
               backgroundColor: 'var(--bg-primary)',
               border: error ? '1px solid var(--primary)' : '1px solid var(--border-color)',
@@ -109,7 +109,7 @@ export function Step3Images({ data, onChange }: Step3ImagesProps) {
           <button
             type="button"
             onClick={addImage}
-            className="px-6 py-3 rounded-lg transition-colors"
+            className="px-3 py-2 rounded-lg transition-colors"
             style={{
               backgroundColor: 'var(--primary)',
               color: '#ffffff',
@@ -117,15 +117,15 @@ export function Step3Images({ data, onChange }: Step3ImagesProps) {
               fontWeight: 'var(--font-medium)'
             }}
           >
-            <Plus className="w-5 h-5" />
+            <Plus className="w-4 h-4" />
           </button>
         </div>
         {error ? (
-          <p className="text-sm mt-2" style={{ color: 'var(--primary)' }}>
+          <p className="text-xs mt-2" style={{ color: 'var(--primary)' }}>
             {error}
           </p>
         ) : (
-          <p className="text-sm mt-2" style={{ color: 'var(--text-secondary)' }}>
+          <p className="text-xs mt-2" style={{ color: 'var(--text-secondary)' }}>
             최대 10장까지 추가할 수 있습니다
           </p>
         )}
@@ -134,10 +134,10 @@ export function Step3Images({ data, onChange }: Step3ImagesProps) {
       {/* 이미지 그리드 */}
       {data.images && data.images.length > 0 ? (
         <div>
-          <p className="mb-3" style={{ fontWeight: 'var(--font-medium)', color: 'var(--text-primary)' }}>
+          <p className="mb-1.5 text-sm" style={{ fontWeight: 'var(--font-medium)', color: 'var(--text-primary)' }}>
             등록된 이미지 ({data.images.length}/10)
           </p>
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
             {data.images.map(img => (
               <div
                 key={img.id}
@@ -145,17 +145,17 @@ export function Step3Images({ data, onChange }: Step3ImagesProps) {
                 style={{
                   backgroundColor: 'var(--bg-tertiary)',
                   borderRadius: 'var(--radius-sm)',
-                  border: img.isPrimary ? '3px solid var(--primary)' : '1px solid var(--border-color)'
+                  border: img.isPrimary ? '2px solid var(--primary)' : '1px solid var(--border-color)'
                 }}
               >
                 {/* 이미지 */}
-                <div className="relative w-full h-40">
+                <div className="relative w-full h-32">
                   {failedImages.has(img.id) ? (
                     <div
                       className="w-full h-full flex flex-col items-center justify-center"
                       style={{ backgroundColor: 'var(--bg-tertiary)' }}
                     >
-                      <ImageIcon className="w-12 h-12 mb-2" style={{ color: 'var(--text-tertiary)' }} />
+                      <ImageIcon className="w-10 h-10 mb-2" style={{ color: 'var(--text-tertiary)' }} />
                       <p className="text-xs text-center px-2" style={{ color: 'var(--text-tertiary)' }}>
                         이미지를 불러올 수 없습니다
                       </p>
@@ -176,27 +176,27 @@ export function Step3Images({ data, onChange }: Step3ImagesProps) {
                     <button
                       type="button"
                       onClick={() => setPrimary(img.id)}
-                      className="opacity-0 group-hover:opacity-100 p-2 rounded-lg transition-opacity"
+                      className="opacity-0 group-hover:opacity-100 p-1.5 rounded-lg transition-opacity"
                       style={{
                         backgroundColor: img.isPrimary ? 'var(--primary)' : 'rgba(255, 255, 255, 0.9)',
                         color: img.isPrimary ? '#ffffff' : 'var(--text-primary)'
                       }}
                       title={img.isPrimary ? '대표 이미지' : '대표로 설정'}
                     >
-                      <Star className="w-5 h-5" fill={img.isPrimary ? '#ffffff' : 'none'} />
+                      <Star className="w-4 h-4" fill={img.isPrimary ? '#ffffff' : 'none'} />
                     </button>
 
                     {/* 삭제 */}
                     <button
                       type="button"
                       onClick={() => removeImage(img.id)}
-                      className="opacity-0 group-hover:opacity-100 p-2 rounded-lg transition-opacity"
+                      className="opacity-0 group-hover:opacity-100 p-1.5 rounded-lg transition-opacity"
                       style={{
                         backgroundColor: 'rgba(255, 255, 255, 0.9)',
                         color: 'var(--text-primary)'
                       }}
                     >
-                      <X className="w-5 h-5" />
+                      <X className="w-4 h-4" />
                     </button>
                   </div>
                 </div>
@@ -204,7 +204,7 @@ export function Step3Images({ data, onChange }: Step3ImagesProps) {
                 {/* 대표 뱃지 */}
                 {img.isPrimary && (
                   <div
-                    className="absolute top-2 left-2 px-2 py-1 rounded text-xs"
+                    className="absolute top-2 left-2 px-1.5 py-0.5 rounded text-xs"
                     style={{
                       backgroundColor: 'var(--primary)',
                       color: '#ffffff',
@@ -220,15 +220,15 @@ export function Step3Images({ data, onChange }: Step3ImagesProps) {
         </div>
       ) : (
         <div
-          className="flex flex-col items-center justify-center py-16 rounded-lg"
+          className="flex flex-col items-center justify-center py-12 rounded-lg"
           style={{
             backgroundColor: 'var(--bg-primary)',
             border: '2px dashed var(--border-color)',
             borderRadius: 'var(--radius)'
           }}
         >
-          <ImageIcon className="w-16 h-16 mb-4" style={{ color: 'var(--text-tertiary)' }} />
-          <p style={{ color: 'var(--text-secondary)' }}>
+          <ImageIcon className="w-12 h-12 mb-2" style={{ color: 'var(--text-tertiary)' }} />
+          <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>
             아직 추가된 이미지가 없습니다
           </p>
         </div>

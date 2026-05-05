@@ -31,14 +31,14 @@ export function Step2Description({ data, onChange }: Step2DescriptionProps) {
   }
 
   return (
-    <div className="space-y-6">
-      <h2 className="text-2xl mb-6" style={{ fontWeight: 'var(--font-bold)', color: 'var(--text-primary)' }}>
+    <div className="space-y-4">
+      <h2 className="text-xl mb-1" style={{ fontWeight: 'var(--font-bold)', color: 'var(--text-primary)' }}>
         숙소에 대한 설명을 작성해주세요
       </h2>
 
       {/* 숙소 설명 */}
       <div>
-        <label className="block mb-2" style={{ fontWeight: 'var(--font-medium)', color: 'var(--text-primary)' }}>
+        <label className="block mb-1.5 text-sm" style={{ fontWeight: 'var(--font-medium)', color: 'var(--text-primary)' }}>
           숙소 설명
         </label>
         <textarea
@@ -47,7 +47,7 @@ export function Step2Description({ data, onChange }: Step2DescriptionProps) {
           placeholder="숙소의 특징, 위치, 주변 환경 등을 자유롭게 작성해주세요..."
           rows={6}
           maxLength={2000}
-          className="w-full px-4 py-3 rounded-lg resize-none"
+          className="w-full px-3 py-2 text-sm rounded-lg resize-none max-w-2xl"
           style={{
             backgroundColor: 'var(--bg-primary)',
             border: '1px solid var(--border-color)',
@@ -55,19 +55,19 @@ export function Step2Description({ data, onChange }: Step2DescriptionProps) {
             borderRadius: 'var(--radius-sm)'
           }}
         />
-        <div className="text-right text-sm mt-1" style={{ color: 'var(--text-tertiary)' }}>
+        <div className="text-right text-xs mt-1" style={{ color: 'var(--text-tertiary)' }}>
           {(data.description || '').length} / 2000
         </div>
       </div>
 
       {/* 편의시설 */}
       <div>
-        <label className="block mb-3" style={{ fontWeight: 'var(--font-medium)', color: 'var(--text-primary)' }}>
+        <label className="block mb-1.5 text-sm" style={{ fontWeight: 'var(--font-medium)', color: 'var(--text-primary)' }}>
           편의시설
         </label>
 
         {/* 기본 옵션 그리드 */}
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 mb-4">
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 mb-3">
           {AMENITY_OPTIONS.map(amenity => {
             const isSelected = (data.amenities || []).includes(amenity)
             return (
@@ -75,7 +75,7 @@ export function Step2Description({ data, onChange }: Step2DescriptionProps) {
                 key={amenity}
                 type="button"
                 onClick={() => toggleAmenity(amenity)}
-                className="px-4 py-3 rounded-lg text-left transition-all"
+                className="px-3 py-2 text-sm rounded-lg text-left transition-all"
                 style={{
                   backgroundColor: isSelected ? 'var(--primary)' : 'var(--bg-tertiary)',
                   color: isSelected ? '#ffffff' : 'var(--text-primary)',
@@ -91,14 +91,14 @@ export function Step2Description({ data, onChange }: Step2DescriptionProps) {
         </div>
 
         {/* 커스텀 편의시설 추가 */}
-        <div className="flex gap-2">
+        <div className="flex gap-3">
           <input
             type="text"
             value={customAmenity}
             onChange={(e) => setCustomAmenity(e.target.value)}
             onKeyPress={(e) => e.key === 'Enter' && addCustomAmenity()}
             placeholder="직접 추가하기..."
-            className="flex-1 px-4 py-2 rounded-lg"
+            className="flex-1 px-3 py-2 text-sm rounded-lg max-w-md"
             style={{
               backgroundColor: 'var(--bg-primary)',
               border: '1px solid var(--border-color)',
@@ -109,24 +109,24 @@ export function Step2Description({ data, onChange }: Step2DescriptionProps) {
           <button
             type="button"
             onClick={addCustomAmenity}
-            className="px-4 py-2 rounded-lg transition-colors"
+            className="px-3 py-2 text-sm rounded-lg transition-colors"
             style={{
               backgroundColor: 'var(--bg-tertiary)',
               color: 'var(--text-primary)',
               borderRadius: 'var(--radius-sm)'
             }}
           >
-            <Plus className="w-5 h-5" />
+            <Plus className="w-4 h-4" />
           </button>
         </div>
 
         {/* 선택된 편의시설 (커스텀만 삭제 가능) */}
         {data.amenities && data.amenities.length > 0 && (
-          <div className="mt-4">
-            <p className="text-sm mb-2" style={{ color: 'var(--text-secondary)' }}>
+          <div className="mt-3">
+            <p className="text-xs mb-1.5" style={{ color: 'var(--text-secondary)' }}>
               선택된 편의시설 ({data.amenities.length}개)
             </p>
-            <div className="flex flex-wrap gap-2">
+            <div className="flex flex-wrap gap-3">
               {data.amenities.filter(a => !AMENITY_OPTIONS.includes(a as any)).map(amenity => (
                 <span
                   key={amenity}

@@ -14,33 +14,38 @@ export default function BookingsPage() {
   }
 
   return (
-    <div className="p-8">
+    <div>
       <div className="mb-8 flex items-center justify-between">
         <div>
-          <h1 className="text-3xl mb-2" style={{ fontWeight: 'var(--font-bold)', color: 'var(--text-primary)' }}>
-            예약 목록
-          </h1>
+          <div className="flex items-center gap-3 mb-2">
+            <Calendar className="w-8 h-8" style={{ color: 'var(--primary)' }} />
+            <h1 className="text-2xl" style={{ fontWeight: 'var(--font-bold)', color: 'var(--text-primary)' }}>
+              예약 목록
+            </h1>
+          </div>
           <p style={{ color: 'var(--text-secondary)' }}>
             전체 예약 내역을 확인하고 관리하세요
           </p>
         </div>
-        <button
-          className="px-4 py-2 rounded-lg transition-colors"
-          style={{
-            backgroundColor: 'var(--primary)',
-            color: '#ffffff',
-            borderRadius: 'var(--radius-sm)',
-            fontWeight: 'var(--font-medium)'
-          }}
-          onMouseEnter={(e) => {
-            e.currentTarget.style.backgroundColor = 'var(--primary-hover)'
-          }}
-          onMouseLeave={(e) => {
-            e.currentTarget.style.backgroundColor = 'var(--primary)'
-          }}
-        >
-          새 예약 추가
-        </button>
+        <Link href="/bookings/new">
+          <button
+            className="px-4 py-2 rounded-lg transition-colors"
+            style={{
+              backgroundColor: 'var(--primary)',
+              color: '#ffffff',
+              borderRadius: 'var(--radius-sm)',
+              fontWeight: 'var(--font-medium)'
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.backgroundColor = 'var(--primary-hover)'
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.backgroundColor = 'var(--primary)'
+            }}
+          >
+            새 예약 추가
+          </button>
+        </Link>
       </div>
 
       <div

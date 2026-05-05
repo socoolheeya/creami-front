@@ -3,234 +3,168 @@
 import Link from 'next/link'
 import { useState, useMemo } from 'react'
 import { mockRatePlans } from '@/lib/data/mock-rateplans'
-import { mockRooms } from '@/lib/data/mock-rooms'
-import { mockAccommodations } from '@/lib/data/mock-accommodations'
-import { RatePlanStatus } from '@/lib/types/rateplan'
-import { AccommodationSelector } from './components/AccommodationSelector'
-import { FilterBar } from './components/FilterBar'
+import { Receipt, Plus, LayoutGrid, List } from 'lucide-react'
 import { RatePlanTableView } from './components/RatePlanTableView'
 import { RatePlanCardView } from './components/RatePlanCardView'
 
+type ViewMode = 'grid' | 'table'
+
 export default function RatePlansPage() {
-  const [selectedAccommodationId, setSelectedAccommodationId] = useState<string | null>(null)
-  const [viewMode, setViewMode] = useState<'table' | 'card'>('table')
-  const [statusFilter, setStatusFilter] = useState<RatePlanStatus | 'all'>('all')
+  const [viewMode, setViewMode] = useState<ViewMode>('grid')
   const [searchQuery, setSearchQuery] = useState('')
 
-  // Filter rooms by selected accommodation
-  const filteredRooms = useMemo(() => {
-    if (!selectedAccommodationId) return mockRooms
-    return mockRooms.filter(room => room.accommodationId === selectedAccommodationId)
-  }, [selectedAccommodationId])
-
-  // Filter rateplans by filtered rooms
-  const accommodationRatePlans = useMemo(() => {
-    if (!selectedAccommodationId) return mockRatePlans
-    const roomIds = new Set(filteredRooms.map(room => room.id))
-    return mockRatePlans.filter(rp => rp.roomId && roomIds.has(rp.roomId))
-  }, [selectedAccommodationId, filteredRooms])
-
-  // Apply status filter and search
+  // Apply search filter
   const filteredRatePlans = useMemo(() => {
-    let result = accommodationRatePlans
+    if (!searchQuery.trim()) return mockRatePlans
 
-    // Status filter
-    if (statusFilter !== 'all') {
-      result = result.filter(rp => rp.status === statusFilter)
-    }
-
-    // Search filter
-    if (searchQuery.trim()) {
-      const query = searchQuery.toLowerCase()
-      result = result.filter(rp =>
-        rp.name.toLowerCase().includes(query) ||
-        rp.enName?.toLowerCase().includes(query) ||
-        rp.benefitName.toLowerCase().includes(query)
-      )
-    }
-
-    return result
-  }, [accommodationRatePlans, statusFilter, searchQuery])
-
-  // Stats based on accommodation filtered rateplans
-  const stats = useMemo(() => ({
-    total: accommodationRatePlans.length,
-    active: accommodationRatePlans.filter(rp => rp.status === 'active').length,
-    draft: accommodationRatePlans.filter(rp => rp.status === 'draft').length,
-    inactive: accommodationRatePlans.filter(rp => rp.status === 'inactive').length,
-  }), [accommodationRatePlans])
+    const query = searchQuery.toLowerCase()
+    return mockRatePlans.filter(rp =>
+      rp.name.toLowerCase().includes(query) ||
+      rp.enName?.toLowerCase().includes(query) ||
+      rp.benefitName.toLowerCase().includes(query)
+    )
+  }, [searchQuery])
 
   return (
-    <div className="container">
-      <div className="page-header">
-        <div>
-          <h1 className="page-title">요금제 관리</h1>
-          <p className="page-description">
-            객실별 요금제를 관리하고 할인 정책을 설정합니다
-          </p>
+    <div>
+      {/* Header */}
+      <div className="flex items-center justify-between mb-4">
+        <div className="flex items-center gap-3">
+          <Receipt className="w-6 h-6" style={{ color: 'var(--primary)' }} />
+          <h1 className="text-2xl" style={{ fontWeight: 'var(--font-bold)', color: 'var(--text-primary)' }}>
+            요금제 관리
+          </h1>
         </div>
-        <Link href="/rateplans/new" className="btn btn-primary">
-          요금제 추가
+
+        <Link href="/rateplans/new">
+          <button
+            className="flex items-center gap-2 px-3 py-1.5 rounded-lg transition-colors text-sm"
+            style={{
+              backgroundColor: 'var(--primary)',
+              color: '#ffffff',
+              borderRadius: 'var(--radius-sm)',
+              fontWeight: 'var(--font-medium)'
+            }}
+          >
+            <Plus className="w-4 h-4" />
+            신규 등록
+          </button>
         </Link>
       </div>
 
-      {/* Accommodation Selector */}
-      <AccommodationSelector
-        accommodations={mockAccommodations}
-        selectedId={selectedAccommodationId}
-        onSelect={setSelectedAccommodationId}
-      />
+      {/* Search and View Toggle */}
+      <div className="mb-4 flex gap-4">
+        <input
+          type="text"
+          placeholder="요금제명 또는 혜택명으로 검색..."
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+          className="flex-1 px-3 py-2 rounded-lg text-sm"
+          style={{
+            backgroundColor: 'var(--bg-primary)',
+            border: '1px solid var(--border-color)',
+            color: 'var(--text-primary)',
+            borderRadius: 'var(--radius-sm)'
+          }}
+        />
 
-      {/* Stats Grid */}
-      <div className="stats-grid">
-        <div className="stat-card">
-          <div className="stat-label">전체 요금제</div>
-          <div className="stat-value">{stats.total}</div>
-        </div>
-        <div className="stat-card">
-          <div className="stat-label">활성 요금제</div>
-          <div className="stat-value">{stats.active}</div>
-        </div>
-        <div className="stat-card">
-          <div className="stat-label">초안</div>
-          <div className="stat-value">{stats.draft}</div>
-        </div>
-        <div className="stat-card">
-          <div className="stat-label">비활성</div>
-          <div className="stat-value">{stats.inactive}</div>
+        {/* View Toggle Switch */}
+        <div
+          className="relative flex items-center p-1"
+          style={{
+            border: '1px solid var(--border-color)',
+            backgroundColor: 'var(--bg-tertiary)',
+            borderRadius: 'var(--radius-sm)',
+            width: '80px',
+            height: '40px'
+          }}
+        >
+          {/* Sliding Background */}
+          <div
+            className="absolute top-1 transition-all duration-200"
+            style={{
+              left: viewMode === 'grid' ? '4px' : 'calc(50% - 4px)',
+              width: 'calc(50% - 4px)',
+              height: 'calc(100% - 8px)',
+              backgroundColor: 'var(--primary)',
+              borderRadius: 'var(--radius-sm)',
+              zIndex: 0
+            }}
+          />
+
+          {/* Grid Button */}
+          <button
+            onClick={() => setViewMode('grid')}
+            className="relative flex-1 flex items-center justify-center transition-colors"
+            style={{
+              color: viewMode === 'grid' ? '#ffffff' : 'var(--text-secondary)',
+              zIndex: 1
+            }}
+            title="카드 뷰"
+          >
+            <LayoutGrid className="w-4 h-4" />
+          </button>
+
+          {/* Table Button */}
+          <button
+            onClick={() => setViewMode('table')}
+            className="relative flex-1 flex items-center justify-center transition-colors"
+            style={{
+              color: viewMode === 'table' ? '#ffffff' : 'var(--text-secondary)',
+              zIndex: 1
+            }}
+            title="테이블 뷰"
+          >
+            <List className="w-4 h-4" />
+          </button>
         </div>
       </div>
 
-      {/* Filter Bar */}
-      <FilterBar
-        statusFilter={statusFilter}
-        searchQuery={searchQuery}
-        viewMode={viewMode}
-        onStatusFilterChange={setStatusFilter}
-        onSearchQueryChange={setSearchQuery}
-        onViewModeChange={setViewMode}
-        totalCount={accommodationRatePlans.length}
-        filteredCount={filteredRatePlans.length}
-      />
-
-      {/* Rate Plans View */}
-      {selectedAccommodationId && accommodationRatePlans.length === 0 ? (
-        <div className="empty-state">
-          <p className="empty-text">
-            선택한 숙소에 등록된 요금제가 없습니다
-          </p>
+      {/* Rate Plans List */}
+      {filteredRatePlans.length === 0 ? (
+        <div
+          className="flex flex-col items-center justify-center py-12 rounded-lg"
+          style={{
+            backgroundColor: 'var(--bg-primary)',
+            borderRadius: 'var(--radius)',
+            border: '2px dashed var(--border-color)'
+          }}
+        >
+          <Receipt className="w-12 h-12 mb-3" style={{ color: 'var(--text-tertiary)' }} />
+          <h3 className="text-lg mb-1.5 text-sm" style={{ fontWeight: 'var(--font-bold)', color: 'var(--text-primary)' }}>
+            {searchQuery ? '검색 결과가 없습니다' : '등록된 요금제가 없습니다'}
+          </h3>
+          {!searchQuery && (
+            <>
+              <p className="mb-4 text-sm" style={{ color: 'var(--text-secondary)', fontWeight: 'var(--font-light)' }}>
+                첫 번째 요금제를 등록해보세요
+              </p>
+              <Link href="/rateplans/new">
+                <button
+                  className="flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm"
+                  style={{
+                    backgroundColor: 'var(--primary)',
+                    color: '#ffffff',
+                    borderRadius: 'var(--radius-sm)',
+                    fontWeight: 'var(--font-medium)'
+                  }}
+                >
+                  <Plus className="w-4 h-4" />
+                  요금제 등록하기
+                </button>
+              </Link>
+            </>
+          )}
+        </div>
+      ) : viewMode === 'grid' ? (
+        <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
+          {filteredRatePlans.map((ratePlan) => (
+            <RatePlanCardView key={ratePlan.id} ratePlan={ratePlan} />
+          ))}
         </div>
       ) : (
-        <>
-          {viewMode === 'table' ? (
-            <RatePlanTableView ratePlans={filteredRatePlans} />
-          ) : (
-            <RatePlanCardView ratePlans={filteredRatePlans} />
-          )}
-        </>
+        <RatePlanTableView ratePlans={filteredRatePlans} />
       )}
-
-      <style jsx>{`
-        .container {
-          padding: var(--spacing-lg);
-          max-width: 1400px;
-          margin: 0 auto;
-        }
-
-        .page-header {
-          display: flex;
-          justify-content: space-between;
-          align-items: flex-start;
-          margin-bottom: var(--spacing-xl);
-        }
-
-        .page-title {
-          font-size: var(--font-size-2xl);
-          font-weight: 700;
-          color: var(--text-primary);
-          margin: 0 0 var(--spacing-xs) 0;
-        }
-
-        .page-description {
-          font-size: var(--font-size-sm);
-          color: var(--text-secondary);
-          margin: 0;
-        }
-
-        .btn {
-          padding: var(--spacing-sm) var(--spacing-lg);
-          border-radius: var(--radius-lg);
-          font-size: var(--font-size-sm);
-          font-weight: 500;
-          text-decoration: none;
-          display: inline-flex;
-          align-items: center;
-          gap: var(--spacing-xs);
-          transition: all 0.2s;
-          border: none;
-          cursor: pointer;
-        }
-
-        .btn-primary {
-          background: var(--primary);
-          color: white;
-        }
-
-        .btn-primary:hover {
-          background: var(--primary-dark);
-        }
-
-        .stats-grid {
-          display: grid;
-          grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-          gap: var(--spacing-md);
-          margin-bottom: var(--spacing-lg);
-        }
-
-        .stat-card {
-          background: var(--bg-secondary);
-          padding: var(--spacing-lg);
-          border-radius: var(--radius-lg);
-          border: 1px solid var(--border-color);
-        }
-
-        .stat-label {
-          font-size: var(--font-size-sm);
-          color: var(--text-secondary);
-          margin-bottom: var(--spacing-xs);
-        }
-
-        .stat-value {
-          font-size: var(--font-size-2xl);
-          font-weight: 700;
-          color: var(--text-primary);
-        }
-
-        .empty-state {
-          text-align: center;
-          padding: var(--spacing-xl);
-          background: var(--bg-secondary);
-          border-radius: var(--radius-lg);
-          border: 1px solid var(--border-color);
-        }
-
-        .empty-text {
-          font-size: var(--font-size-base);
-          color: var(--text-secondary);
-          margin: 0;
-        }
-
-        @media (max-width: 768px) {
-          .page-header {
-            flex-direction: column;
-            gap: var(--spacing-md);
-          }
-
-          .stats-grid {
-            grid-template-columns: repeat(2, 1fr);
-          }
-        }
-      `}</style>
     </div>
   )
 }

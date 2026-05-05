@@ -10,7 +10,7 @@ export default function Dashboard() {
 
   return (
     <div>
-      <h1 className="text-3xl mb-6" style={{ fontWeight: 'var(--font-bold)', color: 'var(--text-primary)' }}>
+      <h1 className="text-2xl mb-6" style={{ fontWeight: 'var(--font-bold)', color: 'var(--text-primary)' }}>
         ARI 대시보드
       </h1>
 

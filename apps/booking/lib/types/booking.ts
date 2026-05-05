@@ -78,4 +78,8 @@ export interface Booking {
   pricing: BookingPricing
   cancellationPolicy: CancellationPolicy
   specialRequests?: string
+  createdAt: Date
+  updatedAt: Date
+  createdBy: string
+  updatedBy: string
 }

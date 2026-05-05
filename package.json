@@ -15,5 +15,12 @@
     "build:discount": "pnpm --filter discount build",
     "build:all": "pnpm -r build",
     "lint:all": "pnpm -r lint"
+  },
+  "dependencies": {
+    "@tanstack/react-query": "^5.100.9",
+    "@tanstack/react-query-devtools": "^5.100.9"
+  },
+  "devDependencies": {
+    "sharp": "^0.34.5"
   }
 }

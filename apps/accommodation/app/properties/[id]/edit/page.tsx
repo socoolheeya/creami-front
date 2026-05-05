@@ -93,7 +93,7 @@ export default function EditAccommodationPage({ params }: { params: Promise<{ id
           <span style={{ fontWeight: 'var(--font-medium)' }}>상세 페이지로</span>
         </Link>
 
-        <h1 className="text-3xl" style={{ fontWeight: 'var(--font-bold)', color: 'var(--text-primary)' }}>
+        <h1 className="text-2xl" style={{ fontWeight: 'var(--font-bold)', color: 'var(--text-primary)' }}>
           숙소 정보 수정
         </h1>
       </div>

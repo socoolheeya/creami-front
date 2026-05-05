@@ -64,6 +64,8 @@ export const mockAccommodations: Accommodation[] = [
     },
     status: 'active',
     createdAt: new Date('2024-01-15'),
+    createdBy: "admin",
+    updatedBy: "admin",
     updatedAt: new Date('2024-01-15')
   },
   {
@@ -116,6 +118,8 @@ export const mockAccommodations: Accommodation[] = [
     },
     status: 'active',
     createdAt: new Date('2024-02-01'),
+    createdBy: "admin",
+    updatedBy: "admin",
     updatedAt: new Date('2024-02-01')
   },
   {
@@ -162,6 +166,8 @@ export const mockAccommodations: Accommodation[] = [
     },
     status: 'active',
     createdAt: new Date('2024-03-10'),
+    createdBy: "admin",
+    updatedBy: "admin",
     updatedAt: new Date('2024-03-10')
   }
 ]

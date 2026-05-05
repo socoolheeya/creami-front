@@ -106,6 +106,8 @@ export interface Accommodation {
   status: AccommodationStatus
   createdAt: Date
   updatedAt: Date
+  createdBy: string
+  updatedBy: string
 }
 
 // Wizard 폼 데이터 (각 단계별)

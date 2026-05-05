@@ -1,17 +1,37 @@
-/* Pretendard Font - @import must be at the top */
-@import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.min.css');
-
 /* CSS Variables */
 :root {
   /* Primary Color */
   --primary: #fa8383;
   --primary-hover: #fb9999;
   --primary-active: #f96d6d;
+  --primary-dark: #f85757;
+  --primary-bg: rgba(250, 131, 131, 0.1);
+
+  /* Success Color */
+  --success: #51cf66;
+  --success-bg: rgba(81, 207, 102, 0.1);
 
   /* Radius */
   --radius: 16px;
   --radius-sm: 8px;
+  --radius-md: 12px;
   --radius-lg: 24px;
+  --radius-full: 9999px;
+
+  /* Spacing */
+  --spacing-xs: 4px;
+  --spacing-sm: 8px;
+  --spacing-md: 16px;
+  --spacing-lg: 24px;
+  --spacing-xl: 32px;
+
+  /* Font Sizes */
+  --font-size-xs: 12px;
+  --font-size-sm: 14px;
+  --font-size-base: 16px;
+  --font-size-lg: 18px;
+  --font-size-xl: 20px;
+  --font-size-2xl: 24px;
 
   /* Light Mode */
   --bg-primary: #ffffff;
@@ -38,6 +58,8 @@
   --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.2);
   --shadow: 0 1px 3px 0 rgb(0 0 0 / 0.3);
   --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.3);
+  --primary-bg: rgba(250, 131, 131, 0.15);
+  --success-bg: rgba(81, 207, 102, 0.15);
 }
 
 /* Font Weight Variables */
@@ -45,6 +67,12 @@
   --font-light: 300;
   --font-medium: 500;
   --font-bold: 700;
+}
+
+/* Layout Variables */
+:root {
+  --main-padding-top: 80px; /* Header height (64px) + spacing (16px) */
+  --main-padding-x: 20px;   /* Horizontal padding */
 }
 
 /* Base Styles */
@@ -56,6 +84,23 @@
 body {
   background-color: var(--bg-secondary);
   color: var(--text-primary);
+}
+
+/* Form Elements - Reduced Size */
+input[type="text"],
+input[type="email"],
+input[type="password"],
+input[type="number"],
+input[type="date"],
+input[type="time"],
+input[type="search"],
+textarea,
+select {
+  padding: 0.375rem 0.75rem; /* 6px 12px */
+}
+
+button {
+  padding: 0.375rem 0.75rem; /* 6px 12px */
 }
 
 /* Typography */
@@ -73,4 +118,13 @@ h1, h2, h3, h4, h5, h6 {
 
 .text-bold {
   font-weight: var(--font-bold);
+}
+
+/* Layout Classes */
+.main-content {
+  padding-top: var(--main-padding-top);
+  padding-left: var(--main-padding-x);
+  padding-right: var(--main-padding-x);
+  padding-bottom: var(--main-padding-x);
+  transition: all 300ms;
 }

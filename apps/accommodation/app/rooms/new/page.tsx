@@ -93,7 +93,7 @@ function NewRoomPageContent() {
         {/* 헤더 */}
         <div className="mb-8">
           <h1
-            className="text-3xl mb-2"
+            className="text-2xl mb-2"
             style={{
               fontWeight: 'var(--font-bold)',
               color: 'var(--text-primary)'

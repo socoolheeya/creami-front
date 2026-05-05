@@ -113,38 +113,38 @@ export function AccommodationSelector({ accommodations, selectedId, onSelect }: 
         .selector-container {
           background: var(--bg-secondary);
           border-radius: var(--radius-lg);
-          padding: var(--spacing-xl);
+          padding: var(--spacing-lg);
           border: 1px solid var(--border-color);
-          margin-bottom: var(--spacing-lg);
+          margin-bottom: var(--spacing-md);
         }
 
         .selector-header {
           display: flex;
           align-items: center;
           justify-content: space-between;
-          margin-bottom: var(--spacing-lg);
+          margin-bottom: var(--spacing-md);
         }
 
         .selector-title {
-          font-size: var(--font-size-xl);
+          font-size: var(--font-size-lg);
           font-weight: 700;
           color: var(--text-primary);
           display: flex;
           align-items: center;
-          gap: var(--spacing-sm);
+          gap: var(--spacing-xs);
           margin: 0;
         }
 
         :global(.selector-title .title-icon) {
-          width: 20px;
-          height: 20px;
+          width: 18px;
+          height: 18px;
           color: var(--primary);
         }
 
         .clear-btn {
-          padding: var(--spacing-xs) var(--spacing-md);
+          padding: var(--spacing-xs) var(--spacing-sm);
           border-radius: var(--radius-md);
-          font-size: var(--font-size-sm);
+          font-size: var(--font-size-xs);
           font-weight: 500;
           background: var(--bg-primary);
           border: 1px solid var(--border-color);
@@ -158,23 +158,23 @@ export function AccommodationSelector({ accommodations, selectedId, onSelect }: 
         }
 
         .search-wrapper {
-          margin-bottom: var(--spacing-lg);
+          margin-bottom: var(--spacing-md);
           position: relative;
         }
 
         :global(.search-wrapper .search-icon) {
           position: absolute;
-          left: var(--spacing-md);
+          left: var(--spacing-sm);
           top: 50%;
           transform: translateY(-50%);
-          width: 16px;
-          height: 16px;
+          width: 14px;
+          height: 14px;
           color: var(--text-tertiary);
         }
 
         .search-input {
           width: 100%;
-          padding: var(--spacing-sm) var(--spacing-md) var(--spacing-sm) 40px;
+          padding: var(--spacing-xs) var(--spacing-sm) var(--spacing-xs) 36px;
           border-radius: var(--radius-md);
           background: var(--bg-primary);
           border: 1px solid var(--border-color);
@@ -192,8 +192,8 @@ export function AccommodationSelector({ accommodations, selectedId, onSelect }: 
         }
 
         .selected-display {
-          margin-bottom: var(--spacing-lg);
-          padding: var(--spacing-lg);
+          margin-bottom: var(--spacing-md);
+          padding: var(--spacing-md);
           border-radius: var(--radius-md);
           background: var(--primary);
         }
@@ -205,28 +205,28 @@ export function AccommodationSelector({ accommodations, selectedId, onSelect }: 
         }
 
         .selected-title {
-          font-size: var(--font-size-base);
+          font-size: var(--font-size-sm);
           font-weight: 700;
           color: white;
           margin: 0 0 var(--spacing-xs) 0;
         }
 
         .selected-subtitle {
-          font-size: var(--font-size-sm);
+          font-size: var(--font-size-xs);
           color: rgba(255, 255, 255, 0.8);
           margin: 0;
         }
 
         .accommodation-grid {
           display: grid;
-          grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-          gap: var(--spacing-md);
-          max-height: 400px;
+          grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+          gap: var(--spacing-sm);
+          max-height: 300px;
           overflow-y: auto;
         }
 
         .accommodation-card {
-          padding: var(--spacing-lg);
+          padding: var(--spacing-md);
           border-radius: var(--radius-md);
           text-align: left;
           transition: all 0.2s;
@@ -249,7 +249,7 @@ export function AccommodationSelector({ accommodations, selectedId, onSelect }: 
         }
 
         .accommodation-name {
-          font-size: var(--font-size-sm);
+          font-size: var(--font-size-xs);
           font-weight: 700;
           color: var(--text-primary);
           margin: 0 0 var(--spacing-xs) 0;
@@ -258,19 +258,19 @@ export function AccommodationSelector({ accommodations, selectedId, onSelect }: 
         .accommodation-address {
           font-size: var(--font-size-xs);
           color: var(--text-secondary);
-          margin: 0 0 var(--spacing-md) 0;
+          margin: 0 0 var(--spacing-sm) 0;
         }
 
         .accommodation-footer {
           display: flex;
           align-items: center;
           justify-content: space-between;
-          gap: var(--spacing-sm);
+          gap: var(--spacing-xs);
         }
 
         .accommodation-type {
           font-size: var(--font-size-xs);
-          padding: var(--spacing-xs) var(--spacing-sm);
+          padding: var(--spacing-xs) var(--spacing-xs);
           border-radius: var(--radius-sm);
           background: var(--bg-tertiary);
           color: var(--text-secondary);
@@ -282,7 +282,7 @@ export function AccommodationSelector({ accommodations, selectedId, onSelect }: 
 
         .empty-state {
           text-align: center;
-          padding: var(--spacing-xl);
+          padding: var(--spacing-lg);
         }
 
         .empty-text {

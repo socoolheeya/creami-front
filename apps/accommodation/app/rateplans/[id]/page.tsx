@@ -352,7 +352,7 @@ export default function RatePlanPage({ params }: RatePlanPageProps) {
 
       <style jsx>{`
         .container {
-          padding: var(--spacing-lg);
+          padding: var(--spacing-md);
           max-width: 1400px;
           margin: 0 auto;
         }
@@ -361,16 +361,16 @@ export default function RatePlanPage({ params }: RatePlanPageProps) {
           display: flex;
           justify-content: space-between;
           align-items: flex-start;
-          margin-bottom: var(--spacing-xl);
+          margin-bottom: var(--spacing-lg);
         }
 
         .breadcrumb {
           display: flex;
           align-items: center;
           gap: var(--spacing-xs);
-          font-size: var(--font-size-sm);
+          font-size: var(--font-size-xs);
           color: var(--text-secondary);
-          margin-bottom: var(--spacing-sm);
+          margin-bottom: var(--spacing-xs);
         }
 
         .breadcrumb a {
@@ -387,28 +387,28 @@ export default function RatePlanPage({ params }: RatePlanPageProps) {
         }
 
         .page-title {
-          font-size: var(--font-size-2xl);
+          font-size: var(--font-size-xl);
           font-weight: 700;
           color: var(--text-primary);
           margin: 0;
         }
 
         .page-subtitle {
-          font-size: var(--font-size-md);
+          font-size: var(--font-size-sm);
           color: var(--text-secondary);
           margin: var(--spacing-xs) 0 0 0;
         }
 
         .header-actions {
           display: flex;
-          gap: var(--spacing-sm);
+          gap: var(--spacing-xs);
           align-items: center;
         }
 
         .btn {
-          padding: var(--spacing-sm) var(--spacing-lg);
+          padding: var(--spacing-xs) var(--spacing-md);
           border-radius: var(--radius-md);
-          font-size: var(--font-size-sm);
+          font-size: var(--font-size-xs);
           font-weight: 500;
           text-decoration: none;
           display: inline-flex;
@@ -429,9 +429,9 @@ export default function RatePlanPage({ params }: RatePlanPageProps) {
         }
 
         .badge {
-          padding: var(--spacing-xs) var(--spacing-md);
+          padding: var(--spacing-xs) var(--spacing-sm);
           border-radius: var(--radius-full);
-          font-size: var(--font-size-sm);
+          font-size: var(--font-size-xs);
           font-weight: 500;
         }
 
@@ -458,14 +458,14 @@ export default function RatePlanPage({ params }: RatePlanPageProps) {
         .content-grid {
           display: grid;
           grid-template-columns: repeat(2, 1fr);
-          gap: var(--spacing-lg);
+          gap: var(--spacing-md);
         }
 
         .section-card {
           background: var(--bg-secondary);
           border: 1px solid var(--border-color);
           border-radius: var(--radius-lg);
-          padding: var(--spacing-xl);
+          padding: var(--spacing-lg);
         }
 
         .section-card.full-width {
@@ -478,17 +478,17 @@ export default function RatePlanPage({ params }: RatePlanPageProps) {
         }
 
         .section-title {
-          font-size: var(--font-size-lg);
+          font-size: var(--font-size-base);
           font-weight: 600;
           color: var(--text-primary);
-          margin: 0 0 var(--spacing-lg) 0;
+          margin: 0 0 var(--spacing-md) 0;
         }
 
         .benefit-header {
           display: flex;
           align-items: center;
-          gap: var(--spacing-sm);
-          margin-bottom: var(--spacing-md);
+          gap: var(--spacing-xs);
+          margin-bottom: var(--spacing-sm);
         }
 
         .benefit-icon {
@@ -498,7 +498,7 @@ export default function RatePlanPage({ params }: RatePlanPageProps) {
         }
 
         .benefit-text {
-          font-size: var(--font-size-md);
+          font-size: var(--font-size-sm);
           color: var(--primary);
           font-weight: 600;
           margin: 0;
@@ -507,7 +507,7 @@ export default function RatePlanPage({ params }: RatePlanPageProps) {
         .info-grid {
           display: grid;
           grid-template-columns: repeat(2, 1fr);
-          gap: var(--spacing-lg);
+          gap: var(--spacing-md);
         }
 
         .info-item {
@@ -530,13 +530,13 @@ export default function RatePlanPage({ params }: RatePlanPageProps) {
         .description-content {
           display: flex;
           flex-direction: column;
-          gap: var(--spacing-lg);
+          gap: var(--spacing-md);
         }
 
         .description-item {
           display: flex;
           flex-direction: column;
-          gap: var(--spacing-sm);
+          gap: var(--spacing-xs);
         }
 
         .description-label {
@@ -556,17 +556,17 @@ export default function RatePlanPage({ params }: RatePlanPageProps) {
         .settings-grid {
           display: grid;
           grid-template-columns: repeat(2, 1fr);
-          gap: var(--spacing-xl);
+          gap: var(--spacing-lg);
         }
 
         .setting-group {
           display: flex;
           flex-direction: column;
-          gap: var(--spacing-md);
+          gap: var(--spacing-sm);
         }
 
         .group-title {
-          font-size: var(--font-size-sm);
+          font-size: var(--font-size-xs);
           font-weight: 600;
           color: var(--text-primary);
           margin: 0;
@@ -577,7 +577,7 @@ export default function RatePlanPage({ params }: RatePlanPageProps) {
         .setting-items {
           display: flex;
           flex-direction: column;
-          gap: var(--spacing-sm);
+          gap: var(--spacing-xs);
         }
 
         .setting-item {
@@ -587,12 +587,12 @@ export default function RatePlanPage({ params }: RatePlanPageProps) {
         }
 
         .setting-label {
-          font-size: var(--font-size-sm);
+          font-size: var(--font-size-xs);
           color: var(--text-secondary);
         }
 
         .setting-value {
-          font-size: var(--font-size-sm);
+          font-size: var(--font-size-xs);
           color: var(--text-primary);
           font-weight: 600;
         }
@@ -600,20 +600,20 @@ export default function RatePlanPage({ params }: RatePlanPageProps) {
         .period-grid {
           display: grid;
           grid-template-columns: repeat(2, 1fr);
-          gap: var(--spacing-xl);
+          gap: var(--spacing-lg);
         }
 
         .period-group {
           display: flex;
           flex-direction: column;
-          gap: var(--spacing-md);
+          gap: var(--spacing-sm);
         }
 
         .period-range {
           display: flex;
           align-items: center;
-          gap: var(--spacing-sm);
-          padding: var(--spacing-md);
+          gap: var(--spacing-xs);
+          padding: var(--spacing-sm);
           background: var(--bg-tertiary);
           border-radius: var(--radius-md);
         }
@@ -626,7 +626,7 @@ export default function RatePlanPage({ params }: RatePlanPageProps) {
         }
 
         .period-date {
-          font-size: var(--font-size-sm);
+          font-size: var(--font-size-xs);
           color: var(--text-primary);
           font-weight: 500;
         }
@@ -638,13 +638,13 @@ export default function RatePlanPage({ params }: RatePlanPageProps) {
         .policies-list {
           display: flex;
           flex-direction: column;
-          gap: var(--spacing-lg);
+          gap: var(--spacing-md);
         }
 
         .policy-card {
           border: 1px solid var(--border-color);
           border-radius: var(--radius-md);
-          padding: var(--spacing-lg);
+          padding: var(--spacing-md);
           background: var(--bg-primary);
         }
 
@@ -652,13 +652,13 @@ export default function RatePlanPage({ params }: RatePlanPageProps) {
           display: flex;
           justify-content: space-between;
           align-items: center;
-          margin-bottom: var(--spacing-md);
-          padding-bottom: var(--spacing-md);
+          margin-bottom: var(--spacing-sm);
+          padding-bottom: var(--spacing-sm);
           border-bottom: 1px solid var(--border-color);
         }
 
         .policy-name {
-          font-size: var(--font-size-md);
+          font-size: var(--font-size-sm);
           font-weight: 600;
           color: var(--text-primary);
           margin: 0;
@@ -667,17 +667,17 @@ export default function RatePlanPage({ params }: RatePlanPageProps) {
         .policy-priority {
           font-size: var(--font-size-xs);
           color: var(--text-secondary);
-          padding: var(--spacing-xs) var(--spacing-sm);
+          padding: var(--spacing-xs) var(--spacing-xs);
           background: var(--bg-tertiary);
           border-radius: var(--radius-sm);
         }
 
         .policy-period {
-          margin-bottom: var(--spacing-md);
+          margin-bottom: var(--spacing-sm);
         }
 
         .policy-days {
-          margin-bottom: var(--spacing-md);
+          margin-bottom: var(--spacing-sm);
         }
 
         .days-label {
@@ -685,7 +685,7 @@ export default function RatePlanPage({ params }: RatePlanPageProps) {
           color: var(--text-secondary);
           font-weight: 500;
           display: block;
-          margin-bottom: var(--spacing-sm);
+          margin-bottom: var(--spacing-xs);
         }
 
         .days-grid {
@@ -694,8 +694,8 @@ export default function RatePlanPage({ params }: RatePlanPageProps) {
         }
 
         .day {
-          width: 32px;
-          height: 32px;
+          width: 28px;
+          height: 28px;
           display: flex;
           align-items: center;
           justify-content: center;
@@ -713,7 +713,7 @@ export default function RatePlanPage({ params }: RatePlanPageProps) {
         }
 
         .penalties-section {
-          padding-top: var(--spacing-md);
+          padding-top: var(--spacing-sm);
           border-top: 1px solid var(--border-color);
         }
 
@@ -722,7 +722,7 @@ export default function RatePlanPage({ params }: RatePlanPageProps) {
           color: var(--text-secondary);
           font-weight: 500;
           display: block;
-          margin-bottom: var(--spacing-sm);
+          margin-bottom: var(--spacing-xs);
         }
 
         .penalties-list {
@@ -735,18 +735,18 @@ export default function RatePlanPage({ params }: RatePlanPageProps) {
           display: flex;
           justify-content: space-between;
           align-items: center;
-          padding: var(--spacing-sm) var(--spacing-md);
+          padding: var(--spacing-xs) var(--spacing-sm);
           background: var(--bg-tertiary);
           border-radius: var(--radius-sm);
         }
 
         .penalty-days {
-          font-size: var(--font-size-sm);
+          font-size: var(--font-size-xs);
           color: var(--text-secondary);
         }
 
         .penalty-amount {
-          font-size: var(--font-size-sm);
+          font-size: var(--font-size-xs);
           color: var(--text-primary);
           font-weight: 600;
         }

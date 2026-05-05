@@ -17,6 +17,7 @@ export function AccommodationTable({ accommodations }: AccommodationTableProps) 
   const [sortOrder, setSortOrder] = useState<SortOrder>('asc')
   const [typeFilter, setTypeFilter] = useState<AccommodationType | 'all'>('all')
   const [statusFilter, setStatusFilter] = useState<'all' | 'active' | 'inactive'>('all')
+  const [idSearch, setIdSearch] = useState('')
   const [nameSearch, setNameSearch] = useState('')
   const [addressSearch, setAddressSearch] = useState('')
   const [contactSearch, setContactSearch] = useState('')
@@ -34,6 +35,11 @@ export function AccommodationTable({ accommodations }: AccommodationTableProps) 
     let result = [...accommodations]
 
     // 검색 필터 적용
+    if (idSearch) {
+      result = result.filter(acc =>
+        acc.id.toLowerCase().includes(idSearch.toLowerCase())
+      )
+    }
     if (nameSearch) {
       result = result.filter(acc =>
         acc.name.toLowerCase().includes(nameSearch.toLowerCase())
@@ -75,10 +81,10 @@ export function AccommodationTable({ accommodations }: AccommodationTableProps) 
     }
 
     return result
-  }, [accommodations, sortField, sortOrder, typeFilter, statusFilter, nameSearch, addressSearch, contactSearch])
+  }, [accommodations, sortField, sortOrder, typeFilter, statusFilter, idSearch, nameSearch, addressSearch, contactSearch])
 
   const SortableHeader = ({ field, children }: { field: SortField; children: React.ReactNode }) => (
-    <th className="px-6 py-4 text-left">
+    <th className="px-3 py-2 text-left text-sm">
       <button
         onClick={() => handleSort(field)}
         className="flex items-center gap-2 transition-colors"
@@ -109,29 +115,49 @@ export function AccommodationTable({ accommodations }: AccommodationTableProps) 
       <table className="w-full">
         <thead>
           <tr style={{ backgroundColor: 'var(--bg-tertiary)', borderBottom: '1px solid var(--border-color)' }}>
+            <th className="px-2 py-2 text-left text-sm" style={{ color: 'var(--text-primary)', fontWeight: 'var(--font-bold)', width: '80px' }}>
+              ID
+            </th>
             <SortableHeader field="name">숙소명</SortableHeader>
             <SortableHeader field="type">유형</SortableHeader>
-            <th className="px-6 py-4 text-left" style={{ color: 'var(--text-primary)', fontWeight: 'var(--font-bold)' }}>
+            <th className="px-3 py-2 text-left text-sm" style={{ color: 'var(--text-primary)', fontWeight: 'var(--font-bold)' }}>
               주소
             </th>
-            <th className="px-6 py-4 text-left" style={{ color: 'var(--text-primary)', fontWeight: 'var(--font-bold)' }}>
+            <th className="px-3 py-2 text-left text-sm" style={{ color: 'var(--text-primary)', fontWeight: 'var(--font-bold)' }}>
               연락처
             </th>
-            <th className="px-6 py-4 text-left" style={{ color: 'var(--text-primary)', fontWeight: 'var(--font-bold)' }}>
+            <th className="px-3 py-2 text-left text-sm" style={{ color: 'var(--text-primary)', fontWeight: 'var(--font-bold)' }}>
               체크인/아웃
             </th>
             <SortableHeader field="status">상태</SortableHeader>
           </tr>
           {/* Filter Row */}
           <tr style={{ backgroundColor: 'var(--bg-primary)', borderBottom: '1px solid var(--border-color)' }}>
+            {/* ID 검색 */}
+            <th className="px-2 py-2">
+              <input
+                type="text"
+                placeholder="ID"
+                value={idSearch}
+                onChange={(e) => setIdSearch(e.target.value)}
+                className="w-full px-2 py-1 text-xs"
+                style={{
+                  backgroundColor: 'var(--bg-secondary)',
+                  border: '1px solid var(--border-color)',
+                  borderRadius: 'var(--radius-sm)',
+                  color: 'var(--text-primary)',
+                  width: '70px'
+                }}
+              />
+            </th>
             {/* 숙소명 검색 */}
-            <th className="px-6 py-3">
+            <th className="px-3 py-2">
               <input
                 type="text"
                 placeholder="검색..."
                 value={nameSearch}
                 onChange={(e) => setNameSearch(e.target.value)}
-                className="w-full px-3 py-1.5 text-sm"
+                className="w-full px-2 py-1 text-xs"
                 style={{
                   backgroundColor: 'var(--bg-secondary)',
                   border: '1px solid var(--border-color)',
@@ -141,11 +167,11 @@ export function AccommodationTable({ accommodations }: AccommodationTableProps) 
               />
             </th>
             {/* 유형 필터 */}
-            <th className="px-6 py-3">
+            <th className="px-3 py-2">
               <select
                 value={typeFilter}
                 onChange={(e) => setTypeFilter(e.target.value as AccommodationType | 'all')}
-                className="w-full px-3 py-1.5 text-sm"
+                className="w-full px-2 py-1 text-xs"
                 style={{
                   backgroundColor: 'var(--bg-secondary)',
                   border: '1px solid var(--border-color)',
@@ -160,13 +186,13 @@ export function AccommodationTable({ accommodations }: AccommodationTableProps) 
               </select>
             </th>
             {/* 주소 검색 */}
-            <th className="px-6 py-3">
+            <th className="px-3 py-2">
               <input
                 type="text"
                 placeholder="검색..."
                 value={addressSearch}
                 onChange={(e) => setAddressSearch(e.target.value)}
-                className="w-full px-3 py-1.5 text-sm"
+                className="w-full px-2 py-1 text-xs"
                 style={{
                   backgroundColor: 'var(--bg-secondary)',
                   border: '1px solid var(--border-color)',
@@ -176,13 +202,13 @@ export function AccommodationTable({ accommodations }: AccommodationTableProps) 
               />
             </th>
             {/* 연락처 검색 */}
-            <th className="px-6 py-3">
+            <th className="px-3 py-2">
               <input
                 type="text"
                 placeholder="검색..."
                 value={contactSearch}
                 onChange={(e) => setContactSearch(e.target.value)}
-                className="w-full px-3 py-1.5 text-sm"
+                className="w-full px-2 py-1 text-xs"
                 style={{
                   backgroundColor: 'var(--bg-secondary)',
                   border: '1px solid var(--border-color)',
@@ -192,13 +218,13 @@ export function AccommodationTable({ accommodations }: AccommodationTableProps) 
               />
             </th>
             {/* 체크인/아웃 - 필터 없음 */}
-            <th className="px-6 py-3"></th>
+            <th className="px-3 py-2"></th>
             {/* 상태 필터 */}
-            <th className="px-6 py-3">
+            <th className="px-3 py-2">
               <select
                 value={statusFilter}
                 onChange={(e) => setStatusFilter(e.target.value as 'all' | 'active' | 'inactive')}
-                className="w-full px-3 py-1.5 text-sm"
+                className="w-full px-2 py-1 text-xs"
                 style={{
                   backgroundColor: 'var(--bg-secondary)',
                   border: '1px solid var(--border-color)',
@@ -226,17 +252,24 @@ export function AccommodationTable({ accommodations }: AccommodationTableProps) 
                 e.currentTarget.style.backgroundColor = 'transparent'
               }}
             >
+              {/* ID */}
+              <td className="px-2 py-2">
+                <span className="text-xs font-mono" style={{ color: 'var(--text-tertiary)' }}>
+                  {accommodation.id}
+                </span>
+              </td>
+
               {/* 숙소명 */}
-              <td className="px-6 py-4">
+              <td className="px-3 py-2">
                 <Link href={`/properties/${accommodation.id}`}>
                   <div className="flex flex-col cursor-pointer">
                     <span
-                      className="hover:underline"
+                      className="hover:underline text-sm"
                       style={{ fontWeight: 'var(--font-bold)', color: 'var(--text-primary)' }}
                     >
                       {accommodation.name}
                     </span>
-                    <span className="text-xs mt-1" style={{ color: 'var(--text-tertiary)' }}>
+                    <span className="text-xs mt-0.5" style={{ color: 'var(--text-tertiary)' }}>
                       {accommodation.images.length}장 사진 • {accommodation.amenities.length}개 편의시설
                     </span>
                   </div>
@@ -244,9 +277,9 @@ export function AccommodationTable({ accommodations }: AccommodationTableProps) 
               </td>
 
               {/* 유형 */}
-              <td className="px-6 py-4">
+              <td className="px-3 py-2">
                 <span
-                  className="px-2 py-1 rounded text-xs"
+                  className="px-2 py-0.5 rounded text-xs"
                   style={{
                     backgroundColor: 'var(--bg-tertiary)',
                     color: 'var(--text-secondary)',
@@ -258,28 +291,28 @@ export function AccommodationTable({ accommodations }: AccommodationTableProps) 
               </td>
 
               {/* 주소 */}
-              <td className="px-6 py-4">
+              <td className="px-3 py-2">
                 <div className="flex items-start gap-2">
                   <MapPin className="w-4 h-4 flex-shrink-0 mt-0.5" style={{ color: 'var(--text-tertiary)' }} />
-                  <span className="text-sm" style={{ color: 'var(--text-secondary)' }}>
+                  <span className="text-xs" style={{ color: 'var(--text-secondary)' }}>
                     {accommodation.address}
                   </span>
                 </div>
               </td>
 
               {/* 연락처 */}
-              <td className="px-6 py-4">
-                <div className="flex flex-col gap-1">
+              <td className="px-3 py-2">
+                <div className="flex flex-col gap-0.5">
                   <div className="flex items-center gap-2">
                     <Phone className="w-3 h-3" style={{ color: 'var(--text-tertiary)' }} />
-                    <span className="text-sm" style={{ color: 'var(--text-secondary)' }}>
+                    <span className="text-xs" style={{ color: 'var(--text-secondary)' }}>
                       {accommodation.phone}
                     </span>
                   </div>
                   {accommodation.email && (
                     <div className="flex items-center gap-2">
                       <Mail className="w-3 h-3" style={{ color: 'var(--text-tertiary)' }} />
-                      <span className="text-sm" style={{ color: 'var(--text-secondary)' }}>
+                      <span className="text-xs" style={{ color: 'var(--text-secondary)' }}>
                         {accommodation.email}
                       </span>
                     </div>
@@ -288,10 +321,10 @@ export function AccommodationTable({ accommodations }: AccommodationTableProps) 
               </td>
 
               {/* 체크인/아웃 */}
-              <td className="px-6 py-4">
+              <td className="px-3 py-2">
                 <div className="flex items-center gap-2">
                   <Calendar className="w-4 h-4" style={{ color: 'var(--text-tertiary)' }} />
-                  <div className="flex flex-col text-sm" style={{ color: 'var(--text-secondary)' }}>
+                  <div className="flex flex-col text-xs" style={{ color: 'var(--text-secondary)' }}>
                     <span>IN: {accommodation.checkIn}</span>
                     <span>OUT: {accommodation.checkOut}</span>
                   </div>
@@ -299,9 +332,9 @@ export function AccommodationTable({ accommodations }: AccommodationTableProps) 
               </td>
 
               {/* 상태 */}
-              <td className="px-6 py-4">
+              <td className="px-3 py-2">
                 <span
-                  className="px-3 py-1 rounded-full text-sm"
+                  className="px-2 py-0.5 rounded-full text-xs"
                   style={{
                     backgroundColor: accommodation.status === 'active' ? '#d1fae5' : '#fee2e2',
                     color: accommodation.status === 'active' ? '#065f46' : '#991b1b',

@@ -3,11 +3,13 @@ import { RatePlan } from '../types/rateplan'
 export const mockRatePlans: RatePlan[] = [
   {
     id: '1',
+    accommodationId: '1',
     roomId: '101',
     name: '얼리버드 특가',
     enName: 'Early Bird Special',
     benefitName: '30일 전 예약 시 20% 할인',
     ratePlanType: 'standalone',
+    priceType: 'net_rate',
     status: 'active',
     mealPlan: 'breakfast',
     enabled: true,
@@ -66,15 +68,19 @@ export const mockRatePlans: RatePlan[] = [
       }
     ],
     createdAt: new Date('2024-01-15'),
-    updatedAt: new Date('2024-01-15')
+    updatedAt: new Date('2024-01-15'),
+    createdBy: 'admin',
+    updatedBy: 'admin'
   },
   {
     id: '2',
+    accommodationId: '1',
     roomId: '101',
     name: '주말 특가',
     enName: 'Weekend Special',
     benefitName: '주말 숙박 15% 할인',
     ratePlanType: 'standalone',
+    priceType: 'sell_rate_no_commission',
     status: 'active',
     mealPlan: 'bed_and_breakfast',
     enabled: true,
@@ -126,15 +132,19 @@ export const mockRatePlans: RatePlan[] = [
       }
     ],
     createdAt: new Date('2024-02-01'),
-    updatedAt: new Date('2024-02-01')
+    updatedAt: new Date('2024-02-01'),
+    createdBy: 'admin',
+    updatedBy: 'admin'
   },
   {
     id: '3',
+    accommodationId: '1',
     roomId: '102',
     name: '비즈니스 플랜',
     enName: 'Business Plan',
     benefitName: '기업 계약 요금',
     ratePlanType: 'business',
+    priceType: 'commission_included',
     status: 'active',
     mealPlan: 'none',
     enabled: true,
@@ -186,6 +196,8 @@ export const mockRatePlans: RatePlan[] = [
       }
     ],
     createdAt: new Date('2024-03-01'),
-    updatedAt: new Date('2024-03-01')
+    updatedAt: new Date('2024-03-01'),
+    createdBy: 'admin',
+    updatedBy: 'admin'
   }
 ]

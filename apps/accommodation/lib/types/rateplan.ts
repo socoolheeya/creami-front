@@ -4,14 +4,17 @@ export type RatePlanType = 'standalone' | 'package' | 'business' | 'opaque' | 'b
 export type RatePlanStatus = 'draft' | 'active' | 'inactive' | 'archived'
 export type MealPlan = 'none' | 'breakfast' | 'lunch' | 'dinner' | 'all_inclusive' | 'breakfast_and_lunch' | 'lunch_and_dinner' | 'bed_and_breakfast' | 'buffet_breakfast'
 export type CancellationPenaltyUnit = 'percentage' | 'fixed'
+export type PriceType = 'net_rate' | 'sell_rate_no_commission' | 'commission_included' | 'net_and_sell'
 
 export interface RatePlan {
   id: string
+  accommodationId?: string
   roomId?: string
   name: string
   enName?: string
   benefitName: string
   ratePlanType: RatePlanType
+  priceType: PriceType
   status: RatePlanStatus
   mealPlan: MealPlan
   enabled: boolean
@@ -24,6 +27,8 @@ export interface RatePlan {
 
   createdAt: Date
   updatedAt: Date
+  createdBy: string
+  updatedBy: string
 }
 
 export interface RatePlanDescription {
@@ -100,4 +105,11 @@ export const RATE_PLAN_STATUS_LABELS: Record<RatePlanStatus, string> = {
   active: '활성',
   inactive: '비활성',
   archived: '보관'
+}
+
+export const PRICE_TYPE_LABELS: Record<PriceType, string> = {
+  net_rate: '입금가',
+  sell_rate_no_commission: '판매가(커미션 미포함)',
+  commission_included: '커미션 포함',
+  net_and_sell: '입금가/판매가'
 }

@@ -101,7 +101,7 @@ export default function MappingsPage() {
       <div className="flex items-center justify-between mb-6">
         <div className="flex items-center gap-3">
           <Link2 className="w-8 h-8" style={{ color: 'var(--primary)' }} />
-          <h1 className="text-3xl" style={{ fontWeight: 'var(--font-bold)', color: 'var(--text-primary)' }}>
+          <h1 className="text-2xl" style={{ fontWeight: 'var(--font-bold)', color: 'var(--text-primary)' }}>
             할인-요금제 매핑
           </h1>
         </div>

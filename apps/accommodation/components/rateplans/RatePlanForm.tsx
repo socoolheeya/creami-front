@@ -8,6 +8,7 @@ import type {
   RatePlanType,
   RatePlanStatus,
   MealPlan,
+  PriceType,
   RatePlanCancellationPolicy,
   RatePlanCancellationPenalty,
   CancellationPenaltyUnit
@@ -15,7 +16,8 @@ import type {
 import {
   RATE_PLAN_TYPE_LABELS,
   MEAL_PLAN_LABELS,
-  RATE_PLAN_STATUS_LABELS
+  RATE_PLAN_STATUS_LABELS,
+  PRICE_TYPE_LABELS
 } from '@/lib/types/rateplan'
 
 interface RatePlanFormProps {
@@ -31,6 +33,7 @@ export default function RatePlanForm({ initialData }: RatePlanFormProps) {
     enName: initialData?.enName || '',
     benefitName: initialData?.benefitName || '',
     ratePlanType: initialData?.ratePlanType || 'standalone' as RatePlanType,
+    priceType: initialData?.priceType || 'net_rate' as PriceType,
     status: initialData?.status || 'draft' as RatePlanStatus,
     mealPlan: initialData?.mealPlan || 'none' as MealPlan,
     enabled: initialData?.enabled ?? true,
@@ -243,6 +246,27 @@ export default function RatePlanForm({ initialData }: RatePlanFormProps) {
                 required
               >
                 {Object.entries(MEAL_PLAN_LABELS).map(([value, label]) => (
+                  <option key={value} value={value}>
+                    {label}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            <div className="form-group">
+              <label htmlFor="priceType" className="form-label required">
+                요금 타입
+              </label>
+              <select
+                id="priceType"
+                className="form-select"
+                value={formData.priceType}
+                onChange={(e) =>
+                  setFormData({ ...formData, priceType: e.target.value as PriceType })
+                }
+                required
+              >
+                {Object.entries(PRICE_TYPE_LABELS).map(([value, label]) => (
                   <option key={value} value={value}>
                     {label}
                   </option>

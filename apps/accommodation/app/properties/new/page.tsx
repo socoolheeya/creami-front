@@ -140,7 +140,7 @@ export default function NewAccommodationPage() {
           <ArrowLeft className="w-5 h-5" />
           <span style={{ fontWeight: 'var(--font-medium)' }}>숙소 목록으로</span>
         </Link>
-        <h1 className="text-3xl" style={{ fontWeight: 'var(--font-bold)', color: 'var(--text-primary)' }}>
+        <h1 className="text-2xl" style={{ fontWeight: 'var(--font-bold)', color: 'var(--text-primary)' }}>
           새 숙소 등록
         </h1>
         <p className="mt-2" style={{ color: 'var(--text-secondary)' }}>

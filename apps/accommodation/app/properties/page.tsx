@@ -16,17 +16,17 @@ export default function AccommodationsPage() {
   return (
     <div>
       {/* Header */}
-      <div className="flex items-center justify-between mb-6">
+      <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-3">
-          <Building2 className="w-8 h-8" style={{ color: 'var(--primary)' }} />
-          <h1 className="text-3xl" style={{ fontWeight: 'var(--font-bold)', color: 'var(--text-primary)' }}>
+          <Building2 className="w-6 h-6" style={{ color: 'var(--primary)' }} />
+          <h1 className="text-2xl" style={{ fontWeight: 'var(--font-bold)', color: 'var(--text-primary)' }}>
             숙소 관리
           </h1>
         </div>
 
         <Link href="/properties/new">
           <button
-            className="flex items-center gap-2 px-4 py-2 rounded-lg transition-colors"
+            className="flex items-center gap-2 px-3 py-1.5 rounded-lg transition-colors text-sm"
             style={{
               backgroundColor: 'var(--primary)',
               color: '#ffffff',
@@ -34,18 +34,18 @@ export default function AccommodationsPage() {
               fontWeight: 'var(--font-medium)'
             }}
           >
-            <Plus className="w-5 h-5" />
+            <Plus className="w-4 h-4" />
             신규 등록
           </button>
         </Link>
       </div>
 
       {/* Search and View Toggle */}
-      <div className="mb-6 flex gap-4">
+      <div className="mb-4 flex gap-3">
         <input
           type="text"
           placeholder="숙소명 또는 주소로 검색..."
-          className="flex-1 px-4 py-2 rounded-lg"
+          className="flex-1 px-3 py-1.5 rounded-lg text-sm"
           style={{
             backgroundColor: 'var(--bg-primary)',
             border: '1px solid var(--border-color)',
@@ -61,8 +61,8 @@ export default function AccommodationsPage() {
             border: '1px solid var(--border-color)',
             backgroundColor: 'var(--bg-tertiary)',
             borderRadius: 'var(--radius-sm)',
-            width: '80px',
-            height: '40px'
+            width: '70px',
+            height: '34px'
           }}
         >
           {/* Sliding Background */}
@@ -88,7 +88,7 @@ export default function AccommodationsPage() {
             }}
             title="카드 뷰"
           >
-            <LayoutGrid className="w-5 h-5" />
+            <LayoutGrid className="w-4 h-4" />
           </button>
 
           {/* Table Button */}
@@ -101,7 +101,7 @@ export default function AccommodationsPage() {
             }}
             title="테이블 뷰"
           >
-            <List className="w-5 h-5" />
+            <List className="w-4 h-4" />
           </button>
         </div>
       </div>
@@ -109,23 +109,23 @@ export default function AccommodationsPage() {
       {/* Accommodation List */}
       {accommodations.length === 0 ? (
         <div
-          className="flex flex-col items-center justify-center py-16 rounded-lg"
+          className="flex flex-col items-center justify-center py-12 rounded-lg"
           style={{
             backgroundColor: 'var(--bg-primary)',
             borderRadius: 'var(--radius)',
             border: '2px dashed var(--border-color)'
           }}
         >
-          <Building2 className="w-16 h-16 mb-4" style={{ color: 'var(--text-tertiary)' }} />
-          <h3 className="text-xl mb-2" style={{ fontWeight: 'var(--font-bold)', color: 'var(--text-primary)' }}>
+          <Building2 className="w-12 h-12 mb-3" style={{ color: 'var(--text-tertiary)' }} />
+          <h3 className="text-lg mb-1.5 text-sm" style={{ fontWeight: 'var(--font-bold)', color: 'var(--text-primary)' }}>
             등록된 숙소가 없습니다
           </h3>
-          <p className="mb-6" style={{ color: 'var(--text-secondary)', fontWeight: 'var(--font-light)' }}>
+          <p className="mb-4 text-sm" style={{ color: 'var(--text-secondary)', fontWeight: 'var(--font-light)' }}>
             첫 번째 숙소를 등록해보세요
           </p>
           <Link href="/properties/new">
             <button
-              className="flex items-center gap-2 px-4 py-2 rounded-lg"
+              className="flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm"
               style={{
                 backgroundColor: 'var(--primary)',
                 color: '#ffffff',
@@ -133,13 +133,13 @@ export default function AccommodationsPage() {
                 fontWeight: 'var(--font-medium)'
               }}
             >
-              <Plus className="w-5 h-5" />
+              <Plus className="w-4 h-4" />
               숙소 등록하기
             </button>
           </Link>
         </div>
       ) : viewMode === 'grid' ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
           {accommodations.map((accommodation) => (
             <AccommodationCard key={accommodation.id} accommodation={accommodation} />
           ))}

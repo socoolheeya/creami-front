@@ -66,9 +66,9 @@ export default function DashboardPage() {
   ]
 
   return (
-    <div className="p-8">
+    <div>
       <div className="mb-8">
-        <h1 className="text-3xl mb-2" style={{ fontWeight: 'var(--font-bold)', color: 'var(--text-primary)' }}>
+        <h1 className="text-2xl mb-2" style={{ fontWeight: 'var(--font-bold)', color: 'var(--text-primary)' }}>
           대시보드
         </h1>
         <p style={{ color: 'var(--text-secondary)' }}>

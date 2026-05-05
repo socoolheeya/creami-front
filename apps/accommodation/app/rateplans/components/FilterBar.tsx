@@ -95,17 +95,17 @@ export function FilterBar({
         .filter-container {
           background: var(--bg-secondary);
           border-radius: var(--radius-lg);
-          padding: var(--spacing-lg);
+          padding: var(--spacing-md);
           border: 1px solid var(--border-color);
-          margin-bottom: var(--spacing-lg);
+          margin-bottom: var(--spacing-md);
         }
 
         .filter-top {
           display: flex;
           align-items: center;
           justify-content: space-between;
-          gap: var(--spacing-md);
-          margin-bottom: var(--spacing-md);
+          gap: var(--spacing-sm);
+          margin-bottom: var(--spacing-sm);
         }
 
         .status-filters {
@@ -115,9 +115,9 @@ export function FilterBar({
         }
 
         .status-btn {
-          padding: var(--spacing-xs) var(--spacing-md);
+          padding: var(--spacing-xs) var(--spacing-sm);
           border-radius: var(--radius-lg);
-          font-size: var(--font-size-sm);
+          font-size: var(--font-size-xs);
           font-weight: 500;
           background: var(--bg-primary);
           border: 1px solid var(--border-color);
@@ -147,7 +147,7 @@ export function FilterBar({
         }
 
         .view-btn {
-          padding: var(--spacing-xs) var(--spacing-sm);
+          padding: var(--spacing-xs) var(--spacing-xs);
           border-radius: var(--radius-md);
           background: transparent;
           border: none;
@@ -170,14 +170,14 @@ export function FilterBar({
         }
 
         :global(.view-btn .view-icon) {
-          width: 18px;
-          height: 18px;
+          width: 16px;
+          height: 16px;
         }
 
         .filter-bottom {
           display: flex;
           align-items: center;
-          gap: var(--spacing-md);
+          gap: var(--spacing-sm);
         }
 
         .search-wrapper {
@@ -187,17 +187,17 @@ export function FilterBar({
 
         :global(.search-wrapper .search-icon) {
           position: absolute;
-          left: var(--spacing-md);
+          left: var(--spacing-sm);
           top: 50%;
           transform: translateY(-50%);
-          width: 16px;
-          height: 16px;
+          width: 14px;
+          height: 14px;
           color: var(--text-tertiary);
         }
 
         .search-input {
           width: 100%;
-          padding: var(--spacing-sm) var(--spacing-md) var(--spacing-sm) 40px;
+          padding: var(--spacing-xs) var(--spacing-sm) var(--spacing-xs) 36px;
           border-radius: var(--radius-lg);
           background: var(--bg-primary);
           border: 1px solid var(--border-color);

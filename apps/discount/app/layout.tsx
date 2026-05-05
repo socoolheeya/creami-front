@@ -6,6 +6,10 @@ import { MainLayout } from "@/components/layout/MainLayout";
 export const metadata: Metadata = {
   title: "Creami Discount",
   description: "할인 관리 시스템",
+  icons: {
+    icon: "/favicon.ico",
+    apple: "/creami-logo.png",
+  },
 };
 
 export default function RootLayout({

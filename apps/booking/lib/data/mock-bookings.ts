@@ -63,7 +63,11 @@ export const mockBookings: Booking[] = [
       ],
       additionalInfo: '노쇼(No-Show) 시 전액 환불 불가'
     },
-    specialRequests: '금연 객실 요청'
+    specialRequests: '금연 객실 요청',
+    createdAt: new Date('2026-05-01'),
+    updatedAt: new Date('2026-05-01'),
+    createdBy: 'admin',
+    updatedBy: 'admin'
   },
   {
     id: '2',
@@ -127,7 +131,11 @@ export const mockBookings: Booking[] = [
           description: '체크인 3일 이내 취소 시 환불 불가'
         }
       ]
-    }
+    },
+    createdAt: new Date('2026-05-03'),
+    updatedAt: new Date('2026-05-03'),
+    createdBy: 'admin',
+    updatedBy: 'admin'
   },
   {
     id: '3',
@@ -196,7 +204,11 @@ export const mockBookings: Booking[] = [
       ],
       additionalInfo: '성수기 예약으로 엄격한 취소 정책이 적용됩니다'
     },
-    specialRequests: '고층 객실, 허니문 패키지'
+    specialRequests: '고층 객실, 허니문 패키지',
+    createdAt: new Date('2026-05-02'),
+    updatedAt: new Date('2026-05-02'),
+    createdBy: 'admin',
+    updatedBy: 'admin'
   },
   {
     id: '4',
@@ -258,7 +270,11 @@ export const mockBookings: Booking[] = [
           description: '체크인 2일 이내 취소 시 환불 불가'
         }
       ]
-    }
+    },
+    createdAt: new Date('2026-05-05'),
+    updatedAt: new Date('2026-05-05'),
+    createdBy: 'admin',
+    updatedBy: 'admin'
   },
   {
     id: '5',
@@ -312,7 +328,11 @@ export const mockBookings: Booking[] = [
       ],
       additionalInfo: '특가 상품으로 예약 후 취소 및 변경이 불가능합니다. 예약 즉시 결제가 진행되며 어떠한 경우에도 환불되지 않습니다.'
     },
-    specialRequests: '비즈니스 목적, 조용한 객실'
+    specialRequests: '비즈니스 목적, 조용한 객실',
+    createdAt: new Date('2026-05-03'),
+    updatedAt: new Date('2026-05-03'),
+    createdBy: 'admin',
+    updatedBy: 'admin'
   }
 ]
 

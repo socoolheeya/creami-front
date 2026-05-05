@@ -26,7 +26,7 @@ export function AccommodationCard({ accommodation }: AccommodationCardProps) {
         }}
       >
       {/* Image */}
-      <div className="relative w-full h-48 bg-gray-200">
+      <div className="relative w-full h-28 bg-gray-200">
         {primaryImage && !imageError ? (
           <Image
             src={primaryImage.url}
@@ -40,7 +40,7 @@ export function AccommodationCard({ accommodation }: AccommodationCardProps) {
             className="w-full h-full flex flex-col items-center justify-center"
             style={{ backgroundColor: 'var(--bg-tertiary)' }}
           >
-            <ImageIcon className="w-12 h-12 mb-2" style={{ color: 'var(--text-tertiary)' }} />
+            <ImageIcon className="w-6 h-6 mb-1" style={{ color: 'var(--text-tertiary)' }} />
             <span className="text-xs" style={{ color: 'var(--text-tertiary)' }}>
               {imageError ? '이미지를 불러올 수 없습니다' : '이미지 없음'}
             </span>
@@ -49,7 +49,7 @@ export function AccommodationCard({ accommodation }: AccommodationCardProps) {
 
         {/* Status Badge */}
         <div
-          className="absolute top-3 right-3 px-2 py-1 rounded text-xs"
+          className="absolute top-2 right-2 px-1.5 py-0.5 rounded text-xs"
           style={{
             backgroundColor: accommodation.status === 'active' ? 'var(--primary)' : 'var(--text-tertiary)',
             color: '#ffffff',
@@ -61,10 +61,10 @@ export function AccommodationCard({ accommodation }: AccommodationCardProps) {
       </div>
 
       {/* Content */}
-      <div className="p-4">
+      <div className="p-2">
         {/* Type Badge */}
         <div
-          className="inline-block px-2 py-0.5 rounded text-xs mb-2"
+          className="inline-block px-1.5 py-0.5 rounded text-xs mb-1"
           style={{
             backgroundColor: 'var(--bg-tertiary)',
             color: 'var(--text-secondary)',
@@ -76,7 +76,7 @@ export function AccommodationCard({ accommodation }: AccommodationCardProps) {
 
         {/* Name */}
         <h3
-          className="text-lg mb-2 truncate"
+          className="text-sm mb-1 truncate"
           style={{
             fontWeight: 'var(--font-bold)',
             color: 'var(--text-primary)'
@@ -86,10 +86,10 @@ export function AccommodationCard({ accommodation }: AccommodationCardProps) {
         </h3>
 
         {/* Address */}
-        <div className="flex items-center gap-2 mb-3">
+        <div className="flex items-center gap-2 mb-1.5">
           <MapPin className="w-4 h-4 flex-shrink-0" style={{ color: 'var(--text-tertiary)' }} />
           <p
-            className="text-sm truncate"
+            className="text-xs truncate"
             style={{
               color: 'var(--text-secondary)',
               fontWeight: 'var(--font-light)'
@@ -100,7 +100,7 @@ export function AccommodationCard({ accommodation }: AccommodationCardProps) {
         </div>
 
         {/* Stats */}
-        <div className="flex items-center gap-4 text-sm" style={{ color: 'var(--text-secondary)' }}>
+        <div className="flex items-center gap-2 text-xs" style={{ color: 'var(--text-secondary)' }}>
           <span>{accommodation.amenities.length}개 편의시설</span>
           <span>•</span>
           <span>{accommodation.images.length}장 사진</span>

@@ -7,6 +7,7 @@ interface WizardNavigationProps {
   onNext: () => void
   onSubmit: () => void
   canProceed: boolean
+  submitLabel?: string
 }
 
 export function WizardNavigation({
@@ -15,7 +16,8 @@ export function WizardNavigation({
   onPrevious,
   onNext,
   onSubmit,
-  canProceed
+  canProceed,
+  submitLabel = '완료'
 }: WizardNavigationProps) {
   const isFirstStep = currentStep === 1
   const isLastStep = currentStep === totalSteps
@@ -58,7 +60,7 @@ export function WizardNavigation({
           }}
         >
           <Check className="w-5 h-5" />
-          완료
+          {submitLabel}
         </button>
       ) : (
         <button
