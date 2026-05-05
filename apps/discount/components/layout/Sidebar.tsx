@@ -1,13 +1,14 @@
 'use client'
 
-import { LayoutDashboard, Tag, ChevronLeft, ChevronRight } from 'lucide-react'
+import { LayoutDashboard, Tag, Link2, ChevronLeft, ChevronRight } from 'lucide-react'
 import { useState } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 
 const menuItems = [
   { icon: LayoutDashboard, label: '할인 대시보드', href: '/' },
-  { icon: Tag, label: '할인 관리', href: '/discounts' }
+  { icon: Tag, label: '할인 관리', href: '/discounts' },
+  { icon: Link2, label: '할인-요금제 매핑', href: '/mappings' }
 ]
 
 export function Sidebar() {
