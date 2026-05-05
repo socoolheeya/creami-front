@@ -1,7 +1,7 @@
 'use client'
 
-import { Grid3x3, Home, BarChart3, Tag, X } from 'lucide-react'
-import { useState } from 'react'
+import { Grid3x3, Home, BarChart3, Tag, ChevronDown } from 'lucide-react'
+import { useState, useRef, useEffect } from 'react'
 import { APPS, CURRENT_APP } from '@/lib/constants'
 
 const iconMap = {
@@ -12,114 +12,152 @@ const iconMap = {
 
 export function AppSwitcher() {
   const [isOpen, setIsOpen] = useState(false)
+  const dropdownRef = useRef<HTMLDivElement>(null)
 
   const handleAppClick = (url: string) => {
     window.location.href = url
   }
 
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setIsOpen(false)
+      }
+    }
+
+    if (isOpen) {
+      document.addEventListener('mousedown', handleClickOutside)
+    }
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside)
+    }
+  }, [isOpen])
+
   return (
-    <>
+    <div className="relative" ref={dropdownRef}>
       <button
-        onClick={() => setIsOpen(true)}
-        className="flex items-center gap-3 px-3 py-2 rounded-lg transition-colors"
+        onClick={() => setIsOpen(!isOpen)}
+        className="flex items-center gap-2 px-3 py-2 rounded-lg transition-colors"
         style={{
-          backgroundColor: 'var(--bg-tertiary)',
+          backgroundColor: isOpen ? 'var(--bg-tertiary)' : 'transparent',
           color: 'var(--text-primary)'
         }}
       >
         <Grid3x3 className="w-5 h-5" />
         <span className="font-medium">{CURRENT_APP.name}</span>
+        <ChevronDown
+          className="w-4 h-4 transition-transform"
+          style={{
+            transform: isOpen ? 'rotate(180deg)' : 'rotate(0deg)'
+          }}
+        />
       </button>
 
+      {/* Dropdown Menu */}
       {isOpen && (
         <div
-          className="fixed inset-0 z-50 flex items-center justify-center"
-          style={{ backgroundColor: 'rgba(0, 0, 0, 0.5)' }}
-          onClick={() => setIsOpen(false)}
+          className="absolute top-full left-0 mt-2 w-80 rounded-lg overflow-hidden shadow-lg z-50"
+          style={{
+            backgroundColor: 'var(--bg-primary)',
+            borderRadius: 'var(--radius)',
+            border: '1px solid var(--border-color)',
+            boxShadow: 'var(--shadow-md)',
+            animation: 'slideDown 0.2s ease-out'
+          }}
         >
-          <div
-            className="relative p-6 rounded-lg max-w-md w-full mx-4"
-            style={{
-              backgroundColor: 'var(--bg-primary)',
-              borderRadius: 'var(--radius)',
-              boxShadow: 'var(--shadow-md)'
-            }}
-            onClick={(e) => e.stopPropagation()}
-          >
-            <button
-              onClick={() => setIsOpen(false)}
-              className="absolute top-4 right-4 p-2 rounded-lg transition-colors"
+          <div className="p-2">
+            <div
+              className="px-3 py-2 text-xs uppercase"
               style={{
-                backgroundColor: 'var(--bg-tertiary)',
-                color: 'var(--text-primary)'
+                color: 'var(--text-tertiary)',
+                fontWeight: 'var(--font-bold)',
+                letterSpacing: '0.5px'
               }}
             >
-              <X className="w-5 h-5" />
-            </button>
-
-            <h2 className="text-xl mb-6" style={{ fontWeight: 'var(--font-bold)' }}>
               앱 전환
-            </h2>
+            </div>
 
-            <div className="grid gap-3">
-              {APPS.map((app) => {
-                const Icon = iconMap[app.icon as keyof typeof iconMap]
-                const isCurrent = app.id === CURRENT_APP.id
+            {APPS.map((app) => {
+              const Icon = iconMap[app.icon as keyof typeof iconMap]
+              const isCurrent = app.id === CURRENT_APP.id
 
-                return (
-                  <button
-                    key={app.id}
-                    onClick={() => handleAppClick(app.url)}
-                    className="flex items-center gap-4 p-4 rounded-lg transition-all text-left"
+              return (
+                <button
+                  key={app.id}
+                  onClick={() => handleAppClick(app.url)}
+                  className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg transition-colors text-left"
+                  style={{
+                    backgroundColor: isCurrent ? 'var(--primary)' : 'transparent',
+                    color: isCurrent ? '#ffffff' : 'var(--text-primary)',
+                    borderRadius: 'var(--radius-sm)'
+                  }}
+                  onMouseEnter={(e) => {
+                    if (!isCurrent) {
+                      e.currentTarget.style.backgroundColor = 'var(--bg-tertiary)'
+                    }
+                  }}
+                  onMouseLeave={(e) => {
+                    if (!isCurrent) {
+                      e.currentTarget.style.backgroundColor = 'transparent'
+                    }
+                  }}
+                >
+                  <div
+                    className="p-2 rounded"
                     style={{
-                      backgroundColor: isCurrent ? 'var(--primary)' : 'var(--bg-secondary)',
-                      color: isCurrent ? '#ffffff' : 'var(--text-primary)',
-                      borderRadius: 'var(--radius-sm)',
-                      cursor: isCurrent ? 'default' : 'pointer',
-                      opacity: isCurrent ? 0.9 : 1
+                      backgroundColor: isCurrent ? 'rgba(255, 255, 255, 0.2)' : 'var(--bg-tertiary)',
+                      borderRadius: 'var(--radius-sm)'
                     }}
-                    disabled={isCurrent}
                   >
+                    <Icon className="w-5 h-5" />
+                  </div>
+                  <div className="flex-1">
+                    <div style={{ fontWeight: 'var(--font-medium)' }}>
+                      {app.name}
+                    </div>
                     <div
-                      className="p-2 rounded-lg"
+                      className="text-xs mt-0.5"
                       style={{
-                        backgroundColor: isCurrent ? 'rgba(255, 255, 255, 0.2)' : 'var(--bg-tertiary)'
+                        color: isCurrent ? 'rgba(255, 255, 255, 0.7)' : 'var(--text-secondary)',
+                        fontWeight: 'var(--font-light)'
                       }}
                     >
-                      <Icon className="w-6 h-6" />
+                      {app.url.replace('http://', '')}
                     </div>
-                    <div>
-                      <div className="font-medium">{app.name}</div>
-                      <div
-                        className="text-sm"
-                        style={{
-                          color: isCurrent ? 'rgba(255, 255, 255, 0.8)' : 'var(--text-secondary)',
-                          fontWeight: 'var(--font-light)'
-                        }}
-                      >
-                        {app.url}
-                      </div>
+                  </div>
+                  {isCurrent && (
+                    <div
+                      className="px-2 py-0.5 rounded text-xs"
+                      style={{
+                        backgroundColor: 'rgba(255, 255, 255, 0.2)',
+                        fontWeight: 'var(--font-medium)'
+                      }}
+                    >
+                      현재
                     </div>
-                    {isCurrent && (
-                      <div className="ml-auto">
-                        <span
-                          className="px-2 py-1 rounded text-xs"
-                          style={{
-                            backgroundColor: 'rgba(255, 255, 255, 0.2)',
-                            fontWeight: 'var(--font-medium)'
-                          }}
-                        >
-                          현재 앱
-                        </span>
-                      </div>
-                    )}
-                  </button>
-                )
-              })}
-            </div>
+                  )}
+                </button>
+              )
+            })}
           </div>
         </div>
       )}
-    </>
+
+      {/* CSS Animation */}
+      <style jsx>{`
+        @keyframes slideDown {
+          from {
+            opacity: 0;
+            transform: translateY(-10px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+      `}</style>
+    </div>
   )
 }
