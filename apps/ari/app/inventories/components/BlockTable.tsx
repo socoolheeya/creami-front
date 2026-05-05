@@ -69,7 +69,7 @@ export function BlockTable({ blocks }: BlockTableProps) {
                   borderBottom: '1px solid var(--border-color)'
                 }}
               >
-                블럭 코드
+                재고 코드
               </th>
               <th
                 className="px-4 py-3 text-left text-sm"
@@ -79,7 +79,7 @@ export function BlockTable({ blocks }: BlockTableProps) {
                   borderBottom: '1px solid var(--border-color)'
                 }}
               >
-                블럭명
+                재고명
               </th>
               <th
                 className="px-4 py-3 text-left text-sm"
@@ -250,7 +250,7 @@ export function BlockTable({ blocks }: BlockTableProps) {
                     {formatDate(block.startDate)} ~ {formatDate(block.endDate)}
                   </td>
                   <td className="px-4 py-3 text-center">
-                    <Link href={`/blocks/${block.id}`}>
+                    <Link href={`/inventories/${block.id}`}>
                       <button
                         className="inline-flex items-center justify-center p-2 rounded-lg transition-colors"
                         style={{

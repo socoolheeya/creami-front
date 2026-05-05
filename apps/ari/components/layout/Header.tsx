@@ -1,21 +1,23 @@
 'use client'
 
 import { User } from 'lucide-react'
-import { AppSwitcher } from './AppSwitcher'
 import { ThemeToggle } from '../ui/ThemeToggle'
 
-export function Header() {
+interface HeaderProps {
+  isCollapsed: boolean
+}
+
+export function Header({ isCollapsed }: HeaderProps) {
   return (
     <header
-      className="fixed top-0 left-0 right-0 h-16 z-40 flex items-center justify-between px-6"
+      className="fixed top-0 right-0 h-16 z-40 flex items-center justify-between px-6 transition-all duration-300"
       style={{
         backgroundColor: 'var(--bg-primary)',
-        borderBottom: '1px solid var(--border-color)'
+        borderBottom: '1px solid var(--border-color)',
+        left: isCollapsed ? '56px' : '240px'
       }}
     >
-      <div className="flex items-center gap-4">
-        <AppSwitcher />
-      </div>
+      <div className="flex-1"></div>
 
       <div className="flex items-center gap-3">
         <ThemeToggle />

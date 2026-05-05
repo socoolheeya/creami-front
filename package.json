@@ -5,9 +5,9 @@
   "scripts": {
     "dev:home": "pnpm --filter home dev",
     "dev:accommodation": "pnpm --filter accommodation exec next dev -p 3001",
-    "dev:booking": "pnpm --filter booking exec next dev -p 3002",
-    "dev:ari": "pnpm --filter ari exec next dev -p 3003",
-    "dev:discount": "pnpm --filter discount exec next dev -p 3004",
+    "dev:ari": "pnpm --filter ari exec next dev -p 3002",
+    "dev:discount": "pnpm --filter discount exec next dev -p 3003",
+    "dev:booking": "pnpm --filter booking exec next dev -p 3004",
     "build:home": "pnpm --filter home build",
     "build:accommodation": "pnpm --filter accommodation build",
     "build:booking": "pnpm --filter booking build",

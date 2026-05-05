@@ -40,7 +40,7 @@ export function BlockCard({ block }: BlockCardProps) {
   const utilizationPercentage = getUtilizationPercentage()
 
   return (
-    <Link href={`/blocks/${block.id}`}>
+    <Link href={`/inventories/${block.id}`}>
       <div
         className="rounded-lg overflow-hidden transition-all hover:shadow-lg cursor-pointer p-5"
         style={{

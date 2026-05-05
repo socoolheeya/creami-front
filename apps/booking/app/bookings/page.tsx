@@ -1,37 +1,11 @@
 'use client'
 
 import { Calendar, User, Building2, Clock } from 'lucide-react'
+import Link from 'next/link'
+import { mockBookings } from '@/lib/data/mock-bookings'
 
 export default function BookingsPage() {
-  const bookings = [
-    {
-      id: 'BK001',
-      guestName: '김철수',
-      accommodation: 'Grand Hotel Seoul',
-      checkIn: '2026-05-10',
-      checkOut: '2026-05-12',
-      status: 'confirmed' as const,
-      totalAmount: '₩240,000'
-    },
-    {
-      id: 'BK002',
-      guestName: '이영희',
-      accommodation: 'Sunset Resort Busan',
-      checkIn: '2026-05-15',
-      checkOut: '2026-05-17',
-      status: 'pending' as const,
-      totalAmount: '₩320,000'
-    },
-    {
-      id: 'BK003',
-      guestName: 'John Smith',
-      accommodation: 'Jeju Paradise Hotel',
-      checkIn: '2026-05-20',
-      checkOut: '2026-05-25',
-      status: 'confirmed' as const,
-      totalAmount: '₩850,000'
-    }
-  ]
+  const bookings = mockBookings
 
   const statusConfig = {
     confirmed: { label: '확정', color: '#10b981', bgColor: '#d1fae5' },
@@ -88,7 +62,7 @@ export default function BookingsPage() {
                 고객명
               </th>
               <th className="px-6 py-4 text-left" style={{ color: 'var(--text-primary)', fontWeight: 'var(--font-bold)' }}>
-                숙소
+                숙소 / 객실 / 요금제
               </th>
               <th className="px-6 py-4 text-left" style={{ color: 'var(--text-primary)', fontWeight: 'var(--font-bold)' }}>
                 체크인/아웃
@@ -107,7 +81,7 @@ export default function BookingsPage() {
               return (
                 <tr
                   key={booking.id}
-                  className="transition-colors cursor-pointer"
+                  className="transition-colors"
                   style={{ borderBottom: '1px solid var(--border-color)' }}
                   onMouseEnter={(e) => {
                     e.currentTarget.style.backgroundColor = 'var(--bg-secondary)'
@@ -117,12 +91,22 @@ export default function BookingsPage() {
                   }}
                 >
                   <td className="px-6 py-4">
-                    <div className="flex items-center gap-2">
-                      <Calendar className="w-4 h-4" style={{ color: 'var(--primary)' }} />
-                      <span style={{ fontWeight: 'var(--font-medium)', color: 'var(--text-primary)' }}>
-                        {booking.id}
+                    <Link
+                      href={`/bookings/${booking.id}`}
+                      className="flex items-center gap-2 transition-colors"
+                      style={{ color: 'var(--primary)' }}
+                      onMouseEnter={(e) => {
+                        e.currentTarget.style.textDecoration = 'underline'
+                      }}
+                      onMouseLeave={(e) => {
+                        e.currentTarget.style.textDecoration = 'none'
+                      }}
+                    >
+                      <Calendar className="w-4 h-4" />
+                      <span style={{ fontWeight: 'var(--font-medium)' }}>
+                        {booking.bookingNumber}
                       </span>
-                    </div>
+                    </Link>
                   </td>
                   <td className="px-6 py-4">
                     <div className="flex items-center gap-2">
@@ -133,11 +117,16 @@ export default function BookingsPage() {
                     </div>
                   </td>
                   <td className="px-6 py-4">
-                    <div className="flex items-center gap-2">
-                      <Building2 className="w-4 h-4" style={{ color: 'var(--text-tertiary)' }} />
-                      <span style={{ color: 'var(--text-primary)' }}>
-                        {booking.accommodation}
-                      </span>
+                    <div className="flex items-start gap-2">
+                      <Building2 className="w-4 h-4 mt-0.5" style={{ color: 'var(--text-tertiary)' }} />
+                      <div>
+                        <div style={{ color: 'var(--text-primary)', fontWeight: 'var(--font-medium)' }}>
+                          {booking.accommodation}
+                        </div>
+                        <div className="text-xs mt-0.5" style={{ color: 'var(--text-tertiary)' }}>
+                          {booking.roomType} • {booking.ratePlan}
+                        </div>
+                      </div>
                     </div>
                   </td>
                   <td className="px-6 py-4">
@@ -162,7 +151,7 @@ export default function BookingsPage() {
                   </td>
                   <td className="px-6 py-4 text-right">
                     <span style={{ fontWeight: 'var(--font-bold)', color: 'var(--text-primary)' }}>
-                      {booking.totalAmount}
+                      ₩{booking.pricing.totalAmount.toLocaleString()}
                     </span>
                   </td>
                 </tr>

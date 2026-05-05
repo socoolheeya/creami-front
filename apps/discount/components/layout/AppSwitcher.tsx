@@ -1,18 +1,21 @@
 'use client'
 
-import { Grid3x3, Home, BarChart3, Tag, ChevronDown } from 'lucide-react'
+import { Home, BarChart3, Tag, LayoutDashboard, Calendar, ChevronDown } from 'lucide-react'
 import { useState, useRef, useEffect } from 'react'
 import { APPS, CURRENT_APP } from '@/lib/constants'
 
 const iconMap = {
   Home,
+  LayoutDashboard,
   BarChart3,
-  Tag
+  Tag,
+  Calendar
 }
 
 export function AppSwitcher() {
   const [isOpen, setIsOpen] = useState(false)
   const dropdownRef = useRef<HTMLDivElement>(null)
+  const CurrentIcon = iconMap[CURRENT_APP.icon as keyof typeof iconMap]
 
   const handleAppClick = (url: string) => {
     window.location.href = url
@@ -45,7 +48,12 @@ export function AppSwitcher() {
           color: 'var(--text-primary)'
         }}
       >
-        <Grid3x3 className="w-5 h-5" />
+        <CurrentIcon
+          className="w-5 h-5"
+          style={{
+            color: 'var(--primary)'
+          }}
+        />
         <span className="font-medium">{CURRENT_APP.name}</span>
         <ChevronDown
           className="w-4 h-4 transition-transform"

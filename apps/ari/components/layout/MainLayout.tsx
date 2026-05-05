@@ -5,16 +5,16 @@ import { Header } from './Header'
 import { Sidebar } from './Sidebar'
 
 export function MainLayout({ children }: { children: ReactNode }) {
-  const [isSidebarCollapsed] = useState(false)
+  const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false)
 
   return (
     <div className="min-h-screen" style={{ backgroundColor: 'var(--bg-secondary)' }}>
-      <Header />
-      <Sidebar />
+      <Header isCollapsed={isSidebarCollapsed} />
+      <Sidebar isCollapsed={isSidebarCollapsed} setIsCollapsed={setIsSidebarCollapsed} />
       <main
         className="pt-16 transition-all duration-300"
         style={{
-          marginLeft: isSidebarCollapsed ? '64px' : '240px'
+          marginLeft: isSidebarCollapsed ? '56px' : '240px'
         }}
       >
         <div className="p-6">
