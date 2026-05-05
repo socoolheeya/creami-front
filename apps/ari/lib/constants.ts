@@ -2,21 +2,21 @@ export const APPS = [
   {
     id: 'accommodation',
     name: 'Creami Accommodation',
-    url: 'http://localhost:3000',
+    url: 'http://localhost:3001',
     icon: 'Home',
     color: '#fa8383'
   },
   {
     id: 'ari',
     name: 'Creami ARI',
-    url: 'http://localhost:3001',
+    url: 'http://localhost:3003',
     icon: 'BarChart3',
     color: '#fa8383'
   },
   {
     id: 'discount',
     name: 'Creami Discount',
-    url: 'http://localhost:3002',
+    url: 'http://localhost:3004',
     icon: 'Tag',
     color: '#fa8383'
   }

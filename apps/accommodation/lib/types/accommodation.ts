@@ -1,18 +1,58 @@
-export type AccommodationType = 'hotel' | 'motel' | 'pension' | 'guesthouse'
+export type AccommodationType =
+  | 'hotel'
+  | 'resort'
+  | 'motel'
+  | 'rental_cottage'
+  | 'guesthouse'
+  | 'pension'
+  | 'vacation_home'
+  | 'apartment'
+  | 'hostel'
+  | 'bed_breakfast'
+  | 'capsule_hotel'
+  | 'camping'
+  | 'glamping'
+  | 'villa'
+  | 'temple_stay'
+  | 'farm_stay'
+  | 'hanok_stay'
+  | 'love_motel'
+  | 'condo'
+  | 'serviced_apartment'
+  | 'boutique_hotel'
+  | 'business_hotel'
+  | 'family_hotel'
+  | 'luxury_hotel'
+  | 'budget_hotel'
+  | 'eco_hotel'
+  | 'other'
 
-export type AccommodationStatus = 'active' | 'inactive'
+export type AccommodationStatus = 'draft' | 'active' | 'inactive' | 'archived'
 
 export interface AccommodationImage {
   id: string
+  name: string
   url: string
   isPrimary: boolean
-  order: number
+  sortOrder: number
+  altText?: string
+}
+
+export type ChargeType = 'percentage' | 'fixed'
+
+export interface ChargeConfig {
+  type: ChargeType
+  value: number
 }
 
 export interface BillingPolicy {
-  cancellationPolicy: string
-  depositPolicy: string
-  paymentMethods: string[]
+  currency: string // 'KRW', 'USD', 'JPY', etc.
+  paymentMethod?: string
+  bankName?: string
+  accountNumber?: string
+  commission: ChargeConfig
+  surcharge?: ChargeConfig
+  tax?: ChargeConfig
 }
 
 export interface Accommodation {
@@ -20,15 +60,41 @@ export interface Accommodation {
 
   // Step 1: 기본정보
   name: string
+  enName?: string
   type: AccommodationType
+  stars?: number
+
+  // Address
   address: string
+  addressDetail?: string
+  city?: string
+  countryCode?: string
+  zipCode?: string
+
+  // Location
+  latitude?: number
+  longitude?: number
+
+  // Contact
   phone: string
-  email: string
+  email?: string
+  homepage?: string
+  faxNumbers?: string[]
+
+  // Check-in/out
   checkIn: string  // "15:00"
   checkOut: string // "11:00"
 
+  // Language & Settings
+  language?: string
+
+  // Property Info
+  roomCount?: number
+  floorCount?: number
+
   // Step 2: Description
   description: string
+  enDescription?: string
   amenities: string[]
 
   // Step 3: Images
@@ -80,19 +146,42 @@ export const AMENITY_OPTIONS = [
   '공항 셔틀'
 ] as const
 
-// 결제 수단 옵션
-export const PAYMENT_METHOD_OPTIONS = [
-  '현금',
-  '신용카드',
-  '체크카드',
-  '계좌이체',
-  '간편결제'
+// 통화 옵션
+export const CURRENCY_OPTIONS = [
+  { code: 'KRW', name: '원 (₩)', symbol: '₩' },
+  { code: 'USD', name: '달러 ($)', symbol: '$' },
+  { code: 'JPY', name: '엔 (¥)', symbol: '¥' },
+  { code: 'EUR', name: '유로 (€)', symbol: '€' },
+  { code: 'CNY', name: '위안 (¥)', symbol: '¥' }
 ] as const
 
 // 숙소 타입 라벨
 export const ACCOMMODATION_TYPE_LABELS: Record<AccommodationType, string> = {
   hotel: '호텔',
+  resort: '리조트',
   motel: '모텔',
+  rental_cottage: '렌탈 코티지',
+  guesthouse: '게스트하우스',
   pension: '펜션',
-  guesthouse: '게스트하우스'
+  vacation_home: '휴가용 주택',
+  apartment: '아파트',
+  hostel: '호스텔',
+  bed_breakfast: 'B&B',
+  capsule_hotel: '캡슐 호텔',
+  camping: '캠핑장',
+  glamping: '글램핑',
+  villa: '빌라',
+  temple_stay: '템플스테이',
+  farm_stay: '농어촌 민박',
+  hanok_stay: '한옥스테이',
+  love_motel: '러브 모텔',
+  condo: '콘도',
+  serviced_apartment: '서비스 아파트',
+  boutique_hotel: '부티크 호텔',
+  business_hotel: '비즈니스 호텔',
+  family_hotel: '가족 호텔',
+  luxury_hotel: '럭셔리 호텔',
+  budget_hotel: '저예산 호텔',
+  eco_hotel: '에코 호텔',
+  other: '기타'
 }

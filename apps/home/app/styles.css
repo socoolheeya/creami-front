@@ -1,0 +1,76 @@
+/* Pretendard Font - @import must be at the top */
+@import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.min.css');
+
+/* CSS Variables */
+:root {
+  /* Primary Color */
+  --primary: #fa8383;
+  --primary-hover: #fb9999;
+  --primary-active: #f96d6d;
+
+  /* Radius */
+  --radius: 16px;
+  --radius-sm: 8px;
+  --radius-lg: 24px;
+
+  /* Light Mode */
+  --bg-primary: #ffffff;
+  --bg-secondary: #f8f9fa;
+  --bg-tertiary: #e9ecef;
+  --text-primary: #212529;
+  --text-secondary: #6c757d;
+  --text-tertiary: #868e96;
+  --border-color: #dee2e6;
+  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+  --shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1);
+  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+}
+
+[data-theme='dark'] {
+  /* Dark Mode (우선) */
+  --bg-primary: #1a1d23;
+  --bg-secondary: #222630;
+  --bg-tertiary: #2c303a;
+  --text-primary: #f8f9fa;
+  --text-secondary: #adb5bd;
+  --text-tertiary: #868e96;
+  --border-color: #3a3f4b;
+  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.2);
+  --shadow: 0 1px 3px 0 rgb(0 0 0 / 0.3);
+  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.3);
+}
+
+/* Font Weight Variables */
+:root {
+  --font-light: 300;
+  --font-medium: 500;
+  --font-bold: 700;
+}
+
+/* Base Styles */
+* {
+  font-family: 'Pretendard Variable', -apple-system, BlinkMacSystemFont, system-ui, Roboto, sans-serif;
+  font-weight: var(--font-medium);
+}
+
+body {
+  background-color: var(--bg-secondary);
+  color: var(--text-primary);
+}
+
+/* Typography */
+h1, h2, h3, h4, h5, h6 {
+  font-weight: var(--font-bold);
+}
+
+.text-light {
+  font-weight: var(--font-light);
+}
+
+.text-medium {
+  font-weight: var(--font-medium);
+}
+
+.text-bold {
+  font-weight: var(--font-bold);
+}

@@ -1,16 +1,14 @@
 'use client'
 
-import { Home, Settings, LayoutDashboard, Calendar, Users, ChevronLeft, ChevronRight } from 'lucide-react'
+import { LayoutDashboard, DollarSign, Calendar, ChevronLeft, ChevronRight } from 'lucide-react'
 import { useState } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 
 const menuItems = [
   { icon: LayoutDashboard, label: '대시보드', href: '/' },
-  { icon: Calendar, label: '예약 관리', href: '/reservations' },
-  { icon: Home, label: '객실 관리', href: '/rooms' },
-  { icon: Users, label: '고객 관리', href: '/customers' },
-  { icon: Settings, label: '설정', href: '/settings' }
+  { icon: DollarSign, label: '요금 관리', href: '/rates' },
+  { icon: Calendar, label: '블럭 관리', href: '/blocks' }
 ]
 
 export function Sidebar() {

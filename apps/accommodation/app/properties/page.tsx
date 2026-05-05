@@ -1,10 +1,17 @@
-import { Building2, Plus } from 'lucide-react'
+'use client'
+
+import { Building2, Plus, LayoutGrid, List } from 'lucide-react'
 import Link from 'next/link'
+import { useState } from 'react'
 import { mockAccommodations } from '@/lib/data/mock-accommodations'
 import { AccommodationCard } from './components/AccommodationCard'
+import { AccommodationTable } from './components/AccommodationTable'
+
+type ViewMode = 'grid' | 'table'
 
 export default function AccommodationsPage() {
   const accommodations = mockAccommodations
+  const [viewMode, setViewMode] = useState<ViewMode>('grid')
 
   return (
     <div>
@@ -17,7 +24,7 @@ export default function AccommodationsPage() {
           </h1>
         </div>
 
-        <Link href="/accommodations/new">
+        <Link href="/properties/new">
           <button
             className="flex items-center gap-2 px-4 py-2 rounded-lg transition-colors"
             style={{
@@ -33,7 +40,7 @@ export default function AccommodationsPage() {
         </Link>
       </div>
 
-      {/* Search and Filters */}
+      {/* Search and View Toggle */}
       <div className="mb-6 flex gap-4">
         <input
           type="text"
@@ -46,9 +53,60 @@ export default function AccommodationsPage() {
             borderRadius: 'var(--radius-sm)'
           }}
         />
+
+        {/* View Toggle Switch */}
+        <div
+          className="relative flex items-center p-1"
+          style={{
+            border: '1px solid var(--border-color)',
+            backgroundColor: 'var(--bg-tertiary)',
+            borderRadius: 'var(--radius-sm)',
+            width: '80px',
+            height: '40px'
+          }}
+        >
+          {/* Sliding Background */}
+          <div
+            className="absolute top-1 transition-all duration-200"
+            style={{
+              left: viewMode === 'grid' ? '4px' : 'calc(50% - 4px)',
+              width: 'calc(50% - 4px)',
+              height: 'calc(100% - 8px)',
+              backgroundColor: 'var(--primary)',
+              borderRadius: 'var(--radius-sm)',
+              zIndex: 0
+            }}
+          />
+
+          {/* Grid Button */}
+          <button
+            onClick={() => setViewMode('grid')}
+            className="relative flex-1 flex items-center justify-center transition-colors"
+            style={{
+              color: viewMode === 'grid' ? '#ffffff' : 'var(--text-secondary)',
+              zIndex: 1
+            }}
+            title="카드 뷰"
+          >
+            <LayoutGrid className="w-5 h-5" />
+          </button>
+
+          {/* Table Button */}
+          <button
+            onClick={() => setViewMode('table')}
+            className="relative flex-1 flex items-center justify-center transition-colors"
+            style={{
+              color: viewMode === 'table' ? '#ffffff' : 'var(--text-secondary)',
+              zIndex: 1
+            }}
+            title="테이블 뷰"
+          >
+            <List className="w-5 h-5" />
+          </button>
+        </div>
       </div>
 
-      {/* Accommodation Grid */}
+      {/* Accommodation List */}
       {accommodations.length === 0 ? (
         <div
           className="flex flex-col items-center justify-center py-16 rounded-lg"
@@ -65,7 +123,7 @@ export default function AccommodationsPage() {
           <p className="mb-6" style={{ color: 'var(--text-secondary)', fontWeight: 'var(--font-light)' }}>
             첫 번째 숙소를 등록해보세요
           </p>
-          <Link href="/accommodations/new">
+          <Link href="/properties/new">
             <button
               className="flex items-center gap-2 px-4 py-2 rounded-lg"
               style={{
@@ -80,12 +138,14 @@ export default function AccommodationsPage() {
             </button>
           </Link>
         </div>
-      ) : (
+      ) : viewMode === 'grid' ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {accommodations.map((accommodation) => (
             <AccommodationCard key={accommodation.id} accommodation={accommodation} />
           ))}
         </div>
+      ) : (
+        <AccommodationTable accommodations={accommodations} />
       )}
     </div>
   )
