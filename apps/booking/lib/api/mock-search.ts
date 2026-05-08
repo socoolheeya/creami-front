@@ -15,7 +15,9 @@ const mockRoomRates: AvailableRoomRate[] = [
     totalPrice: 0, // 계산됨
     nights: 0, // 계산됨
     available: true,
-    maxOccupancy: 2
+    maxOccupancy: 2,
+    freeCancellation: true,
+    cancellationDeadline: '2025-01-15'
   },
   {
     roomId: 'ROOM002',
@@ -28,7 +30,9 @@ const mockRoomRates: AvailableRoomRate[] = [
     totalPrice: 0,
     nights: 0,
     available: true,
-    maxOccupancy: 4
+    maxOccupancy: 4,
+    freeCancellation: true,
+    cancellationDeadline: '2025-01-10'
   },
   {
     roomId: 'ROOM003',
@@ -41,7 +45,8 @@ const mockRoomRates: AvailableRoomRate[] = [
     totalPrice: 0,
     nights: 0,
     available: true,
-    maxOccupancy: 2
+    maxOccupancy: 2,
+    freeCancellation: false
   },
   {
     roomId: 'ROOM004',
@@ -54,7 +59,9 @@ const mockRoomRates: AvailableRoomRate[] = [
     totalPrice: 0,
     nights: 0,
     available: true,
-    maxOccupancy: 2
+    maxOccupancy: 2,
+    freeCancellation: true,
+    cancellationDeadline: '2025-01-20'
   },
   {
     roomId: 'ROOM005',
@@ -67,7 +74,8 @@ const mockRoomRates: AvailableRoomRate[] = [
     totalPrice: 0,
     nights: 0,
     available: true,
-    maxOccupancy: 3
+    maxOccupancy: 3,
+    freeCancellation: false
   }
 ]
 
@@ -85,7 +93,18 @@ export async function searchAvailableRooms(request: SearchRequest): Promise<Sear
   // 실제로는 API 호출
   await new Promise(resolve => setTimeout(resolve, 500)) // 네트워크 지연 시뮬레이션
 
-  const accommodation = mockAccommodations.find(a => a.id === request.accommodationId)
+  // accommodationId 또는 accommodationQuery로 숙소 찾기
+  let accommodation
+  if (request.accommodationId) {
+    accommodation = mockAccommodations.find(a => a.id === request.accommodationId)
+  } else if (request.accommodationQuery) {
+    const query = request.accommodationQuery.toLowerCase()
+    accommodation = mockAccommodations.find(a =>
+      a.id.toLowerCase().includes(query) ||
+      a.name.toLowerCase().includes(query)
+    )
+  }
+
   const nights = calculateNights(request.checkIn, request.checkOut)
 
   // 총 인원 계산
@@ -103,7 +122,7 @@ export async function searchAvailableRooms(request: SearchRequest): Promise<Sear
     }))
 
   return {
-    accommodationId: request.accommodationId,
+    accommodationId: accommodation?.id || request.accommodationId || '',
     accommodationName: accommodation?.name || 'Unknown',
     checkIn: request.checkIn,
     checkOut: request.checkOut,

@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
+import { useCreateRatePlan, useUpdateRatePlan } from '@/hooks/useRatePlans'
 import type {
   RatePlan,
   RatePlanType,
@@ -27,6 +28,9 @@ interface RatePlanFormProps {
 export default function RatePlanForm({ initialData }: RatePlanFormProps) {
   const router = useRouter()
   const isEdit = !!initialData
+  const createRatePlan = useCreateRatePlan()
+  const updateRatePlan = useUpdateRatePlan()
+  const [isSubmitting, setIsSubmitting] = useState(false)
 
   const [formData, setFormData] = useState({
     name: initialData?.name || '',
@@ -68,11 +72,61 @@ export default function RatePlanForm({ initialData }: RatePlanFormProps) {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
 
-    // Here you would typically send data to your API
-    console.log('Submitting rateplan:', { formData, cancellationPolicies })
+    if (isSubmitting) return
 
-    // Navigate back to list or detail page
-    router.push(isEdit ? `/rateplans/${initialData.id}` : '/rateplans')
+    setIsSubmitting(true)
+
+    try {
+      const ratePlanData = {
+        name: formData.name,
+        enName: formData.enName,
+        benefitName: formData.benefitName,
+        ratePlanType: formData.ratePlanType,
+        priceType: formData.priceType,
+        status: formData.status,
+        mealPlan: formData.mealPlan,
+        enabled: formData.enabled,
+        roomId: formData.roomId,
+        description: {
+          description: formData.description,
+          enDescription: formData.enDescription,
+        },
+        setting: {
+          allotment: formData.allotment,
+          minLos: formData.minLos,
+          maxLos: formData.maxLos,
+          minThroughDays: formData.minThroughDays,
+          maxThroughDays: formData.maxThroughDays,
+          minAdvanceDays: formData.minAdvanceDays,
+          maxAdvanceDays: formData.maxAdvanceDays,
+          closedToArrival: formData.closedToArrival,
+          closedToDeparture: formData.closedToDeparture,
+        },
+        salePeriod: {
+          bookingStartDate: formData.bookingStartDate,
+          bookingEndDate: formData.bookingEndDate,
+          stayStartDate: formData.stayStartDate,
+          stayEndDate: formData.stayEndDate,
+        },
+        cancellationPolicies,
+      }
+
+      if (isEdit) {
+        await updateRatePlan.mutateAsync({
+          id: initialData.id,
+          data: ratePlanData,
+        })
+        router.push(`/rateplans/${initialData.id}`)
+      } else {
+        await createRatePlan.mutateAsync(ratePlanData)
+        router.push('/rateplans')
+      }
+    } catch (error) {
+      console.error('Failed to submit rateplan:', error)
+      alert(`요금제 ${isEdit ? '수정' : '등록'}에 실패했습니다. 다시 시도해주세요.`)
+    } finally {
+      setIsSubmitting(false)
+    }
   }
 
   const addCancellationPolicy = () => {
@@ -764,8 +818,8 @@ export default function RatePlanForm({ initialData }: RatePlanFormProps) {
           <Link href="/rateplans" className="btn btn-secondary">
             취소
           </Link>
-          <button type="submit" className="btn btn-primary">
-            {isEdit ? '수정 완료' : '생성'}
+          <button type="submit" className="btn btn-primary" disabled={isSubmitting}>
+            {isSubmitting ? (isEdit ? '수정 중...' : '등록 중...') : (isEdit ? '수정 완료' : '생성')}
           </button>
         </div>
       </form>

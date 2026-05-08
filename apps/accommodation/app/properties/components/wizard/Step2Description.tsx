@@ -1,10 +1,10 @@
-import { AccommodationFormData, AMENITY_OPTIONS } from '@/lib/types/accommodation'
+import { PropertyFormData, AMENITY_OPTIONS } from '../../../../lib/types/property'
 import { Plus, X } from 'lucide-react'
 import { useState } from 'react'
 
 interface Step2DescriptionProps {
-  data: AccommodationFormData
-  onChange: (data: Partial<AccommodationFormData>) => void
+  data: PropertyFormData
+  onChange: (data: Partial<PropertyFormData>) => void
 }
 
 export function Step2Description({ data, onChange }: Step2DescriptionProps) {
@@ -31,15 +31,15 @@ export function Step2Description({ data, onChange }: Step2DescriptionProps) {
   }
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-6">
       <h2 className="text-xl mb-1" style={{ fontWeight: 'var(--font-bold)', color: 'var(--text-primary)' }}>
         숙소에 대한 설명을 작성해주세요
       </h2>
 
-      {/* 숙소 설명 */}
+      {/* 한글 숙소 설명 */}
       <div>
         <label className="block mb-1.5 text-sm" style={{ fontWeight: 'var(--font-medium)', color: 'var(--text-primary)' }}>
-          숙소 설명
+          숙소 설명 (한글) <span style={{ color: 'var(--primary)' }}>*</span>
         </label>
         <textarea
           value={data.description || ''}
@@ -47,7 +47,7 @@ export function Step2Description({ data, onChange }: Step2DescriptionProps) {
           placeholder="숙소의 특징, 위치, 주변 환경 등을 자유롭게 작성해주세요..."
           rows={6}
           maxLength={2000}
-          className="w-full px-3 py-2 text-sm rounded-lg resize-none max-w-2xl"
+          className="w-full px-3 py-2 text-sm rounded-lg resize-none"
           style={{
             backgroundColor: 'var(--bg-primary)',
             border: '1px solid var(--border-color)',
@@ -57,6 +57,30 @@ export function Step2Description({ data, onChange }: Step2DescriptionProps) {
         />
         <div className="text-right text-xs mt-1" style={{ color: 'var(--text-tertiary)' }}>
           {(data.description || '').length} / 2000
+        </div>
+      </div>
+
+      {/* 영문 숙소 설명 */}
+      <div>
+        <label className="block mb-1.5 text-sm" style={{ fontWeight: 'var(--font-medium)', color: 'var(--text-primary)' }}>
+          숙소 설명 (영문) <span style={{ color: 'var(--primary)' }}>*</span>
+        </label>
+        <textarea
+          value={data.enDescription || ''}
+          onChange={(e) => onChange({ enDescription: e.target.value })}
+          placeholder="Please describe your property in English..."
+          rows={6}
+          maxLength={2000}
+          className="w-full px-3 py-2 text-sm rounded-lg resize-none"
+          style={{
+            backgroundColor: 'var(--bg-primary)',
+            border: '1px solid var(--border-color)',
+            color: 'var(--text-primary)',
+            borderRadius: 'var(--radius-sm)'
+          }}
+        />
+        <div className="text-right text-xs mt-1" style={{ color: 'var(--text-tertiary)' }}>
+          {(data.enDescription || '').length} / 2000
         </div>
       </div>
 

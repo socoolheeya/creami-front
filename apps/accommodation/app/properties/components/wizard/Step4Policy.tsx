@@ -1,9 +1,9 @@
-import { AccommodationFormData, CURRENCY_OPTIONS, ChargeType } from '@/lib/types/accommodation'
+import { PropertyFormData, CURRENCY_OPTIONS, ChargeType } from '../../../../lib/types/property'
 import { DollarSign, Percent, Plus, Trash2 } from 'lucide-react'
 
 interface Step4PolicyProps {
-  data: AccommodationFormData
-  onChange: (data: Partial<AccommodationFormData>) => void
+  data: PropertyFormData
+  onChange: (data: Partial<PropertyFormData>) => void
 }
 
 export function Step4Policy({ data, onChange }: Step4PolicyProps) {

@@ -1,6 +1,6 @@
-import { Accommodation } from '../types/accommodation'
+import { Property } from '../types/property'
 
-export const mockAccommodations: Accommodation[] = [
+export const mockAccommodations: Property[] = [
   {
     id: '1',
     name: '그랜드 호텔 서울',

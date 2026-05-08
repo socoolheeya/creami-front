@@ -6,7 +6,7 @@ import { CalendarCheck } from 'lucide-react'
 import { SearchRequest, SearchResponse, AvailableRoomRate, CreateBookingRequest } from '@/lib/types/search'
 import { searchAvailableRooms, createBooking } from '@/lib/api/mock-search'
 import { SearchForm } from './components/SearchForm'
-import { RoomRateCard } from './components/RoomRateCard'
+import { RoomRateTable } from './components/RoomRateTable'
 import { BookingForm } from './components/BookingForm'
 
 export default function NewBookingPage() {
@@ -34,13 +34,13 @@ export default function NewBookingPage() {
   }
 
   const handleBooking = async (formData: { guestName: string; guestEmail: string; guestPhone: string; specialRequests?: string }) => {
-    if (!selectedRoomRate || !searchRequest) return
+    if (!selectedRoomRate || !searchRequest || !searchResult) return
 
     setIsBooking(true)
 
     try {
       const request: CreateBookingRequest = {
-        accommodationId: searchRequest.accommodationId,
+        accommodationId: searchResult.accommodationId, // 검색 결과에서 가져온 실제 ID 사용
         roomId: selectedRoomRate.roomId,
         ratePlanId: selectedRoomRate.ratePlanId,
         checkIn: searchRequest.checkIn,
@@ -118,19 +118,11 @@ export default function NewBookingPage() {
                   </p>
                 </div>
               ) : (
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  {searchResult.results.map((roomRate) => (
-                    <RoomRateCard
-                      key={`${roomRate.roomId}-${roomRate.ratePlanId}`}
-                      roomRate={roomRate}
-                      isSelected={
-                        selectedRoomRate?.roomId === roomRate.roomId &&
-                        selectedRoomRate?.ratePlanId === roomRate.ratePlanId
-                      }
-                      onSelect={() => setSelectedRoomRate(roomRate)}
-                    />
-                  ))}
-                </div>
+                <RoomRateTable
+                  roomRates={searchResult.results}
+                  selectedRoomRate={selectedRoomRate}
+                  onSelect={setSelectedRoomRate}
+                />
               )}
             </div>
           )}

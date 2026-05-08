@@ -1,7 +1,7 @@
 'use client'
 
 import { Discount, DISCOUNT_TYPE_LABELS, DISCOUNT_STATUS_LABELS, DISCOUNT_TARGET_LABELS } from '@/lib/types/discount'
-import { Tag, Percent, DollarSign, Calendar, Users } from 'lucide-react'
+import { Tag, Percent, DollarSign, Calendar } from 'lucide-react'
 import Link from 'next/link'
 
 interface DiscountCardProps {
@@ -14,10 +14,6 @@ export function DiscountCard({ discount }: DiscountCardProps) {
     discount.status === 'scheduled' ? '#3b82f6' :
     discount.status === 'expired' ? 'var(--text-tertiary)' :
     '#6b7280'
-
-  const usagePercentage = discount.usageLimit
-    ? (discount.usedCount / discount.usageLimit) * 100
-    : 0
 
   return (
     <Link href={`/discounts/${discount.id}`}>
@@ -125,34 +121,7 @@ export function DiscountCard({ discount }: DiscountCardProps) {
                 {discount.endDate.toLocaleDateString('ko-KR', { month: 'short', day: 'numeric' })}
               </span>
             </div>
-
-            {discount.usageLimit && (
-              <div className="flex items-center gap-2">
-                <Users className="w-4 h-4" style={{ color: 'var(--text-secondary)' }} />
-                <span style={{ color: 'var(--text-secondary)' }}>
-                  사용: {discount.usedCount} / {discount.usageLimit}회
-                </span>
-              </div>
-            )}
           </div>
-
-          {/* Usage Progress Bar */}
-          {discount.usageLimit && (
-            <div className="mt-4">
-              <div
-                className="h-2 rounded-full overflow-hidden"
-                style={{ backgroundColor: 'var(--bg-tertiary)' }}
-              >
-                <div
-                  className="h-full rounded-full transition-all"
-                  style={{
-                    width: `${Math.min(usagePercentage, 100)}%`,
-                    backgroundColor: usagePercentage >= 90 ? '#ef4444' : usagePercentage >= 70 ? '#f59e0b' : 'var(--primary)'
-                  }}
-                />
-              </div>
-            </div>
-          )}
         </div>
       </div>
     </Link>

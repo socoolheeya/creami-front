@@ -1,11 +1,11 @@
 'use client'
 
-import { Accommodation, ACCOMMODATION_TYPE_LABELS } from '@/lib/types/accommodation'
+import { Property, PROPERTY_TYPE_LABELS } from '../../../lib/types/property'
 import { Building2, Search } from 'lucide-react'
 import { useState } from 'react'
 
 interface AccommodationSelectorProps {
-  accommodations: Accommodation[]
+  accommodations: Property[]
   selectedId: string | null
   onSelect: (accommodationId: string | null) => void
 }
@@ -90,7 +90,7 @@ export function AccommodationSelector({ accommodations, selectedId, onSelect }: 
               )}
               <div className="accommodation-footer">
                 <span className="accommodation-type">
-                  {ACCOMMODATION_TYPE_LABELS[accommodation.type]}
+                  {PROPERTY_TYPE_LABELS[accommodation.type]}
                 </span>
                 {accommodation.stars && (
                   <span className="accommodation-stars">

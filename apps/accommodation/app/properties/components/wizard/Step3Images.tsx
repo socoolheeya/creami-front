@@ -1,11 +1,11 @@
-import { AccommodationFormData, AccommodationImage } from '@/lib/types/accommodation'
+import { PropertyFormData, PropertyImage } from '../../../../lib/types/property'
 import { Image as ImageIcon, Star, X, Plus } from 'lucide-react'
 import { useState } from 'react'
 import Image from 'next/image'
 
 interface Step3ImagesProps {
-  data: AccommodationFormData
-  onChange: (data: Partial<AccommodationFormData>) => void
+  data: PropertyFormData
+  onChange: (data: Partial<PropertyFormData>) => void
 }
 
 export function Step3Images({ data, onChange }: Step3ImagesProps) {
@@ -43,7 +43,7 @@ export function Step3Images({ data, onChange }: Step3ImagesProps) {
       return
     }
 
-    const newImage: AccommodationImage = {
+    const newImage: PropertyImage = {
       id: Date.now().toString(),
       name: '',
       url: trimmedUrl,

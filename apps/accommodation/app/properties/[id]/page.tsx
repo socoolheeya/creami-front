@@ -5,7 +5,7 @@ import Link from 'next/link'
 import Image from 'next/image'
 import { useState, use } from 'react'
 import { mockAccommodations } from '@/lib/data/mock-accommodations'
-import { ACCOMMODATION_TYPE_LABELS, CURRENCY_OPTIONS } from '@/lib/types/accommodation'
+import { PROPERTY_TYPE_LABELS, CURRENCY_OPTIONS } from '../../../lib/types/property'
 import { mockRatePlans } from '@/lib/data/mock-rateplans'
 import { PRICE_TYPE_LABELS } from '@/lib/types/rateplan'
 
@@ -64,7 +64,7 @@ export default function AccommodationDetailPage({ params }: { params: Promise<{ 
                   fontWeight: 'var(--font-medium)'
                 }}
               >
-                {ACCOMMODATION_TYPE_LABELS[accommodation.type]}
+                {PROPERTY_TYPE_LABELS[accommodation.type]}
               </span>
               <span
                 className="px-2 py-0.5 rounded-full text-xs"

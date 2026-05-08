@@ -1,6 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { api } from '@/lib/api/client'
-import { Accommodation } from '@/lib/types/accommodation'
+import { Property } from '../lib/types/property'
 
 // Query Keys (캐시 키 관리)
 export const propertyKeys = {
@@ -15,7 +15,7 @@ export const propertyKeys = {
 export function useProperties(filters?: Record<string, unknown>) {
   return useQuery({
     queryKey: propertyKeys.list(filters),
-    queryFn: () => api.get<Accommodation[]>('/properties'),
+    queryFn: () => api.get<Property[]>('/properties'),
   })
 }
 
@@ -23,7 +23,7 @@ export function useProperties(filters?: Record<string, unknown>) {
 export function useProperty(id: string) {
   return useQuery({
     queryKey: propertyKeys.detail(id),
-    queryFn: () => api.get<Accommodation>(`/properties/${id}`),
+    queryFn: () => api.get<Property>(`/properties/${id}`),
     enabled: !!id, // id가 있을 때만 쿼리 실행
   })
 }
@@ -33,8 +33,8 @@ export function useCreateProperty() {
   const queryClient = useQueryClient()
 
   return useMutation({
-    mutationFn: (data: Partial<Accommodation>) =>
-      api.post<Accommodation>('/properties', data),
+    mutationFn: (data: Partial<Property>) =>
+      api.post<Property>('/properties', data),
     onSuccess: () => {
       // 생성 성공 시 목록 캐시 무효화 (자동 재조회)
       queryClient.invalidateQueries({ queryKey: propertyKeys.lists() })
@@ -47,8 +47,8 @@ export function useUpdateProperty() {
   const queryClient = useQueryClient()
 
   return useMutation({
-    mutationFn: ({ id, data }: { id: string; data: Partial<Accommodation> }) =>
-      api.put<Accommodation>(`/properties/${id}`, data),
+    mutationFn: ({ id, data }: { id: string; data: Partial<Property> }) =>
+      api.put<Property>(`/properties/${id}`, data),
     onSuccess: (_, variables) => {
       // 수정 성공 시 해당 숙소 상세와 목록 캐시 무효화
       queryClient.invalidateQueries({ queryKey: propertyKeys.detail(variables.id) })

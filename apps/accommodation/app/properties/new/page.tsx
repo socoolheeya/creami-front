@@ -2,7 +2,8 @@
 
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
-import { AccommodationFormData } from '@/lib/types/accommodation'
+import { PropertyFormData } from '../../../lib/types/property'
+import { useCreateProperty } from '@/hooks/useProperties'
 import { StepIndicator } from '../components/wizard/StepIndicator'
 import { WizardNavigation } from '../components/wizard/WizardNavigation'
 import { Step1Basic } from '../components/wizard/Step1Basic'
@@ -17,25 +18,57 @@ const STORAGE_KEY = 'accommodation-draft'
 
 export default function NewAccommodationPage() {
   const router = useRouter()
+  const createProperty = useCreateProperty()
   const [currentStep, setCurrentStep] = useState(1)
-  const [formData, setFormData] = useState<AccommodationFormData>({
-    name: '',
-    type: undefined,
-    address: '',
-    phone: '',
-    email: '',
-    checkIn: '',
-    checkOut: '',
-    description: '',
-    amenities: [],
-    images: [],
-    billingPolicy: {
-      currency: '',
-      commission: {
-        type: 'percentage',
-        value: 0
+  const [isSubmitting, setIsSubmitting] = useState(false)
+
+  // 초기 상태를 함수로 설정 (localStorage에서 불러오기)
+  const [formData, setFormData] = useState<PropertyFormData>(() => {
+    const defaultData: PropertyFormData = {
+      name: '',
+      enName: '',
+      type: undefined,
+      stars: undefined,
+      address: '',
+      addressDetail: '',
+      city: '',
+      countryCode: '',
+      zipCode: '',
+      latitude: undefined,
+      longitude: undefined,
+      phone: '',
+      email: '',
+      checkIn: '',
+      checkOut: '',
+      roomCount: undefined,
+      floorCount: undefined,
+      description: '',
+      enDescription: '',
+      amenities: [],
+      images: [],
+      billingPolicy: {
+        currency: '',
+        commission: {
+          type: 'percentage',
+          value: 0
+        }
       }
     }
+
+    // localStorage에서 저장된 데이터 불러오기
+    if (typeof window !== 'undefined') {
+      const saved = localStorage.getItem(STORAGE_KEY)
+      if (saved) {
+        try {
+          const parsed = JSON.parse(saved)
+          return { ...defaultData, ...parsed }
+        } catch (e) {
+          console.error('Failed to parse saved data:', e)
+        }
+      }
+    }
+
+    return defaultData
   })
 
   // 자동 저장: 폼 데이터 변경 시 localStorage에 저장
@@ -45,21 +78,7 @@ export default function NewAccommodationPage() {
     }
   }, [formData])
 
-  // 초기 로드: localStorage에서 임시 저장 데이터 불러오기
-  useEffect(() => {
-    const saved = localStorage.getItem(STORAGE_KEY)
-    if (saved) {
-      try {
-        const parsed = JSON.parse(saved)
-        // 사용자에게 이어서 작성할지 물어볼 수 있음 (일단 자동 로드)
-        setFormData(parsed)
-      } catch (e) {
-        console.error('Failed to parse saved data:', e)
-      }
-    }
-  }, [])
-
-  const handleDataChange = (data: Partial<AccommodationFormData>) => {
+  const handleDataChange = (data: Partial<PropertyFormData>) => {
     setFormData(prev => ({ ...prev, ...data }))
   }
 
@@ -69,14 +88,29 @@ export default function NewAccommodationPage() {
       case 1:
         return !!(
           formData.name?.trim() &&
+          formData.enName?.trim() &&
           formData.type &&
+          formData.stars &&
           formData.address?.trim() &&
+          formData.addressDetail?.trim() &&
+          formData.city?.trim() &&
+          formData.countryCode?.trim() &&
+          formData.zipCode?.trim() &&
+          formData.latitude !== undefined &&
+          formData.longitude !== undefined &&
           formData.phone?.trim() &&
           formData.checkIn &&
-          formData.checkOut
+          formData.checkOut &&
+          formData.roomCount &&
+          formData.floorCount
         )
       case 2:
-        return !!(formData.description?.trim() && formData.amenities && formData.amenities.length > 0)
+        return !!(
+          formData.description?.trim() &&
+          formData.enDescription?.trim() &&
+          formData.amenities &&
+          formData.amenities.length > 0
+        )
       case 3:
         return !!(formData.images && formData.images.length > 0)
       case 4:
@@ -100,17 +134,59 @@ export default function NewAccommodationPage() {
     setCurrentStep(prev => Math.max(prev - 1, 1))
   }
 
-  const handleSubmit = () => {
-    if (!validateStep(currentStep)) return
+  const handleSubmit = async () => {
+    if (!validateStep(currentStep) || isSubmitting) return
 
-    // TODO: API 호출하여 숙소 생성
-    console.log('Submitting accommodation:', formData)
+    setIsSubmitting(true)
 
-    // 임시 저장 데이터 삭제
-    localStorage.removeItem(STORAGE_KEY)
+    try {
+      // formData를 API가 요구하는 형식으로 변환
+      const accommodationData = {
+        name: formData.name!,
+        enName: formData.enName!,
+        type: formData.type!,
+        stars: formData.stars!,
+        address: formData.address!,
+        addressDetail: formData.addressDetail!,
+        city: formData.city!,
+        countryCode: formData.countryCode!,
+        zipCode: formData.zipCode!,
+        latitude: formData.latitude!,
+        longitude: formData.longitude!,
+        phone: formData.phone!,
+        email: formData.email,
+        checkIn: formData.checkIn!,
+        checkOut: formData.checkOut!,
+        roomCount: formData.roomCount!,
+        floorCount: formData.floorCount!,
+        description: formData.description!,
+        enDescription: formData.enDescription!,
+        amenities: formData.amenities || [],
+        images: formData.images || [],
+        billingPolicy: {
+          currency: formData.billingPolicy?.currency || 'KRW',
+          commission: {
+            type: formData.billingPolicy?.commission?.type || 'percentage',
+            value: formData.billingPolicy?.commission?.value || 0
+          }
+        },
+        status: 'draft' as const
+      }
 
-    // 목록 페이지로 이동
-    router.push('/properties')
+      // API 호출하여 숙소 생성
+      await createProperty.mutateAsync(accommodationData)
+
+      // 임시 저장 데이터 삭제
+      localStorage.removeItem(STORAGE_KEY)
+
+      // 목록 페이지로 이동
+      router.push('/properties')
+    } catch (error) {
+      console.error('Failed to create property:', error)
+      alert('숙소 등록에 실패했습니다. 다시 시도해주세요.')
+    } finally {
+      setIsSubmitting(false)
+    }
   }
 
   const renderStep = () => {
@@ -170,7 +246,8 @@ export default function NewAccommodationPage() {
           onPrevious={handlePrevious}
           onNext={handleNext}
           onSubmit={handleSubmit}
-          canProceed={validateStep(currentStep)}
+          canProceed={validateStep(currentStep) && !isSubmitting}
+          isSubmitting={isSubmitting}
         />
       </div>
 

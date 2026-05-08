@@ -24,7 +24,8 @@ export function SearchForm({ onSearch, isLoading }: SearchFormProps) {
   const dropdownRef = useRef<HTMLDivElement>(null)
 
   const filteredAccommodations = mockAccommodations.filter(acc =>
-    acc.name.toLowerCase().includes(searchQuery.toLowerCase())
+    acc.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    acc.id.toLowerCase().includes(searchQuery.toLowerCase())
   )
 
   // 외부 클릭 시 드롭다운 닫기
@@ -56,13 +57,13 @@ export function SearchForm({ onSearch, isLoading }: SearchFormProps) {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
 
-    if (!accommodationId || !checkIn || !checkOut) {
+    if ((!accommodationId && !searchQuery) || !checkIn || !checkOut) {
       alert('모든 필수 항목을 입력해주세요')
       return
     }
 
     const request: SearchRequest = {
-      accommodationId,
+      ...(accommodationId ? { accommodationId } : { accommodationQuery: searchQuery }),
       checkIn,
       checkOut,
       occupancies
@@ -97,8 +98,8 @@ export function SearchForm({ onSearch, isLoading }: SearchFormProps) {
               value={searchQuery}
               onChange={(e) => handleSearchQueryChange(e.target.value)}
               onFocus={() => setShowDropdown(true)}
-              placeholder="숙소명 검색..."
-              required={!accommodationId}
+              placeholder="숙소명 또는 숙소ID 검색..."
+              required={!accommodationId && !searchQuery}
               className="w-full px-3 py-2 rounded-lg"
               style={{
                 backgroundColor: 'var(--bg-secondary)',
@@ -144,7 +145,7 @@ export function SearchForm({ onSearch, isLoading }: SearchFormProps) {
                   >
                     <div style={{ fontWeight: 'var(--font-medium)' }}>{acc.name}</div>
                     <div style={{ fontSize: '12px', color: 'var(--text-tertiary)', marginTop: '2px' }}>
-                      {acc.address}
+                      ID: {acc.id} · {acc.address}
                     </div>
                   </div>
                 ))

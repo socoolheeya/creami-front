@@ -4,10 +4,10 @@ import { Edit, MoreVertical, MapPin, ImageIcon } from 'lucide-react'
 import Link from 'next/link'
 import Image from 'next/image'
 import { useState } from 'react'
-import { Accommodation, ACCOMMODATION_TYPE_LABELS } from '@/lib/types/accommodation'
+import { Property, PROPERTY_TYPE_LABELS } from '../../../lib/types/property'
 
 interface AccommodationCardProps {
-  accommodation: Accommodation
+  accommodation: Property
 }
 
 export function AccommodationCard({ accommodation }: AccommodationCardProps) {
@@ -71,7 +71,7 @@ export function AccommodationCard({ accommodation }: AccommodationCardProps) {
             fontWeight: 'var(--font-medium)'
           }}
         >
-          {ACCOMMODATION_TYPE_LABELS[accommodation.type]}
+          {PROPERTY_TYPE_LABELS[accommodation.type]}
         </div>
 
         {/* Name */}

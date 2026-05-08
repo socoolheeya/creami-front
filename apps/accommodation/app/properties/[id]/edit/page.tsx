@@ -5,7 +5,7 @@ import Link from 'next/link'
 import { useState, use } from 'react'
 import { useRouter } from 'next/navigation'
 import { mockAccommodations } from '@/lib/data/mock-accommodations'
-import { ACCOMMODATION_TYPE_LABELS, CURRENCY_OPTIONS, AMENITY_OPTIONS, AccommodationType } from '@/lib/types/accommodation'
+import { PROPERTY_TYPE_LABELS, CURRENCY_OPTIONS, AMENITY_OPTIONS, PropertyType } from '../../../../lib/types/property'
 
 export default function EditAccommodationPage({ params }: { params: Promise<{ id: string }> }) {
   const router = useRouter()
@@ -159,7 +159,7 @@ export default function EditAccommodationPage({ params }: { params: Promise<{ id
                 </label>
                 <select
                   value={formData.type}
-                  onChange={(e) => setFormData({ ...formData, type: e.target.value as AccommodationType })}
+                  onChange={(e) => setFormData({ ...formData, type: e.target.value as PropertyType })}
                   className="w-full px-4 py-2 rounded"
                   style={{
                     backgroundColor: 'var(--bg-secondary)',
@@ -169,7 +169,7 @@ export default function EditAccommodationPage({ params }: { params: Promise<{ id
                   }}
                   required
                 >
-                  {Object.entries(ACCOMMODATION_TYPE_LABELS).map(([key, label]) => (
+                  {Object.entries(PROPERTY_TYPE_LABELS).map(([key, label]) => (
                     <option key={key} value={key}>{label}</option>
                   ))}
                 </select>

@@ -14,7 +14,7 @@ export function ViewToggle({ view, onViewChange }: ViewToggleProps) {
       style={{
         border: '1px solid var(--border-color)',
         backgroundColor: 'var(--bg-tertiary)',
-        borderRadius: 'var(--radius-sm)',
+        borderRadius: 'var(--radius)',
         width: '80px',
         height: '40px'
       }}
@@ -27,7 +27,7 @@ export function ViewToggle({ view, onViewChange }: ViewToggleProps) {
           width: 'calc(50% - 4px)',
           height: 'calc(100% - 8px)',
           backgroundColor: 'var(--primary)',
-          borderRadius: 'var(--radius-sm)',
+          borderRadius: 'var(--radius)',
           zIndex: 0
         }}
       />

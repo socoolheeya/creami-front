@@ -13,12 +13,22 @@ type ViewType = 'calendar' | 'grid'
 
 export default function InventoriesPage() {
   const [selectedPropertyId, setSelectedPropertyId] = useState<string>('')
+  const [searchQuery, setSearchQuery] = useState<string>('')
   const [selectedRoomIds, setSelectedRoomIds] = useState<string[]>([])
   const [startDate, setStartDate] = useState<string>('')
   const [endDate, setEndDate] = useState<string>('')
   const [showResults, setShowResults] = useState(false)
   const [isCollapsed, setIsCollapsed] = useState(false)
   const [viewType, setViewType] = useState<ViewType>('grid')
+
+  // Filter properties by search query (ID or name)
+  const filteredProperties = searchQuery
+    ? mockProperties.filter(p =>
+        p.id.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        p.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        p.code.toLowerCase().includes(searchQuery.toLowerCase())
+      )
+    : mockProperties
 
   // Get available room types for selected property
   const availableRooms = selectedPropertyId
@@ -41,6 +51,11 @@ export default function InventoriesPage() {
   const handlePropertyChange = (propertyId: string) => {
     setSelectedPropertyId(propertyId)
     setSelectedRoomIds([]) // Reset room selection when property changes
+    // Update search query with selected property name
+    const property = mockProperties.find(p => p.id === propertyId)
+    if (property) {
+      setSearchQuery(property.name)
+    }
   }
 
   const handleRoomSelect = (roomId: string) => {
@@ -62,6 +77,7 @@ export default function InventoriesPage() {
 
   const handleReset = () => {
     setSelectedPropertyId('')
+    setSearchQuery('')
     setSelectedRoomIds([])
     setStartDate('')
     setEndDate('')
@@ -156,33 +172,80 @@ export default function InventoriesPage() {
         {/* Panel Content */}
         {!isCollapsed && (
           <div className="p-6 pt-4">
-            {/* Property Selection */}
+            {/* Property Search */}
             <div className="mb-4">
               <label
                 className="block text-sm mb-2"
                 style={{ color: 'var(--text-secondary)', fontWeight: 'var(--font-medium)' }}
               >
-                숙소 선택
+                숙소 검색
               </label>
-              <select
-                value={selectedPropertyId}
-                onChange={(e) => handlePropertyChange(e.target.value)}
-                className="w-full px-4 py-2 rounded-lg"
-                style={{
-                  backgroundColor: 'var(--bg-secondary)',
-                  border: '1px solid var(--border-color)',
-                  color: 'var(--text-primary)',
-                  borderRadius: 'var(--radius-sm)',
-                  fontWeight: 'var(--font-medium)'
-                }}
-              >
-                <option value="">숙소를 선택하세요</option>
-                {mockProperties.map((property) => (
-                  <option key={property.id} value={property.id}>
-                    {property.name} ({property.code})
-                  </option>
-                ))}
-              </select>
+
+              {/* Search Input */}
+              <div className="relative">
+                <input
+                  type="text"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  placeholder="숙소 ID, 코드 또는 이름으로 검색..."
+                  className="w-full px-3 py-2 pr-10 text-sm rounded-lg"
+                  style={{
+                    backgroundColor: 'var(--bg-secondary)',
+                    border: '1px solid var(--border-color)',
+                    color: 'var(--text-primary)',
+                    borderRadius: 'var(--radius)'
+                  }}
+                />
+                <Search className="absolute right-3 top-1/2 transform -translate-y-1/2 w-5 h-5" style={{ color: 'var(--text-tertiary)' }} />
+              </div>
+
+              {searchQuery && filteredProperties.length === 0 && (
+                <div className="mt-2 text-sm" style={{ color: 'var(--text-tertiary)' }}>
+                  검색 결과가 없습니다
+                </div>
+              )}
+
+              {searchQuery && filteredProperties.length > 0 && (
+                <div
+                  className="mt-2 rounded-lg overflow-hidden"
+                  style={{
+                    backgroundColor: 'var(--bg-primary)',
+                    border: '1px solid var(--border-color)',
+                    maxHeight: '200px',
+                    overflowY: 'auto'
+                  }}
+                >
+                  {filteredProperties.map((property) => (
+                    <div
+                      key={property.id}
+                      onClick={() => handlePropertyChange(property.id)}
+                      className="px-4 py-3 cursor-pointer transition-colors"
+                      style={{
+                        backgroundColor: selectedPropertyId === property.id ? 'var(--primary-bg)' : 'transparent',
+                        borderLeft: selectedPropertyId === property.id ? '3px solid var(--primary)' : '3px solid transparent',
+                        borderBottom: '1px solid var(--border-color)'
+                      }}
+                      onMouseEnter={(e) => {
+                        if (selectedPropertyId !== property.id) {
+                          e.currentTarget.style.backgroundColor = 'var(--bg-secondary)'
+                        }
+                      }}
+                      onMouseLeave={(e) => {
+                        if (selectedPropertyId !== property.id) {
+                          e.currentTarget.style.backgroundColor = 'transparent'
+                        }
+                      }}
+                    >
+                      <div style={{ fontWeight: 'var(--font-medium)', color: 'var(--text-primary)' }}>
+                        {property.name}
+                      </div>
+                      <div style={{ fontSize: '0.75rem', color: 'var(--text-tertiary)', marginTop: '2px' }}>
+                        ID: {property.id} · 코드: {property.code}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
 
             {/* Room Type Selection */}
@@ -204,13 +267,12 @@ export default function InventoriesPage() {
                       e.target.value = '' // Reset select
                     }
                   }}
-                  className="w-full px-4 py-2 rounded-lg mb-3"
+                  className="w-full px-3 py-2 text-sm rounded-lg mb-3"
                   style={{
                     backgroundColor: 'var(--bg-secondary)',
                     border: '1px solid var(--border-color)',
                     color: 'var(--text-primary)',
-                    borderRadius: 'var(--radius-sm)',
-                    fontWeight: 'var(--font-medium)'
+                    borderRadius: 'var(--radius)'
                   }}
                 >
                   <option value="">객실 타입을 선택하세요</option>
@@ -229,15 +291,14 @@ export default function InventoriesPage() {
                     {selectedRooms.map((room) => (
                       <div
                         key={room.id}
-                        className="flex items-center gap-2 px-3 py-1.5 rounded-lg"
+                        className="flex items-center gap-2 px-3 py-1.5 text-sm rounded-lg"
                         style={{
                           backgroundColor: 'var(--primary)',
                           color: '#ffffff',
-                          borderRadius: 'var(--radius-sm)',
-                          fontWeight: 'var(--font-medium)'
+                          borderRadius: 'var(--radius)'
                         }}
                       >
-                        <span className="text-sm">{room.name}</span>
+                        <span>{room.name}</span>
                         <button
                           onClick={() => handleRoomRemove(room.id)}
                           className="hover:opacity-80 transition-opacity"
@@ -251,11 +312,11 @@ export default function InventoriesPage() {
 
                 {selectedRooms.length === 0 && (
                   <div
-                    className="text-sm text-center py-3 rounded-lg"
+                    className="text-sm text-center py-2 rounded-lg"
                     style={{
                       backgroundColor: 'var(--bg-secondary)',
                       color: 'var(--text-tertiary)',
-                      borderRadius: 'var(--radius-sm)'
+                      borderRadius: 'var(--radius)'
                     }}
                   >
                     선택된 객실이 없습니다
@@ -306,12 +367,11 @@ export default function InventoriesPage() {
                   <button
                     key={days}
                     onClick={() => handleQuickDateSelect(days)}
-                    className="px-4 py-2 rounded-lg transition-colors"
+                    className="px-3 py-1.5 text-sm rounded-lg transition-colors"
                     style={{
                       backgroundColor: 'var(--bg-tertiary)',
                       color: 'var(--text-primary)',
-                      borderRadius: 'var(--radius-sm)',
-                      fontWeight: 'var(--font-medium)',
+                      borderRadius: 'var(--radius)',
                       border: '1px solid var(--border-color)'
                     }}
                     onMouseEnter={(e) => {
@@ -336,28 +396,26 @@ export default function InventoriesPage() {
               <button
                 onClick={handleSearch}
                 disabled={!selectedPropertyId || selectedRoomIds.length === 0 || !startDate || !endDate}
-                className="flex items-center gap-2 px-6 py-2 rounded-lg transition-colors"
+                className="flex items-center gap-2 px-3 py-1.5 text-sm rounded-lg transition-colors"
                 style={{
                   backgroundColor: (selectedPropertyId && selectedRoomIds.length > 0 && startDate && endDate) ? 'var(--primary)' : 'var(--bg-tertiary)',
                   color: (selectedPropertyId && selectedRoomIds.length > 0 && startDate && endDate) ? '#ffffff' : 'var(--text-tertiary)',
-                  borderRadius: 'var(--radius-sm)',
-                  fontWeight: 'var(--font-medium)',
+                  borderRadius: 'var(--radius)',
                   cursor: (selectedPropertyId && selectedRoomIds.length > 0 && startDate && endDate) ? 'pointer' : 'not-allowed'
                 }}
               >
-                <Search className="w-5 h-5" />
+                <Search className="w-4 h-4" />
                 조회
               </button>
 
               {showResults && (
                 <button
                   onClick={handleReset}
-                  className="px-6 py-2 rounded-lg transition-colors"
+                  className="px-3 py-1.5 text-sm rounded-lg transition-colors"
                   style={{
                     backgroundColor: 'var(--bg-secondary)',
                     color: 'var(--text-primary)',
-                    borderRadius: 'var(--radius-sm)',
-                    fontWeight: 'var(--font-medium)',
+                    borderRadius: 'var(--radius)',
                     border: '1px solid var(--border-color)'
                   }}
                 >
@@ -377,8 +435,8 @@ export default function InventoriesPage() {
             style={{
               border: '1px solid var(--border-color)',
               backgroundColor: 'var(--bg-tertiary)',
-              borderRadius: 'var(--radius-sm)',
-              width: '120px',
+              borderRadius: 'var(--radius)',
+              width: '80px',
               height: '40px'
             }}
           >
@@ -389,7 +447,7 @@ export default function InventoriesPage() {
                 width: 'calc(50% - 4px)',
                 height: 'calc(100% - 8px)',
                 backgroundColor: 'var(--primary)',
-                borderRadius: 'var(--radius-sm)',
+                borderRadius: 'var(--radius)',
                 zIndex: 0
               }}
             />

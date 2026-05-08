@@ -1,9 +1,9 @@
 'use client'
 
-import { DoorOpen, Plus } from 'lucide-react'
+import { DoorOpen, Plus, Search } from 'lucide-react'
 import Link from 'next/link'
-import { useState } from 'react'
-import { mockRooms } from '@/lib/data/mock-rooms'
+import { useState, useMemo } from 'react'
+import { useRooms } from '@/hooks/useRooms'
 import { RoomCard } from './components/RoomCard'
 import { RoomTable } from './components/RoomTable'
 import { ViewToggle } from './components/ViewToggle'
@@ -11,17 +11,20 @@ import { ViewToggle } from './components/ViewToggle'
 type ViewMode = 'grid' | 'table'
 
 export default function RoomsPage() {
-  const rooms = mockRooms
+  const { data, isLoading, error } = useRooms()
   const [viewMode, setViewMode] = useState<ViewMode>('grid')
   const [searchQuery, setSearchQuery] = useState('')
 
+  // API 응답이 배열이 아닐 경우 대비
+  const rooms = Array.isArray(data) ? data : (data?.data || [])
+
   // 검색 필터링
-  const filteredRooms = rooms.filter(room => {
+  const filteredRooms = useMemo(() => rooms.filter(room => {
     const matchesSearch = searchQuery === '' ||
       room.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
       room.accommodationName?.toLowerCase().includes(searchQuery.toLowerCase())
     return matchesSearch
-  })
+  }), [rooms, searchQuery])
 
   return (
     <div>
@@ -52,26 +55,45 @@ export default function RoomsPage() {
 
       {/* Search and View Toggle */}
       <div className="mb-4 flex gap-3">
-        <input
-          type="text"
-          placeholder="객실명 또는 숙소명으로 검색..."
-          value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
-          className="flex-1 px-3 py-2 text-sm rounded-lg"
-          style={{
-            backgroundColor: 'var(--bg-primary)',
-            border: '1px solid var(--border-color)',
-            color: 'var(--text-primary)',
-            borderRadius: 'var(--radius-sm)'
-          }}
-        />
+        <div className="flex-1 relative">
+          <input
+            type="text"
+            placeholder="객실명 또는 숙소명으로 검색..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="w-full px-3 py-2 pr-10 text-sm rounded-lg"
+            style={{
+              backgroundColor: 'var(--bg-primary)',
+              border: '1px solid var(--border-color)',
+              color: 'var(--text-primary)',
+              borderRadius: 'var(--radius)'
+            }}
+          />
+          <Search className="absolute right-3 top-1/2 transform -translate-y-1/2 w-5 h-5 pointer-events-none" style={{ color: 'var(--text-tertiary)' }} />
+        </div>
 
         {/* View Toggle */}
         <ViewToggle view={viewMode} onViewChange={setViewMode} />
       </div>
 
-      {/* Room List */}
-      {filteredRooms.length === 0 ? (
+      {/* Loading State */}
+      {isLoading ? (
+        <div className="flex items-center justify-center py-12">
+          <div style={{ color: 'var(--text-secondary)' }}>로딩 중...</div>
+        </div>
+      ) : error ? (
+        <div
+          className="flex flex-col items-center justify-center py-12 rounded-lg"
+          style={{
+            backgroundColor: 'var(--bg-primary)',
+            borderRadius: 'var(--radius)',
+            border: '2px solid var(--error)'
+          }}
+        >
+          <p style={{ color: 'var(--error)' }}>데이터를 불러오는데 실패했습니다.</p>
+          <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>{error.message}</p>
+        </div>
+      ) : filteredRooms.length === 0 ? (
         <div
           className="flex flex-col items-center justify-center py-16 rounded-lg"
           style={{

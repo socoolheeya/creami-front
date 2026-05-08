@@ -17,15 +17,17 @@ export function Sidebar() {
 
   return (
     <aside
-      className="fixed left-0 top-16 bottom-0 z-30 transition-all duration-300"
+      className="fixed left-0 bottom-0 z-30"
       style={{
-        width: isCollapsed ? '80px' : '288px',
+        top: 'var(--header-height)',
+        width: isCollapsed ? 'var(--sidebar-collapsed)' : 'var(--sidebar-width)',
         backgroundColor: 'var(--bg-primary)',
-        borderRight: '1px solid var(--border-color)'
+        borderRight: '1px solid var(--border-color)',
+        transition: 'width 300ms ease-in-out'
       }}
     >
-      <nav className="p-4">
-        <ul className="space-y-2">
+      <nav style={{ padding: 'var(--spacing-md)' }}>
+        <ul style={{ display: 'flex', flexDirection: 'column', gap: 'var(--spacing-sm)' }}>
           {menuItems.map((item) => {
             const Icon = item.icon
             const isActive = pathname === item.href
@@ -34,21 +36,25 @@ export function Sidebar() {
               <li key={item.href}>
                 <Link
                   href={item.href}
-                  className="flex items-center gap-3 px-3 py-2 rounded-lg transition-colors overflow-hidden"
+                  className="flex items-center overflow-hidden transition-colors"
                   style={{
+                    gap: 'var(--spacing-sm)',
+                    padding: 'var(--spacing-sm) var(--spacing-md)',
                     backgroundColor: isActive ? 'var(--primary)' : 'transparent',
                     color: isActive ? '#ffffff' : 'var(--text-primary)',
-                    borderRadius: 'var(--radius-sm)'
+                    borderRadius: 'var(--radius-sm)',
+                    fontSize: 'var(--font-size-sm)',
+                    fontWeight: 'var(--font-medium)'
                   }}
                   title={isCollapsed ? item.label : undefined}
                 >
-                  <Icon className="w-5 h-5 flex-shrink-0" />
+                  <Icon style={{ width: '1.25rem', height: '1.25rem', flexShrink: 0 }} />
                   <span
-                    className="whitespace-nowrap transition-all duration-300"
+                    className="whitespace-nowrap"
                     style={{
-                      fontWeight: 'var(--font-medium)',
                       opacity: isCollapsed ? 0 : 1,
-                      maxWidth: isCollapsed ? '0' : '200px'
+                      maxWidth: isCollapsed ? '0' : '200px',
+                      transition: 'opacity 300ms, max-width 300ms'
                     }}
                   >
                     {item.label}

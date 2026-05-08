@@ -1,4 +1,4 @@
-export type AccommodationType =
+export type PropertyType =
   | 'hotel'
   | 'resort'
   | 'motel'
@@ -27,9 +27,9 @@ export type AccommodationType =
   | 'eco_hotel'
   | 'other'
 
-export type AccommodationStatus = 'draft' | 'active' | 'inactive' | 'archived'
+export type PropertyStatus = 'draft' | 'active' | 'inactive' | 'archived'
 
-export interface AccommodationImage {
+export interface PropertyImage {
   id: string
   name: string
   url: string
@@ -55,13 +55,13 @@ export interface BillingPolicy {
   tax?: ChargeConfig
 }
 
-export interface Accommodation {
+export interface Property {
   id: string
 
   // Step 1: 기본정보
   name: string
   enName?: string
-  type: AccommodationType
+  type: PropertyType
   stars?: number
 
   // Address
@@ -98,12 +98,12 @@ export interface Accommodation {
   amenities: string[]
 
   // Step 3: Images
-  images: AccommodationImage[]
+  images: PropertyImage[]
 
   // Step 4: Billing Policy
   billingPolicy: BillingPolicy
 
-  status: AccommodationStatus
+  status: PropertyStatus
   createdAt: Date
   updatedAt: Date
   createdBy: string
@@ -111,24 +111,45 @@ export interface Accommodation {
 }
 
 // Wizard 폼 데이터 (각 단계별)
-export interface AccommodationFormData {
-  // Step 1
+export interface PropertyFormData {
+  // Step 1: 기본 정보
   name?: string
-  type?: AccommodationType
+  enName?: string
+  type?: PropertyType
+  stars?: number
+
+  // 주소 정보
   address?: string
+  addressDetail?: string
+  city?: string
+  countryCode?: string
+  zipCode?: string
+
+  // 위치 정보
+  latitude?: number
+  longitude?: number
+
+  // 연락처
   phone?: string
   email?: string
+
+  // 체크인/아웃
   checkIn?: string
   checkOut?: string
 
-  // Step 2
+  // 숙소 정보
+  roomCount?: number
+  floorCount?: number
+
+  // Step 2: 상세 설명
   description?: string
+  enDescription?: string
   amenities?: string[]
 
-  // Step 3
-  images?: AccommodationImage[]
+  // Step 3: 이미지
+  images?: PropertyImage[]
 
-  // Step 4
+  // Step 4: 요금 정책
   billingPolicy?: Partial<BillingPolicy>
 }
 
@@ -158,7 +179,7 @@ export const CURRENCY_OPTIONS = [
 ] as const
 
 // 숙소 타입 라벨
-export const ACCOMMODATION_TYPE_LABELS: Record<AccommodationType, string> = {
+export const PROPERTY_TYPE_LABELS: Record<PropertyType, string> = {
   hotel: '호텔',
   resort: '리조트',
   motel: '모텔',

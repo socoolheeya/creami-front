@@ -3,21 +3,26 @@
 import { useState, useEffect, Suspense } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { RoomFormData } from '@/lib/types/room'
+import { useCreateRoom } from '@/hooks/useRooms'
 import { StepIndicator } from '../components/wizard/StepIndicator'
 import { WizardNavigation } from '../components/wizard/WizardNavigation'
 import { Step1Basic } from '../components/wizard/Step1Basic'
 import { Step2Details } from '../components/wizard/Step2Details'
-import { Step3Features } from '../components/wizard/Step3Features'
-import { Step4Images } from '../components/wizard/Step4Images'
+import { Step3Occupancy } from '../components/wizard/Step3Occupancy'
+import { Step4Description } from '../components/wizard/Step4Description'
+import { Step5Features } from '../components/wizard/Step5Features'
+import { Step6Images } from '../components/wizard/Step6Images'
 
-const STEPS = ['기본정보', '객실정보', '특징', '이미지']
+const STEPS = ['기본정보', '객실정보', '인원정보', '상세설명', '특징', '이미지']
 
 function NewRoomPageContent() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const preselectedAccommodationId = searchParams?.get('accommodation') || undefined
+  const createRoom = useCreateRoom()
 
   const [currentStep, setCurrentStep] = useState(1)
+  const [isSubmitting, setIsSubmitting] = useState(false)
   const [formData, setFormData] = useState<RoomFormData>({
     accommodationId: preselectedAccommodationId,
     sizeUnit: 'sqm',
@@ -41,7 +46,10 @@ function NewRoomPageContent() {
         return !!(
           formData.size &&
           formData.size > 0 &&
-          formData.floor !== undefined &&
+          formData.floor !== undefined
+        )
+      case 3:
+        return !!(
           formData.bedConfiguration &&
           formData.bedConfiguration.length > 0 &&
           formData.standardOccupancy &&
@@ -49,9 +57,11 @@ function NewRoomPageContent() {
           formData.maxOccupancy &&
           formData.maxOccupancy >= formData.standardOccupancy
         )
-      case 3:
-        return !!(formData.viewType && formData.smokingAllowed !== undefined)
       case 4:
+        return true // 상세설명은 선택사항
+      case 5:
+        return !!(formData.viewType && formData.smokingAllowed !== undefined)
+      case 6:
         return true // 이미지는 선택사항
       default:
         return false
@@ -70,15 +80,23 @@ function NewRoomPageContent() {
     }
   }
 
-  const handleSubmit = () => {
-    if (!canProceed()) return
+  const handleSubmit = async () => {
+    if (!canProceed() || isSubmitting) return
 
-    // TODO: API 호출로 데이터 저장
-    console.log('객실 데이터:', formData)
+    setIsSubmitting(true)
 
-    // 임시로 콘솔 출력 후 목록으로 이동
-    alert('객실이 등록되었습니다!')
-    router.push('/rooms')
+    try {
+      // API 호출하여 객실 생성
+      await createRoom.mutateAsync(formData)
+
+      // 목록 페이지로 이동
+      router.push('/rooms')
+    } catch (error) {
+      console.error('Failed to create room:', error)
+      alert('객실 등록에 실패했습니다. 다시 시도해주세요.')
+    } finally {
+      setIsSubmitting(false)
+    }
   }
 
   return (
@@ -126,10 +144,16 @@ function NewRoomPageContent() {
             <Step2Details formData={formData} onChange={handleChange} />
           )}
           {currentStep === 3 && (
-            <Step3Features formData={formData} onChange={handleChange} />
+            <Step3Occupancy formData={formData} onChange={handleChange} />
           )}
           {currentStep === 4 && (
-            <Step4Images formData={formData} onChange={handleChange} />
+            <Step4Description formData={formData} onChange={handleChange} />
+          )}
+          {currentStep === 5 && (
+            <Step5Features formData={formData} onChange={handleChange} />
+          )}
+          {currentStep === 6 && (
+            <Step6Images formData={formData} onChange={handleChange} />
           )}
         </div>
 
@@ -141,6 +165,7 @@ function NewRoomPageContent() {
           onNext={handleNext}
           onSubmit={handleSubmit}
           canProceed={canProceed()}
+          isSubmitting={isSubmitting}
         />
       </div>
     </div>

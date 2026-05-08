@@ -14,12 +14,11 @@ function MainLayoutContent({ children }: { children: ReactNode }) {
       <Sidebar />
       <main
         style={{
-          marginLeft: isCollapsed ? '80px' : '288px',
-          paddingTop: 'var(--main-padding-top)',
-          paddingLeft: 'var(--main-padding-x)',
-          paddingRight: 'var(--main-padding-x)',
-          paddingBottom: 'var(--main-padding-x)',
-          transition: 'all 300ms'
+          marginLeft: isCollapsed ? 'var(--sidebar-collapsed)' : 'var(--sidebar-width)',
+          marginTop: 'var(--header-height)',
+          padding: 'var(--spacing-xl)',
+          transition: 'margin-left 300ms ease-in-out',
+          minHeight: 'calc(100vh - var(--header-height))'
         }}
       >
         {children}

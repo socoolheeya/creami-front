@@ -1,17 +1,20 @@
 'use client'
 
-import { Building2, Plus, LayoutGrid, List } from 'lucide-react'
+import { Building2, Plus, LayoutGrid, List, Search } from 'lucide-react'
 import Link from 'next/link'
 import { useState } from 'react'
-import { mockAccommodations } from '@/lib/data/mock-accommodations'
+import { useProperties } from '@/hooks/useProperties'
 import { AccommodationCard } from './components/AccommodationCard'
 import { AccommodationTable } from './components/AccommodationTable'
 
 type ViewMode = 'grid' | 'table'
 
 export default function AccommodationsPage() {
-  const accommodations = mockAccommodations
+  const { data, isLoading, error } = useProperties()
   const [viewMode, setViewMode] = useState<ViewMode>('grid')
+
+  // API 응답이 배열이 아닐 경우 대비 (예: { data: [...] } 형태)
+  const accommodations = Array.isArray(data) ? data : (data?.data || [])
 
   return (
     <div>
@@ -42,17 +45,20 @@ export default function AccommodationsPage() {
 
       {/* Search and View Toggle */}
       <div className="mb-4 flex gap-3">
-        <input
-          type="text"
-          placeholder="숙소명 또는 주소로 검색..."
-          className="flex-1 px-3 py-1.5 rounded-lg text-sm"
-          style={{
-            backgroundColor: 'var(--bg-primary)',
-            border: '1px solid var(--border-color)',
-            color: 'var(--text-primary)',
-            borderRadius: 'var(--radius-sm)'
-          }}
-        />
+        <div className="flex-1 relative">
+          <input
+            type="text"
+            placeholder="숙소명 또는 주소로 검색..."
+            className="w-full px-3 py-2 pr-10 text-sm rounded-lg"
+            style={{
+              backgroundColor: 'var(--bg-primary)',
+              border: '1px solid var(--border-color)',
+              color: 'var(--text-primary)',
+              borderRadius: 'var(--radius)'
+            }}
+          />
+          <Search className="absolute right-3 top-1/2 transform -translate-y-1/2 w-5 h-5 pointer-events-none" style={{ color: 'var(--text-tertiary)' }} />
+        </div>
 
         {/* View Toggle Switch */}
         <div
@@ -60,9 +66,9 @@ export default function AccommodationsPage() {
           style={{
             border: '1px solid var(--border-color)',
             backgroundColor: 'var(--bg-tertiary)',
-            borderRadius: 'var(--radius-sm)',
-            width: '70px',
-            height: '34px'
+            borderRadius: 'var(--radius)',
+            width: '80px',
+            height: '40px'
           }}
         >
           {/* Sliding Background */}
@@ -73,7 +79,7 @@ export default function AccommodationsPage() {
               width: 'calc(50% - 4px)',
               height: 'calc(100% - 8px)',
               backgroundColor: 'var(--primary)',
-              borderRadius: 'var(--radius-sm)',
+              borderRadius: 'var(--radius)',
               zIndex: 0
             }}
           />
@@ -88,7 +94,7 @@ export default function AccommodationsPage() {
             }}
             title="카드 뷰"
           >
-            <LayoutGrid className="w-4 h-4" />
+            <LayoutGrid className="w-5 h-5" />
           </button>
 
           {/* Table Button */}
@@ -101,13 +107,29 @@ export default function AccommodationsPage() {
             }}
             title="테이블 뷰"
           >
-            <List className="w-4 h-4" />
+            <List className="w-5 h-5" />
           </button>
         </div>
       </div>
 
-      {/* Accommodation List */}
-      {accommodations.length === 0 ? (
+      {/* Loading State */}
+      {isLoading ? (
+        <div className="flex items-center justify-center py-12">
+          <div style={{ color: 'var(--text-secondary)' }}>로딩 중...</div>
+        </div>
+      ) : error ? (
+        <div
+          className="flex flex-col items-center justify-center py-12 rounded-lg"
+          style={{
+            backgroundColor: 'var(--bg-primary)',
+            borderRadius: 'var(--radius)',
+            border: '2px solid var(--error)'
+          }}
+        >
+          <p style={{ color: 'var(--error)' }}>데이터를 불러오는데 실패했습니다.</p>
+          <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>{error.message}</p>
+        </div>
+      ) : accommodations.length === 0 ? (
         <div
           className="flex flex-col items-center justify-center py-12 rounded-lg"
           style={{

@@ -11,7 +11,8 @@ export interface RoomOccupancy {
 }
 
 export interface SearchRequest {
-  accommodationId: string
+  accommodationId?: string // 숙소 ID로 검색 (accommodationQuery와 둘 중 하나만 사용)
+  accommodationQuery?: string // 숙소명 또는 ID로 텍스트 검색 (accommodationId와 둘 중 하나만 사용)
   checkIn: string // YYYY-MM-DD
   checkOut: string // YYYY-MM-DD
   occupancies: RoomOccupancy[]
@@ -30,6 +31,8 @@ export interface AvailableRoomRate {
   nights: number
   available: boolean
   maxOccupancy: number
+  freeCancellation: boolean // 무료 취소 가능 여부
+  cancellationDeadline?: string // 무료 취소 마감일 (YYYY-MM-DD)
 }
 
 export interface SearchResponse {

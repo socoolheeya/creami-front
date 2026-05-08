@@ -1,4 +1,4 @@
-import { ChevronLeft, ChevronRight, Check } from 'lucide-react'
+import { ChevronLeft, ChevronRight, Check, Loader2 } from 'lucide-react'
 
 interface WizardNavigationProps {
   currentStep: number
@@ -7,6 +7,7 @@ interface WizardNavigationProps {
   onNext: () => void
   onSubmit: () => void
   canProceed: boolean
+  isSubmitting?: boolean
 }
 
 export function WizardNavigation({
@@ -15,7 +16,8 @@ export function WizardNavigation({
   onPrevious,
   onNext,
   onSubmit,
-  canProceed
+  canProceed,
+  isSubmitting = false
 }: WizardNavigationProps) {
   const isFirstStep = currentStep === 1
   const isLastStep = currentStep === totalSteps
@@ -46,19 +48,28 @@ export function WizardNavigation({
       {isLastStep ? (
         <button
           onClick={onSubmit}
-          disabled={!canProceed}
+          disabled={!canProceed || isSubmitting}
           className="flex items-center gap-2 px-6 py-2 rounded-lg transition-colors"
           style={{
-            backgroundColor: canProceed ? 'var(--primary)' : 'var(--bg-tertiary)',
-            color: canProceed ? '#ffffff' : 'var(--text-tertiary)',
+            backgroundColor: canProceed && !isSubmitting ? 'var(--primary)' : 'var(--bg-tertiary)',
+            color: canProceed && !isSubmitting ? '#ffffff' : 'var(--text-tertiary)',
             borderRadius: 'var(--radius-sm)',
             fontWeight: 'var(--font-bold)',
-            cursor: canProceed ? 'pointer' : 'not-allowed',
-            opacity: canProceed ? 1 : 0.5
+            cursor: canProceed && !isSubmitting ? 'pointer' : 'not-allowed',
+            opacity: canProceed && !isSubmitting ? 1 : 0.5
           }}
         >
-          <Check className="w-5 h-5" />
-          완료
+          {isSubmitting ? (
+            <>
+              <Loader2 className="w-5 h-5 animate-spin" />
+              등록 중...
+            </>
+          ) : (
+            <>
+              <Check className="w-5 h-5" />
+              완료
+            </>
+          )}
         </button>
       ) : (
         <button

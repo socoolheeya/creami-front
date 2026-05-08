@@ -3,10 +3,10 @@
 import { Edit, MapPin, Phone, Mail, Calendar, ArrowUpDown, Filter } from 'lucide-react'
 import Link from 'next/link'
 import { useState, useMemo } from 'react'
-import { Accommodation, ACCOMMODATION_TYPE_LABELS, AccommodationType } from '@/lib/types/accommodation'
+import { Property, PROPERTY_TYPE_LABELS, PropertyType } from '../../../lib/types/property'
 
 interface AccommodationTableProps {
-  accommodations: Accommodation[]
+  accommodations: Property[]
 }
 
 type SortField = 'name' | 'type' | 'status' | null
@@ -15,7 +15,7 @@ type SortOrder = 'asc' | 'desc'
 export function AccommodationTable({ accommodations }: AccommodationTableProps) {
   const [sortField, setSortField] = useState<SortField>(null)
   const [sortOrder, setSortOrder] = useState<SortOrder>('asc')
-  const [typeFilter, setTypeFilter] = useState<AccommodationType | 'all'>('all')
+  const [typeFilter, setTypeFilter] = useState<PropertyType | 'all'>('all')
   const [statusFilter, setStatusFilter] = useState<'all' | 'active' | 'inactive'>('all')
   const [idSearch, setIdSearch] = useState('')
   const [nameSearch, setNameSearch] = useState('')
@@ -170,7 +170,7 @@ export function AccommodationTable({ accommodations }: AccommodationTableProps) 
             <th className="px-3 py-2">
               <select
                 value={typeFilter}
-                onChange={(e) => setTypeFilter(e.target.value as AccommodationType | 'all')}
+                onChange={(e) => setTypeFilter(e.target.value as PropertyType | 'all')}
                 className="w-full px-2 py-1 text-xs"
                 style={{
                   backgroundColor: 'var(--bg-secondary)',
@@ -180,7 +180,7 @@ export function AccommodationTable({ accommodations }: AccommodationTableProps) 
                 }}
               >
                 <option value="all">전체</option>
-                {Object.entries(ACCOMMODATION_TYPE_LABELS).map(([key, label]) => (
+                {Object.entries(PROPERTY_TYPE_LABELS).map(([key, label]) => (
                   <option key={key} value={key}>{label}</option>
                 ))}
               </select>
@@ -286,7 +286,7 @@ export function AccommodationTable({ accommodations }: AccommodationTableProps) 
                     fontWeight: 'var(--font-medium)'
                   }}
                 >
-                  {ACCOMMODATION_TYPE_LABELS[accommodation.type]}
+                  {PROPERTY_TYPE_LABELS[accommodation.type]}
                 </span>
               </td>
 
