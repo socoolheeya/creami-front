@@ -2,8 +2,9 @@
 
 import { ArrowUpDown } from 'lucide-react'
 import Link from 'next/link'
+import type { ReactNode } from 'react'
 import { useState, useMemo } from 'react'
-import { Discount, DISCOUNT_TYPE_LABELS, DISCOUNT_STATUS_LABELS, DISCOUNT_TARGET_LABELS, DiscountStatus } from '@/lib/types/discount'
+import { Discount, DISCOUNT_TYPE_LABELS, DISCOUNT_STATUS_LABELS, DiscountStatus } from '@/lib/types/discount'
 
 interface DiscountTableProps {
   discounts: Discount[]
@@ -11,6 +12,34 @@ interface DiscountTableProps {
 
 type SortField = 'name' | 'code' | 'value' | 'status' | 'usedCount' | null
 type SortOrder = 'asc' | 'desc'
+
+interface SortableHeaderProps {
+  field: SortField
+  activeField: SortField
+  children: ReactNode
+  onSort: (field: SortField) => void
+}
+
+function SortableHeader({ field, activeField, children, onSort }: SortableHeaderProps) {
+  return (
+    <th className="px-lg py-md text-left">
+      <button
+        onClick={() => onSort(field)}
+        className="flex items-center gap-sm transition-colors"
+        style={{ color: 'var(--text-primary)', fontWeight: 'var(--font-bold)' }}
+      >
+        {children}
+        <ArrowUpDown
+          className="h-md w-md"
+          style={{
+            opacity: activeField === field ? 1 : 0.3,
+            color: activeField === field ? 'var(--primary)' : 'currentColor'
+          }}
+        />
+      </button>
+    </th>
+  )
+}
 
 export function DiscountTable({ discounts }: DiscountTableProps) {
   const [sortField, setSortField] = useState<SortField>(null)
@@ -70,31 +99,11 @@ export function DiscountTable({ discounts }: DiscountTableProps) {
     return result
   }, [discounts, sortField, sortOrder, statusFilter, nameSearch, codeSearch])
 
-  const SortableHeader = ({ field, children }: { field: SortField; children: React.ReactNode }) => (
-    <th className="px-6 py-4 text-left">
-      <button
-        onClick={() => handleSort(field)}
-        className="flex items-center gap-2 transition-colors"
-        style={{ color: 'var(--text-primary)', fontWeight: 'var(--font-bold)' }}
-      >
-        {children}
-        <ArrowUpDown
-          className="w-4 h-4"
-          style={{
-            opacity: sortField === field ? 1 : 0.3,
-            color: sortField === field ? 'var(--primary)' : 'currentColor'
-          }}
-        />
-      </button>
-    </th>
-  )
-
   return (
     <div
-      className="rounded-lg overflow-hidden"
+      className="rounded overflow-hidden"
       style={{
         backgroundColor: 'var(--bg-primary)',
-        borderRadius: 'var(--radius)',
         border: '1px solid var(--border-color)',
         boxShadow: 'var(--shadow)'
       }}
@@ -102,70 +111,67 @@ export function DiscountTable({ discounts }: DiscountTableProps) {
       <table className="w-full">
         <thead>
           <tr style={{ backgroundColor: 'var(--bg-tertiary)', borderBottom: '1px solid var(--border-color)' }}>
-            <SortableHeader field="name">할인명</SortableHeader>
-            <SortableHeader field="code">코드</SortableHeader>
-            <th className="px-6 py-4 text-left" style={{ color: 'var(--text-primary)', fontWeight: 'var(--font-bold)' }}>
+            <SortableHeader field="name" activeField={sortField} onSort={handleSort}>할인명</SortableHeader>
+            <SortableHeader field="code" activeField={sortField} onSort={handleSort}>코드</SortableHeader>
+            <th className="px-lg py-md text-left" style={{ color: 'var(--text-primary)', fontWeight: 'var(--font-bold)' }}>
               타입
             </th>
-            <SortableHeader field="value">할인 금액/율</SortableHeader>
-            <th className="px-6 py-4 text-left" style={{ color: 'var(--text-primary)', fontWeight: 'var(--font-bold)' }}>
+            <SortableHeader field="value" activeField={sortField} onSort={handleSort}>할인 금액/율</SortableHeader>
+            <th className="px-lg py-md text-left" style={{ color: 'var(--text-primary)', fontWeight: 'var(--font-bold)' }}>
               기간
             </th>
-            <SortableHeader field="usedCount">사용 현황</SortableHeader>
-            <SortableHeader field="status">상태</SortableHeader>
+            <SortableHeader field="usedCount" activeField={sortField} onSort={handleSort}>사용 현황</SortableHeader>
+            <SortableHeader field="status" activeField={sortField} onSort={handleSort}>상태</SortableHeader>
           </tr>
           {/* Filter Row */}
           <tr style={{ backgroundColor: 'var(--bg-primary)', borderBottom: '1px solid var(--border-color)' }}>
             {/* 할인명 검색 */}
-            <th className="px-6 py-3">
+            <th className="px-lg py-sm">
               <input
                 type="text"
                 placeholder="검색..."
                 value={nameSearch}
                 onChange={(e) => setNameSearch(e.target.value)}
-                className="w-full px-3 py-1.5 text-sm"
+                className="h-control-sm w-full rounded px-control-px-sm text-base"
                 style={{
                   backgroundColor: 'var(--bg-secondary)',
                   border: '1px solid var(--border-color)',
-                  borderRadius: 'var(--radius-sm)',
                   color: 'var(--text-primary)'
                 }}
               />
             </th>
             {/* 코드 검색 */}
-            <th className="px-6 py-3">
+            <th className="px-lg py-sm">
               <input
                 type="text"
                 placeholder="검색..."
                 value={codeSearch}
                 onChange={(e) => setCodeSearch(e.target.value)}
-                className="w-full px-3 py-1.5 text-sm"
+                className="h-control-sm w-full rounded px-control-px-sm text-base"
                 style={{
                   backgroundColor: 'var(--bg-secondary)',
                   border: '1px solid var(--border-color)',
-                  borderRadius: 'var(--radius-sm)',
                   color: 'var(--text-primary)'
                 }}
               />
             </th>
             {/* 타입 - 필터 없음 */}
-            <th className="px-6 py-3"></th>
+            <th className="px-lg py-sm"></th>
             {/* 할인 금액 - 필터 없음 */}
-            <th className="px-6 py-3"></th>
+            <th className="px-lg py-sm"></th>
             {/* 기간 - 필터 없음 */}
-            <th className="px-6 py-3"></th>
+            <th className="px-lg py-sm"></th>
             {/* 사용 현황 - 필터 없음 */}
-            <th className="px-6 py-3"></th>
+            <th className="px-lg py-sm"></th>
             {/* 상태 필터 */}
-            <th className="px-6 py-3">
+            <th className="px-lg py-sm">
               <select
                 value={statusFilter}
                 onChange={(e) => setStatusFilter(e.target.value as DiscountStatus | 'all')}
-                className="w-full px-3 py-1.5 text-sm"
+                className="h-control-sm w-full rounded px-control-px-sm text-base"
                 style={{
                   backgroundColor: 'var(--bg-secondary)',
                   border: '1px solid var(--border-color)',
-                  borderRadius: 'var(--radius-sm)',
                   color: 'var(--text-primary)'
                 }}
               >
@@ -179,11 +185,11 @@ export function DiscountTable({ discounts }: DiscountTableProps) {
         </thead>
         <tbody>
           {filteredAndSortedData.map((discount) => {
-            const statusColor =
-              discount.status === 'active' ? '#10b981' :
-              discount.status === 'scheduled' ? '#3b82f6' :
-              discount.status === 'expired' ? '#6b7280' :
-              '#9ca3af'
+            const statusStyle =
+              discount.status === 'active' ? { backgroundColor: 'var(--primary-bg)', color: 'var(--primary)' } :
+              discount.status === 'scheduled' ? { backgroundColor: 'var(--info-bg)', color: 'var(--info)' } :
+              discount.status === 'expired' ? { backgroundColor: 'var(--neutral-bg)', color: 'var(--neutral)' } :
+              { backgroundColor: 'var(--bg-tertiary)', color: 'var(--text-tertiary)' }
 
             return (
               <tr
@@ -198,7 +204,7 @@ export function DiscountTable({ discounts }: DiscountTableProps) {
                 }}
               >
                 {/* 할인명 */}
-                <td className="px-6 py-4">
+                <td className="px-lg py-md">
                   <Link href={`/discounts/${discount.id}`}>
                     <div className="flex flex-col cursor-pointer">
                       <span
@@ -208,7 +214,7 @@ export function DiscountTable({ discounts }: DiscountTableProps) {
                         {discount.name}
                       </span>
                       {discount.description && (
-                        <span className="text-xs mt-1" style={{ color: 'var(--text-tertiary)' }}>
+                        <span className="text-xs mt-xs" style={{ color: 'var(--text-tertiary)' }}>
                           {discount.description}
                         </span>
                       )}
@@ -217,9 +223,9 @@ export function DiscountTable({ discounts }: DiscountTableProps) {
                 </td>
 
                 {/* 코드 */}
-                <td className="px-6 py-4">
+                <td className="px-lg py-md">
                   <code
-                    className="px-2 py-1 rounded text-sm"
+                    className="px-sm py-xs rounded text-xs"
                     style={{
                       backgroundColor: 'var(--bg-tertiary)',
                       color: 'var(--text-secondary)',
@@ -231,21 +237,21 @@ export function DiscountTable({ discounts }: DiscountTableProps) {
                 </td>
 
                 {/* 타입 */}
-                <td className="px-6 py-4">
-                  <span className="text-sm" style={{ color: 'var(--text-secondary)' }}>
+                <td className="px-lg py-md">
+                  <span className="text-base" style={{ color: 'var(--text-secondary)' }}>
                     {DISCOUNT_TYPE_LABELS[discount.type]}
                   </span>
                 </td>
 
                 {/* 할인 금액/율 */}
-                <td className="px-6 py-4">
-                  <span className="text-sm" style={{ color: 'var(--text-primary)', fontWeight: 'var(--font-medium)' }}>
+                <td className="px-lg py-md">
+                  <span className="text-base" style={{ color: 'var(--text-primary)', fontWeight: 'var(--font-medium)' }}>
                     {discount.type === 'percentage' ? `${discount.value}%` : `${discount.value.toLocaleString()}원`}
                   </span>
                 </td>
 
                 {/* 기간 */}
-                <td className="px-6 py-4">
+                <td className="px-lg py-md">
                   <div className="flex flex-col text-xs" style={{ color: 'var(--text-secondary)' }}>
                     <span>{discount.startDate.toLocaleDateString('ko-KR')}</span>
                     <span>~ {discount.endDate.toLocaleDateString('ko-KR')}</span>
@@ -253,8 +259,8 @@ export function DiscountTable({ discounts }: DiscountTableProps) {
                 </td>
 
                 {/* 사용 현황 */}
-                <td className="px-6 py-4">
-                  <div className="flex flex-col text-sm" style={{ color: 'var(--text-secondary)' }}>
+                <td className="px-lg py-md">
+                  <div className="flex flex-col text-base" style={{ color: 'var(--text-secondary)' }}>
                     <span>{discount.usedCount}회 사용</span>
                     {discount.usageLimit && (
                       <span className="text-xs">/ {discount.usageLimit}회 한도</span>
@@ -263,12 +269,11 @@ export function DiscountTable({ discounts }: DiscountTableProps) {
                 </td>
 
                 {/* 상태 */}
-                <td className="px-6 py-4">
+                <td className="px-lg py-md">
                   <span
-                    className="px-3 py-1 rounded-full text-sm"
+                    className="px-sm py-xs rounded text-base"
                     style={{
-                      backgroundColor: `${statusColor}20`,
-                      color: statusColor,
+                      ...statusStyle,
                       fontWeight: 'var(--font-medium)'
                     }}
                   >

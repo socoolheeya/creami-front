@@ -146,11 +146,12 @@ export async function createBooking(request: CreateBookingRequest): Promise<Book
 
   const baseAmount = (roomRate?.basePrice || 100000) * nights
   const commission = baseAmount * 0.1
+  const now = new Date()
 
   // 새 예약 객체 생성
   const newBooking: Booking = {
     id: `BK${Date.now()}`,
-    bookingNumber: `BK${new Date().getFullYear()}${String(Date.now()).slice(-6)}`,
+    bookingNumber: `BK${now.getFullYear()}${String(Date.now()).slice(-6)}`,
     channel: 'Direct',
     guestName: request.guestName,
     guestPhone: request.guestPhone,
@@ -199,7 +200,11 @@ export async function createBooking(request: CreateBookingRequest): Promise<Book
         }
       ]
     },
-    specialRequests: request.specialRequests
+    specialRequests: request.specialRequests,
+    createdAt: now,
+    updatedAt: now,
+    createdBy: 'system',
+    updatedBy: 'system'
   }
 
   return newBooking

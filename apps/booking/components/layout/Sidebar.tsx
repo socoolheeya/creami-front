@@ -1,9 +1,8 @@
 'use client'
 
 import { Calendar, CalendarCheck } from 'lucide-react'
-import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { useSidebar } from './SidebarContext'
+import { Sidebar as SidebarComponent, SidebarMenu, SidebarMenuItem, useSidebar } from '@creami/ui'
 
 const menuItems = [
   { icon: Calendar, label: '예약 목록', href: '/bookings' },
@@ -14,59 +13,32 @@ export function Sidebar() {
   const { isCollapsed } = useSidebar()
   const pathname = usePathname()
 
-  return (
-    <aside
-      className="fixed left-0 bottom-0 z-30"
-      style={{
-        top: 'var(--header-height)',
-        width: isCollapsed ? 'var(--sidebar-collapsed)' : 'var(--sidebar-width)',
-        backgroundColor: 'var(--bg-primary)',
-        borderRight: '1px solid var(--border-color)',
-        transition: 'width 300ms ease-in-out'
-      }}
-    >
-      <nav style={{ padding: 'var(--spacing-md)' }}>
-        <ul style={{ display: 'flex', flexDirection: 'column', gap: 'var(--spacing-sm)' }}>
-          {menuItems.map((item) => {
-            const Icon = item.icon
-            // /bookings/new는 정확히 매치, /bookings는 /bookings/new를 제외한 나머지
-            const isActive = item.href === '/bookings'
-              ? pathname === '/bookings' || (pathname.startsWith('/bookings/') && !pathname.startsWith('/bookings/new'))
-              : pathname.startsWith(item.href)
+  const getIsActive = (href: string) => {
+    if (href === '/') {
+      return pathname === '/'
+    }
 
-            return (
-              <li key={item.href}>
-                <Link
-                  href={item.href}
-                  className="flex items-center overflow-hidden transition-colors"
-                  style={{
-                    gap: 'var(--spacing-sm)',
-                    padding: 'var(--spacing-sm) var(--spacing-md)',
-                    backgroundColor: isActive ? 'var(--primary)' : 'transparent',
-                    color: isActive ? '#ffffff' : 'var(--text-primary)',
-                    borderRadius: 'var(--radius-sm)',
-                    fontSize: 'var(--font-size-sm)',
-                    fontWeight: 'var(--font-medium)'
-                  }}
-                  title={isCollapsed ? item.label : undefined}
-                >
-                  <Icon style={{ width: '1.25rem', height: '1.25rem', flexShrink: 0 }} />
-                  <span
-                    className="whitespace-nowrap"
-                    style={{
-                      opacity: isCollapsed ? 0 : 1,
-                      maxWidth: isCollapsed ? '0' : '200px',
-                      transition: 'opacity 300ms, max-width 300ms'
-                    }}
-                  >
-                    {item.label}
-                  </span>
-                </Link>
-              </li>
-            )
-          })}
-        </ul>
-      </nav>
-    </aside>
+    if (href === '/bookings') {
+      return pathname === href || (pathname.startsWith('/bookings/') && !pathname.startsWith('/bookings/new'))
+    }
+
+    return pathname.startsWith(href)
+  }
+
+  return (
+    <SidebarComponent isCollapsed={isCollapsed}>
+      <SidebarMenu>
+        {menuItems.map((item) => (
+          <SidebarMenuItem
+            key={item.href}
+            icon={item.icon}
+            label={item.label}
+            href={item.href}
+            isActive={getIsActive(item.href)}
+            isCollapsed={isCollapsed}
+          />
+        ))}
+      </SidebarMenu>
+    </SidebarComponent>
   )
 }

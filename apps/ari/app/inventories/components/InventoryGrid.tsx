@@ -1,8 +1,8 @@
 'use client'
 
-import { useState, useRef, useEffect } from 'react'
+import { useState, useRef, useEffect, useMemo } from 'react'
 import { ChevronLeft, ChevronRight, Edit2, Copy, Save, X, CalendarRange, Calendar as CalendarIcon } from 'lucide-react'
-import { DatePicker } from '@/components/ui/DatePicker'
+import { DatePicker } from '@creami/ui'
 
 interface RoomInventory {
   roomId: string
@@ -30,6 +30,16 @@ interface SelectedCell {
 
 type ViewMode = 'week' | 'month' | 'all'
 
+const WEEKDAY_LABELS: Record<number, string> = {
+  0: '일',
+  1: '월',
+  2: '화',
+  3: '수',
+  4: '목',
+  5: '금',
+  6: '토'
+}
+
 export function InventoryGrid({ startDate, endDate, selectedRooms }: InventoryGridProps) {
   const [viewMode, setViewMode] = useState<ViewMode>('week')
   const [currentWeekStart, setCurrentWeekStart] = useState(new Date(startDate))
@@ -47,7 +57,7 @@ export function InventoryGrid({ startDate, endDate, selectedRooms }: InventoryGr
   const [bulkRegisterStart, setBulkRegisterStart] = useState('')
   const [bulkRegisterEnd, setBulkRegisterEnd] = useState('')
   const [bulkRegisterWeekdays, setBulkRegisterWeekdays] = useState<number[]>([0, 1, 2, 3, 4, 5, 6])
-  const [bulkRegisterValue, setBulkRegisterValue] = useState('')
+  const [bulkRegisterValues, setBulkRegisterValues] = useState<Record<number, string>>({})
 
   // Ref for auto-scroll
   const scrollContainerRef = useRef<HTMLDivElement>(null)
@@ -319,6 +329,13 @@ export function InventoryGrid({ startDate, endDate, selectedRooms }: InventoryGr
     return '#10b981'
   }
 
+  const hasBulkRegisterValue = () => {
+    return bulkRegisterWeekdays.some((day) => {
+      const value = bulkRegisterValues[day]
+      return value?.trim() !== '' && !isNaN(parseInt(value ?? ''))
+    })
+  }
+
   // Bulk registration handlers
   const toggleWeekday = (day: number) => {
     if (bulkRegisterWeekdays.includes(day)) {
@@ -340,25 +357,42 @@ export function InventoryGrid({ startDate, endDate, selectedRooms }: InventoryGr
     setBulkRegisterWeekdays([0, 6])
   }
 
-  const calculateBulkRegisterCells = () => {
-    if (!bulkRegisterStart || !bulkRegisterEnd) return 0
-
-    let count = 0
-    const start = new Date(bulkRegisterStart)
-    const end = new Date(bulkRegisterEnd)
-
-    for (let d = new Date(start); d <= end; d.setDate(d.getDate() + 1)) {
-      if (bulkRegisterWeekdays.includes(d.getDay())) {
-        count++
-      }
-    }
-
-    return count * selectedRooms.length
+  const handleBulkRegisterValueChange = (day: number, value: string) => {
+    setBulkRegisterValues(prev => ({
+      ...prev,
+      [day]: value
+    }))
   }
 
+  const bulkRegisterPreviewRows = useMemo(() => {
+    const validCells = Object.entries(bulkRegisterValues)
+      .map(([day, value]) => ({
+        day: Number(day),
+        value: parseInt(value)
+      }))
+      .filter(({ day, value }) => bulkRegisterWeekdays.includes(day) && WEEKDAY_LABELS[day] && !isNaN(value))
+      .sort((a, b) => {
+        const order = [1, 2, 3, 4, 5, 6, 0]
+        return order.indexOf(a.day) - order.indexOf(b.day)
+      })
+
+    if (validCells.length === 0) return []
+
+    return selectedRooms.map(room => ({
+      id: room.id,
+      name: room.name,
+      cells: validCells.map(({ day, value }) => ({
+        day,
+        label: WEEKDAY_LABELS[day],
+        available: value,
+        total: 10,
+        booked: Math.max(10 - value, 0)
+      }))
+    }))
+  }, [bulkRegisterValues, bulkRegisterWeekdays, selectedRooms])
+
   const handleBulkRegister = () => {
-    const value = parseInt(bulkRegisterValue)
-    if (isNaN(value) || !bulkRegisterStart || !bulkRegisterEnd) return
+    if (!bulkRegisterStart || !bulkRegisterEnd || !hasBulkRegisterValue()) return
 
     setInventoryData(prev => {
       const updated = { ...prev }
@@ -368,7 +402,8 @@ export function InventoryGrid({ startDate, endDate, selectedRooms }: InventoryGr
       selectedRooms.forEach(room => {
         for (let d = new Date(start); d <= end; d.setDate(d.getDate() + 1)) {
           const dateStr = d.toISOString().split('T')[0]
-          if (bulkRegisterWeekdays.includes(d.getDay()) && updated[room.id]?.dates[dateStr]) {
+          const value = parseInt(bulkRegisterValues[d.getDay()] ?? '')
+          if (bulkRegisterWeekdays.includes(d.getDay()) && !isNaN(value) && updated[room.id]?.dates[dateStr]) {
             updated[room.id] = {
               ...updated[room.id],
               dates: {
@@ -391,7 +426,7 @@ export function InventoryGrid({ startDate, endDate, selectedRooms }: InventoryGr
     setBulkRegisterStart('')
     setBulkRegisterEnd('')
     setBulkRegisterWeekdays([0, 1, 2, 3, 4, 5, 6])
-    setBulkRegisterValue('')
+    setBulkRegisterValues({})
   }
 
   const viewDates = getDatesForView()
@@ -426,7 +461,7 @@ export function InventoryGrid({ startDate, endDate, selectedRooms }: InventoryGr
 
   return (
     <div
-      className="rounded-lg"
+      className="rounded"
       style={{
         backgroundColor: 'var(--bg-primary)',
         borderRadius: 'var(--radius)',
@@ -436,22 +471,25 @@ export function InventoryGrid({ startDate, endDate, selectedRooms }: InventoryGr
     >
       {/* Toolbar */}
       <div
-        className="p-4 space-y-3"
+        className="p-md space-y-md"
         style={{
           borderBottom: '1px solid var(--border-color)'
         }}
       >
         {/* Top Row: View Mode + Bulk Register */}
         <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2">
+          <div
+            className="flex items-center gap-xs rounded p-xs"
+            style={{ backgroundColor: 'var(--bg-secondary)' }}
+          >
             {/* View Mode Selector */}
             <button
               onClick={() => setViewMode('week')}
-              className="px-3 py-1.5 rounded-lg text-sm transition-colors"
+              className="flex h-control-md items-center justify-center rounded border-none px-control-px-md py-none text-base leading-none transition-colors"
               style={{
-                backgroundColor: viewMode === 'week' ? 'var(--primary)' : 'var(--bg-secondary)',
+                backgroundColor: viewMode === 'week' ? 'var(--primary)' : 'transparent',
                 color: viewMode === 'week' ? '#ffffff' : 'var(--text-primary)',
-                borderRadius: 'var(--radius-sm)',
+                borderRadius: 'var(--radius)',
                 fontWeight: 'var(--font-medium)'
               }}
             >
@@ -459,11 +497,11 @@ export function InventoryGrid({ startDate, endDate, selectedRooms }: InventoryGr
             </button>
             <button
               onClick={() => setViewMode('month')}
-              className="px-3 py-1.5 rounded-lg text-sm transition-colors"
+              className="flex h-control-md items-center justify-center rounded border-none px-control-px-md py-none text-base leading-none transition-colors"
               style={{
-                backgroundColor: viewMode === 'month' ? 'var(--primary)' : 'var(--bg-secondary)',
+                backgroundColor: viewMode === 'month' ? 'var(--primary)' : 'transparent',
                 color: viewMode === 'month' ? '#ffffff' : 'var(--text-primary)',
-                borderRadius: 'var(--radius-sm)',
+                borderRadius: 'var(--radius)',
                 fontWeight: 'var(--font-medium)'
               }}
             >
@@ -471,11 +509,11 @@ export function InventoryGrid({ startDate, endDate, selectedRooms }: InventoryGr
             </button>
             <button
               onClick={() => setViewMode('all')}
-              className="px-3 py-1.5 rounded-lg text-sm transition-colors"
+              className="flex h-control-md items-center justify-center rounded border-none px-control-px-md py-none text-base leading-none transition-colors"
               style={{
-                backgroundColor: viewMode === 'all' ? 'var(--primary)' : 'var(--bg-secondary)',
+                backgroundColor: viewMode === 'all' ? 'var(--primary)' : 'transparent',
                 color: viewMode === 'all' ? '#ffffff' : 'var(--text-primary)',
-                borderRadius: 'var(--radius-sm)',
+                borderRadius: 'var(--radius)',
                 fontWeight: 'var(--font-medium)'
               }}
             >
@@ -486,34 +524,34 @@ export function InventoryGrid({ startDate, endDate, selectedRooms }: InventoryGr
           {/* Bulk Register Button */}
           <button
             onClick={() => setShowBulkRegister(true)}
-            className="flex items-center gap-2 px-4 py-2 rounded-lg transition-colors"
+            className="flex items-center gap-sm px-control-px-lg py-sm rounded text-base leading-none transition-colors"
             style={{
               backgroundColor: 'var(--primary)',
               color: '#ffffff',
-              borderRadius: 'var(--radius-sm)',
+              borderRadius: 'var(--radius)',
               fontWeight: 'var(--font-bold)'
             }}
           >
-            <CalendarRange className="w-5 h-5" />
+            <CalendarRange className="w-icon-md h-icon-md" />
             대량 등록
           </button>
         </div>
 
         {/* Bottom Row: Navigation + Selection Actions */}
         <div className="flex items-center justify-between">
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-md">
             {viewMode !== 'all' && (
               <>
                 <button
                   onClick={handlePrevWeek}
-                  className="p-2 rounded-lg transition-colors"
+                  className="p-sm rounded transition-colors"
                   style={{
                     backgroundColor: 'var(--bg-secondary)',
                     color: 'var(--text-primary)',
-                    borderRadius: 'var(--radius-sm)'
+                    borderRadius: 'var(--radius)'
                   }}
                 >
-                  <ChevronLeft className="w-5 h-5" />
+                  <ChevronLeft className="w-icon-md h-icon-md" />
                 </button>
 
                 <div
@@ -538,14 +576,14 @@ export function InventoryGrid({ startDate, endDate, selectedRooms }: InventoryGr
 
                 <button
                   onClick={handleNextWeek}
-                  className="p-2 rounded-lg transition-colors"
+                  className="p-sm rounded transition-colors"
                   style={{
                     backgroundColor: 'var(--bg-secondary)',
                     color: 'var(--text-primary)',
-                    borderRadius: 'var(--radius-sm)'
+                    borderRadius: 'var(--radius)'
                   }}
                 >
-                  <ChevronRight className="w-5 h-5" />
+                  <ChevronRight className="w-icon-md h-icon-md" />
                 </button>
               </>
             )}
@@ -564,9 +602,9 @@ export function InventoryGrid({ startDate, endDate, selectedRooms }: InventoryGr
 
           {/* Action Buttons */}
           {selectedCells.length > 0 && (
-          <div className="flex items-center gap-2">
+            <div className="flex items-center gap-sm">
             <span
-              className="text-sm px-3 py-1 rounded"
+              className="text-base px-control-px-md py-xs rounded leading-none"
               style={{
                 backgroundColor: 'var(--bg-tertiary)',
                 color: 'var(--text-secondary)',
@@ -578,43 +616,43 @@ export function InventoryGrid({ startDate, endDate, selectedRooms }: InventoryGr
 
             <button
               onClick={() => setShowBulkEdit(true)}
-              className="flex items-center gap-2 px-4 py-2 rounded-lg transition-colors"
+              className="flex items-center gap-sm px-control-px-lg py-sm rounded text-base leading-none transition-colors"
               style={{
                 backgroundColor: 'var(--primary)',
                 color: '#ffffff',
-                borderRadius: 'var(--radius-sm)',
+                borderRadius: 'var(--radius)',
                 fontWeight: 'var(--font-medium)'
               }}
             >
-              <Edit2 className="w-4 h-4" />
+              <Edit2 className="w-md h-md" />
               일괄 수정
             </button>
 
             <button
               onClick={handleCopyDown}
-              className="flex items-center gap-2 px-4 py-2 rounded-lg transition-colors"
+              className="flex items-center gap-sm px-control-px-lg py-sm rounded text-base leading-none transition-colors"
               style={{
                 backgroundColor: 'var(--bg-secondary)',
                 color: 'var(--text-primary)',
-                borderRadius: 'var(--radius-sm)',
+                borderRadius: 'var(--radius)',
                 fontWeight: 'var(--font-medium)',
                 border: '1px solid var(--border-color)'
               }}
             >
-              <Copy className="w-4 h-4" />
+              <Copy className="w-md h-md" />
               복사
             </button>
 
             <button
               onClick={() => setSelectedCells([])}
-              className="p-2 rounded-lg transition-colors"
+              className="p-sm rounded transition-colors"
               style={{
                 backgroundColor: 'var(--bg-secondary)',
                 color: 'var(--text-primary)',
-                borderRadius: 'var(--radius-sm)'
+                borderRadius: 'var(--radius)'
               }}
             >
-              <X className="w-4 h-4" />
+              <X className="w-md h-md" />
             </button>
           </div>
           )}
@@ -627,14 +665,14 @@ export function InventoryGrid({ startDate, endDate, selectedRooms }: InventoryGr
           <thead>
             <tr style={{ backgroundColor: 'var(--bg-secondary)' }}>
               <th
-                className="px-4 py-3 text-left sticky left-0 z-10"
+                className="px-md py-sm text-left sticky left-0 z-10"
                 style={{
                   backgroundColor: 'var(--bg-secondary)',
                   borderRight: '1px solid var(--border-color)',
                   borderBottom: '1px solid var(--border-color)',
                   fontWeight: 'var(--font-bold)',
                   color: 'var(--text-primary)',
-                  minWidth: '150px'
+                  minWidth: 'var(--rate-row-header-width)'
                 }}
               >
                 객실 타입
@@ -646,17 +684,17 @@ export function InventoryGrid({ startDate, endDate, selectedRooms }: InventoryGr
                 return (
                   <th
                     key={date.toISOString()}
-                    className="px-4 py-3 text-center"
+                    className="px-md py-sm text-center"
                     style={{
                       borderBottom: '1px solid var(--border-color)',
                       fontWeight: 'var(--font-bold)',
-                      color: dayOfWeek === 0 ? '#ef4444' : dayOfWeek === 6 ? '#3b82f6' : 'var(--text-primary)',
-                      minWidth: '120px',
+                      color: dayOfWeek === 0 ? 'var(--error)' : dayOfWeek === 6 ? 'var(--primary)' : 'var(--text-primary)',
+                      minWidth: 'var(--rate-date-column-width)',
                       backgroundColor: isWeekend ? 'var(--bg-tertiary)' : 'var(--bg-secondary)'
                     }}
                   >
                     <div>{date.getDate()}일</div>
-                    <div className="text-xs" style={{ fontWeight: 'var(--font-light)' }}>
+                    <div className="text-base" style={{ fontWeight: 'var(--font-light)' }}>
                       {['일', '월', '화', '수', '목', '금', '토'][dayOfWeek]}
                     </div>
                   </th>
@@ -668,7 +706,7 @@ export function InventoryGrid({ startDate, endDate, selectedRooms }: InventoryGr
             {selectedRooms.map((room) => (
               <tr key={room.id}>
                 <td
-                  className="px-4 py-3 sticky left-0 z-10"
+                  className="px-md py-sm sticky left-0 z-10"
                   style={{
                     backgroundColor: 'var(--bg-primary)',
                     borderRight: '1px solid var(--border-color)',
@@ -695,7 +733,7 @@ export function InventoryGrid({ startDate, endDate, selectedRooms }: InventoryGr
                       onMouseDown={() => handleMouseDown(room.id, dateStr)}
                       onMouseEnter={() => handleMouseEnter(room.id, dateStr)}
                       onDoubleClick={() => handleCellDoubleClick(room.id, dateStr)}
-                      className="px-3 py-2 cursor-pointer transition-all"
+                      className="px-sm py-sm cursor-pointer transition-all"
                       style={{
                         borderBottom: '1px solid var(--border-color)',
                         backgroundColor: isSelected
@@ -717,7 +755,7 @@ export function InventoryGrid({ startDate, endDate, selectedRooms }: InventoryGr
                             if (e.key === 'Escape') setEditingCell(null)
                           }}
                           autoFocus
-                          className="w-full px-2 py-1 text-center rounded"
+                          className="w-full px-sm py-xs text-center rounded"
                           style={{
                             backgroundColor: 'var(--bg-secondary)',
                             border: '2px solid var(--primary)',
@@ -729,13 +767,13 @@ export function InventoryGrid({ startDate, endDate, selectedRooms }: InventoryGr
                         <div className="text-center">
                           {/* Utilization Bar */}
                           <div
-                            className="h-1 rounded-full mb-1"
+                            className="h-xs rounded mb-xs"
                             style={{
                               backgroundColor: 'var(--bg-tertiary)'
                             }}
                           >
                             <div
-                              className="h-full rounded-full"
+                              className="h-full rounded"
                               style={{
                                 width: `${((dayData.total - dayData.available) / dayData.total) * 100}%`,
                                 backgroundColor: getUtilizationColor(dayData.available, dayData.total)
@@ -756,7 +794,7 @@ export function InventoryGrid({ startDate, endDate, selectedRooms }: InventoryGr
 
                           {/* Total Count */}
                           <div
-                            className="text-xs"
+                            className="text-base"
                             style={{
                               color: isSelected ? '#ffffff' : 'var(--text-tertiary)',
                               fontWeight: 'var(--font-light)'
@@ -785,7 +823,7 @@ export function InventoryGrid({ startDate, endDate, selectedRooms }: InventoryGr
           onClick={() => setShowBulkEdit(false)}
         >
           <div
-            className="rounded-lg p-6 w-96"
+            className="rounded p-lg w-modal-sm"
             style={{
               backgroundColor: 'var(--bg-primary)',
               borderRadius: 'var(--radius)',
@@ -795,7 +833,7 @@ export function InventoryGrid({ startDate, endDate, selectedRooms }: InventoryGr
             onClick={(e) => e.stopPropagation()}
           >
             <h3
-              className="text-xl mb-4"
+              className="text-xl mb-md"
               style={{
                 fontWeight: 'var(--font-bold)',
                 color: 'var(--text-primary)'
@@ -805,7 +843,7 @@ export function InventoryGrid({ startDate, endDate, selectedRooms }: InventoryGr
             </h3>
 
             <p
-              className="text-sm mb-4"
+              className="text-base mb-md"
               style={{
                 color: 'var(--text-secondary)',
                 fontWeight: 'var(--font-light)'
@@ -815,7 +853,7 @@ export function InventoryGrid({ startDate, endDate, selectedRooms }: InventoryGr
             </p>
 
             <label
-              className="block text-sm mb-2"
+              className="block text-base mb-sm"
               style={{
                 color: 'var(--text-secondary)',
                 fontWeight: 'var(--font-medium)'
@@ -828,28 +866,28 @@ export function InventoryGrid({ startDate, endDate, selectedRooms }: InventoryGr
               value={bulkEditValue}
               onChange={(e) => setBulkEditValue(e.target.value)}
               placeholder="숫자 입력"
-              className="w-full px-4 py-2 rounded-lg mb-4"
+              className="w-full h-control-md px-control-px-lg py-none rounded mb-md text-base leading-none"
               style={{
                 backgroundColor: 'var(--bg-secondary)',
                 border: '1px solid var(--border-color)',
                 color: 'var(--text-primary)',
-                borderRadius: 'var(--radius-sm)',
+                borderRadius: 'var(--radius)',
                 fontWeight: 'var(--font-medium)'
               }}
             />
 
-            <div className="flex gap-3">
+            <div className="flex justify-end gap-md">
               <button
                 onClick={handleBulkEdit}
-                className="flex-1 flex items-center justify-center gap-2 px-4 py-2 rounded-lg"
+                className="flex h-control-md w-modal-action items-center justify-center gap-sm rounded border-none px-control-px-md py-none text-base leading-none"
                 style={{
                   backgroundColor: 'var(--primary)',
                   color: '#ffffff',
-                  borderRadius: 'var(--radius-sm)',
+                  borderRadius: 'var(--radius)',
                   fontWeight: 'var(--font-medium)'
                 }}
               >
-                <Save className="w-4 h-4" />
+                <Save className="w-icon-md h-icon-md" />
                 저장
               </button>
               <button
@@ -857,11 +895,11 @@ export function InventoryGrid({ startDate, endDate, selectedRooms }: InventoryGr
                   setShowBulkEdit(false)
                   setBulkEditValue('')
                 }}
-                className="flex-1 px-4 py-2 rounded-lg"
+                className="flex h-control-md w-modal-action items-center justify-center rounded px-control-px-md py-none text-base leading-none"
                 style={{
                   backgroundColor: 'var(--bg-secondary)',
                   color: 'var(--text-primary)',
-                  borderRadius: 'var(--radius-sm)',
+                  borderRadius: 'var(--radius)',
                   fontWeight: 'var(--font-medium)',
                   border: '1px solid var(--border-color)'
                 }}
@@ -883,34 +921,73 @@ export function InventoryGrid({ startDate, endDate, selectedRooms }: InventoryGr
           onClick={() => setShowBulkRegister(false)}
         >
           <div
-            className="rounded-lg p-6 w-[600px] max-h-[90vh] overflow-y-auto"
+            className="rounded p-lg w-modal-md overflow-y-auto"
             style={{
               backgroundColor: 'var(--bg-primary)',
               borderRadius: 'var(--radius)',
               boxShadow: 'var(--shadow-md)',
-              border: '1px solid var(--border-color)'
+              border: '1px solid var(--border-color)',
+              maxHeight: 'var(--modal-max-height)'
             }}
             onClick={(e) => e.stopPropagation()}
           >
-            <h3
-              className="text-2xl mb-6"
-              style={{
-                fontWeight: 'var(--font-bold)',
-                color: 'var(--text-primary)'
-              }}
-            >
-              재고 대량 등록
-            </h3>
+            <div className="mb-lg flex items-center justify-between gap-md">
+              <h3
+                className="m-none text-2xl"
+                style={{
+                  fontWeight: 'var(--font-bold)',
+                  color: 'var(--text-primary)'
+                }}
+              >
+                재고 대량 등록
+              </h3>
+              <div className="flex shrink-0 gap-md">
+                <button
+                  onClick={handleBulkRegister}
+                  disabled={!bulkRegisterStart || !bulkRegisterEnd || !hasBulkRegisterValue() || bulkRegisterWeekdays.length === 0}
+                  className="flex h-control-md w-modal-action items-center justify-center gap-sm rounded border-none px-control-px-md py-none text-base leading-none"
+                  style={{
+                    backgroundColor: (bulkRegisterStart && bulkRegisterEnd && hasBulkRegisterValue() && bulkRegisterWeekdays.length > 0) ? 'var(--primary)' : 'var(--bg-tertiary)',
+                    color: (bulkRegisterStart && bulkRegisterEnd && hasBulkRegisterValue() && bulkRegisterWeekdays.length > 0) ? '#ffffff' : 'var(--text-tertiary)',
+                    borderRadius: 'var(--radius)',
+                    fontWeight: 'var(--font-bold)',
+                    cursor: (bulkRegisterStart && bulkRegisterEnd && hasBulkRegisterValue() && bulkRegisterWeekdays.length > 0) ? 'pointer' : 'not-allowed'
+                  }}
+                >
+                  <Save className="w-icon-md h-icon-md" />
+                  등록
+                </button>
+                <button
+                  onClick={() => {
+                    setShowBulkRegister(false)
+                    setBulkRegisterStart('')
+                    setBulkRegisterEnd('')
+                    setBulkRegisterWeekdays([0, 1, 2, 3, 4, 5, 6])
+                    setBulkRegisterValues({})
+                  }}
+                  className="flex h-control-md w-modal-action items-center justify-center rounded px-control-px-md py-none text-base leading-none"
+                  style={{
+                    backgroundColor: 'var(--bg-secondary)',
+                    color: 'var(--text-primary)',
+                    borderRadius: 'var(--radius)',
+                    fontWeight: 'var(--font-medium)',
+                    border: '1px solid var(--border-color)'
+                  }}
+                >
+                  취소
+                </button>
+              </div>
+            </div>
 
             {/* Date Range */}
-            <div className="mb-6">
+            <div className="mb-lg">
               <label
-                className="block text-sm mb-2"
+                className="block text-base mb-sm"
                 style={{ color: 'var(--text-secondary)', fontWeight: 'var(--font-medium)' }}
               >
                 기간 선택
               </label>
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-2 gap-md">
                 <DatePicker
                   label="시작일"
                   value={bulkRegisterStart}
@@ -922,28 +999,28 @@ export function InventoryGrid({ startDate, endDate, selectedRooms }: InventoryGr
                   value={bulkRegisterEnd}
                   onChange={setBulkRegisterEnd}
                   placeholder="종료일 선택"
+                  align="right"
                 />
               </div>
             </div>
 
             {/* Weekday Filter */}
-            <div className="mb-6">
+            <div className="mb-lg">
               <label
-                className="block text-sm mb-3"
+                className="block text-base mb-md"
                 style={{ color: 'var(--text-secondary)', fontWeight: 'var(--font-medium)' }}
               >
                 요일 선택
               </label>
 
-              {/* Quick Selection */}
-              <div className="flex gap-2 mb-3">
+              <div className="flex gap-sm mb-md">
                 <button
                   onClick={selectAllWeekdays}
-                  className="px-3 py-1.5 rounded-lg text-sm transition-colors"
+                  className="h-control-md rounded px-control-px-md py-none text-base leading-none transition-colors"
                   style={{
                     backgroundColor: 'var(--bg-tertiary)',
                     color: 'var(--text-primary)',
-                    borderRadius: 'var(--radius-sm)',
+                    borderRadius: 'var(--radius)',
                     fontWeight: 'var(--font-medium)',
                     border: '1px solid var(--border-color)'
                   }}
@@ -952,11 +1029,11 @@ export function InventoryGrid({ startDate, endDate, selectedRooms }: InventoryGr
                 </button>
                 <button
                   onClick={selectWeekdaysOnly}
-                  className="px-3 py-1.5 rounded-lg text-sm transition-colors"
+                  className="h-control-md rounded px-control-px-md py-none text-base leading-none transition-colors"
                   style={{
                     backgroundColor: 'var(--bg-tertiary)',
                     color: 'var(--text-primary)',
-                    borderRadius: 'var(--radius-sm)',
+                    borderRadius: 'var(--radius)',
                     fontWeight: 'var(--font-medium)',
                     border: '1px solid var(--border-color)'
                   }}
@@ -965,11 +1042,11 @@ export function InventoryGrid({ startDate, endDate, selectedRooms }: InventoryGr
                 </button>
                 <button
                   onClick={selectWeekendsOnly}
-                  className="px-3 py-1.5 rounded-lg text-sm transition-colors"
+                  className="h-control-md rounded px-control-px-md py-none text-base leading-none transition-colors"
                   style={{
                     backgroundColor: 'var(--bg-tertiary)',
                     color: 'var(--text-primary)',
-                    borderRadius: 'var(--radius-sm)',
+                    borderRadius: 'var(--radius)',
                     fontWeight: 'var(--font-medium)',
                     border: '1px solid var(--border-color)'
                   }}
@@ -978,48 +1055,69 @@ export function InventoryGrid({ startDate, endDate, selectedRooms }: InventoryGr
                 </button>
               </div>
 
-              {/* Weekday Checkboxes */}
-              <div className="flex flex-wrap gap-2">
+              <div className="grid grid-cols-7 gap-sm">
                 {[
-                  { day: 0, label: '일', color: '#ef4444' },
+                  { day: 0, label: '일', color: 'var(--error)' },
                   { day: 1, label: '월', color: 'var(--text-primary)' },
                   { day: 2, label: '화', color: 'var(--text-primary)' },
                   { day: 3, label: '수', color: 'var(--text-primary)' },
                   { day: 4, label: '목', color: 'var(--text-primary)' },
                   { day: 5, label: '금', color: 'var(--text-primary)' },
-                  { day: 6, label: '토', color: '#3b82f6' }
-                ].map(({ day, label, color }) => (
-                  <button
-                    key={day}
-                    onClick={() => toggleWeekday(day)}
-                    className="flex items-center justify-center w-12 h-12 rounded-lg transition-all"
-                    style={{
-                      backgroundColor: bulkRegisterWeekdays.includes(day) ? 'var(--primary)' : 'var(--bg-secondary)',
-                      color: bulkRegisterWeekdays.includes(day) ? '#ffffff' : color,
-                      borderRadius: 'var(--radius-sm)',
-                      fontWeight: 'var(--font-bold)',
-                      border: bulkRegisterWeekdays.includes(day) ? '2px solid var(--primary)' : '1px solid var(--border-color)'
-                    }}
-                  >
-                    {label}
-                  </button>
-                ))}
+                  { day: 6, label: '토', color: 'var(--primary)' }
+                ].map(({ day, label, color }) => {
+                  const active = bulkRegisterWeekdays.includes(day)
+
+                  return (
+                    <label key={day} className="block">
+                      <button
+                        type="button"
+                        onClick={() => toggleWeekday(day)}
+                        className="mb-xs flex h-control-md w-full items-center justify-center rounded border-none text-base leading-none transition-colors"
+                        style={{
+                          backgroundColor: active ? 'var(--primary)' : 'var(--bg-secondary)',
+                          color: active ? '#ffffff' : color,
+                          borderRadius: 'var(--radius)',
+                          fontWeight: 'var(--font-bold)'
+                        }}
+                      >
+                        {label}
+                      </button>
+                      <input
+                        type="number"
+                        disabled={!active}
+                        value={bulkRegisterValues[day] ?? ''}
+                        onChange={(event) => handleBulkRegisterValueChange(day, event.target.value)}
+                        placeholder="0"
+                        className="h-control-md w-full rounded px-control-px-sm py-none text-center text-base leading-none"
+                        style={{
+                          backgroundColor: active ? 'var(--bg-secondary)' : 'var(--bg-tertiary)',
+                          border: '1px solid var(--border-color)',
+                          borderRadius: 'var(--radius)',
+                          color: active ? 'var(--text-primary)' : 'var(--text-tertiary)',
+                          cursor: active ? 'text' : 'not-allowed',
+                          fontWeight: 'var(--font-medium)',
+                          opacity: active ? 1 : 0.6
+                        }}
+                      />
+                    </label>
+                  )
+                })}
               </div>
             </div>
 
             {/* Room Types Info */}
-            <div className="mb-6">
+            <div className="mb-lg">
               <label
-                className="block text-sm mb-2"
+                className="block text-base mb-sm"
                 style={{ color: 'var(--text-secondary)', fontWeight: 'var(--font-medium)' }}
               >
                 적용 객실 ({selectedRooms.length}개)
               </label>
               <div
-                className="p-3 rounded-lg text-sm"
+                className="p-sm rounded text-base"
                 style={{
                   backgroundColor: 'var(--bg-secondary)',
-                  borderRadius: 'var(--radius-sm)',
+                  borderRadius: 'var(--radius)',
                   color: 'var(--text-primary)',
                   fontWeight: 'var(--font-light)'
                 }}
@@ -1028,117 +1126,85 @@ export function InventoryGrid({ startDate, endDate, selectedRooms }: InventoryGr
               </div>
             </div>
 
-            {/* Available Count */}
-            <div className="mb-6">
-              <label
-                className="block text-sm mb-2"
-                style={{ color: 'var(--text-secondary)', fontWeight: 'var(--font-medium)' }}
-              >
-                가용 객실 수
-              </label>
-              <input
-                type="number"
-                value={bulkRegisterValue}
-                onChange={(e) => setBulkRegisterValue(e.target.value)}
-                placeholder="숫자 입력"
-                className="w-full px-4 py-2 rounded-lg"
-                style={{
-                  backgroundColor: 'var(--bg-secondary)',
-                  border: '1px solid var(--border-color)',
-                  color: 'var(--text-primary)',
-                  borderRadius: 'var(--radius-sm)',
-                  fontWeight: 'var(--font-medium)'
-                }}
-              />
-            </div>
-
             {/* Preview */}
-            <div
-              className="mb-6 p-4 rounded-lg"
-              style={{
-                backgroundColor: 'var(--bg-tertiary)',
-                borderRadius: 'var(--radius-sm)',
-                border: '1px solid var(--border-color)'
-              }}
-            >
-              <div
-                className="text-sm mb-1"
-                style={{
-                  color: 'var(--text-secondary)',
-                  fontWeight: 'var(--font-medium)'
-                }}
-              >
+            <div className="mb-none">
+              <div className="mb-sm text-base" style={{ color: 'var(--text-secondary)', fontWeight: 'var(--font-medium)' }}>
                 적용 미리보기
               </div>
               <div
-                className="text-2xl"
+                className="overflow-x-auto rounded"
                 style={{
-                  color: 'var(--primary)',
-                  fontWeight: 'var(--font-bold)'
+                  border: '1px solid var(--border-color)',
+                  borderRadius: 'var(--radius)'
                 }}
               >
-                {calculateBulkRegisterCells()}개 셀
-              </div>
-              <div
-                className="text-xs mt-1"
-                style={{
-                  color: 'var(--text-tertiary)',
-                  fontWeight: 'var(--font-light)'
-                }}
-              >
-                {selectedRooms.length}개 객실 × 선택된 날짜
+                <table className="w-full border-separate border-spacing-0">
+                  <thead>
+                    <tr style={{ backgroundColor: 'var(--bg-secondary)' }}>
+                      <th className="px-md py-sm text-left text-base" style={{ color: 'var(--text-primary)', fontWeight: 'var(--font-bold)', borderBottom: '1px solid var(--border-color)' }}>
+                        객실
+                      </th>
+                      <th className="px-md py-sm text-left text-base" style={{ color: 'var(--text-primary)', fontWeight: 'var(--font-bold)', borderBottom: '1px solid var(--border-color)' }}>
+                        요일
+                      </th>
+                      <th className="px-md py-sm text-right text-base" style={{ color: 'var(--text-primary)', fontWeight: 'var(--font-bold)', borderBottom: '1px solid var(--border-color)' }}>
+                        입력재고
+                      </th>
+                      <th className="px-md py-sm text-right text-base" style={{ color: 'var(--text-primary)', fontWeight: 'var(--font-bold)', borderBottom: '1px solid var(--border-color)' }}>
+                        총재고
+                      </th>
+                      <th className="px-md py-sm text-right text-base" style={{ color: 'var(--text-primary)', fontWeight: 'var(--font-bold)', borderBottom: '1px solid var(--border-color)' }}>
+                        예약
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {bulkRegisterPreviewRows.length === 0 ? (
+                      <tr>
+                        <td colSpan={5} className="px-md py-lg text-center text-base" style={{ color: 'var(--text-tertiary)', fontWeight: 'var(--font-light)' }}>
+                          요일별 재고를 입력하면 적용 결과가 표시됩니다.
+                        </td>
+                      </tr>
+                    ) : (
+                      bulkRegisterPreviewRows.flatMap((row) =>
+                        row.cells.map((cell, index) => (
+                          <tr key={`${row.id}-${cell.day}`}>
+                            <td className="px-md py-sm text-base" style={{ color: 'var(--text-primary)', fontWeight: 'var(--font-medium)', borderBottom: '1px solid var(--border-color)' }}>
+                              {index === 0 ? `${row.id} / ${row.name}` : ''}
+                            </td>
+                            <td className="px-md py-sm text-base" style={{ color: cell.day === 0 ? 'var(--error)' : cell.day === 6 ? 'var(--primary)' : 'var(--text-secondary)', fontWeight: 'var(--font-bold)', borderBottom: '1px solid var(--border-color)' }}>
+                              {cell.label}
+                            </td>
+                            <td className="px-md py-sm text-right text-base" style={{ color: 'var(--primary)', fontWeight: 'var(--font-bold)', borderBottom: '1px solid var(--border-color)' }}>
+                              {cell.available}
+                            </td>
+                            <td className="px-md py-sm text-right text-base" style={{ color: 'var(--text-primary)', fontWeight: 'var(--font-medium)', borderBottom: '1px solid var(--border-color)' }}>
+                              {cell.total}
+                            </td>
+                            <td className="px-md py-sm text-right text-base" style={{ color: 'var(--text-secondary)', fontWeight: 'var(--font-medium)', borderBottom: '1px solid var(--border-color)' }}>
+                              {cell.booked}
+                            </td>
+                          </tr>
+                        ))
+                      )
+                    )}
+                  </tbody>
+                </table>
               </div>
             </div>
 
-            {/* Actions */}
-            <div className="flex gap-3">
-              <button
-                onClick={handleBulkRegister}
-                disabled={!bulkRegisterStart || !bulkRegisterEnd || !bulkRegisterValue || bulkRegisterWeekdays.length === 0}
-                className="flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-lg"
-                style={{
-                  backgroundColor: (bulkRegisterStart && bulkRegisterEnd && bulkRegisterValue && bulkRegisterWeekdays.length > 0) ? 'var(--primary)' : 'var(--bg-tertiary)',
-                  color: (bulkRegisterStart && bulkRegisterEnd && bulkRegisterValue && bulkRegisterWeekdays.length > 0) ? '#ffffff' : 'var(--text-tertiary)',
-                  borderRadius: 'var(--radius-sm)',
-                  fontWeight: 'var(--font-bold)',
-                  cursor: (bulkRegisterStart && bulkRegisterEnd && bulkRegisterValue && bulkRegisterWeekdays.length > 0) ? 'pointer' : 'not-allowed'
-                }}
-              >
-                <Save className="w-5 h-5" />
-                등록
-              </button>
-              <button
-                onClick={() => {
-                  setShowBulkRegister(false)
-                  setBulkRegisterStart('')
-                  setBulkRegisterEnd('')
-                  setBulkRegisterWeekdays([0, 1, 2, 3, 4, 5, 6])
-                  setBulkRegisterValue('')
-                }}
-                className="flex-1 px-4 py-3 rounded-lg"
-                style={{
-                  backgroundColor: 'var(--bg-secondary)',
-                  color: 'var(--text-primary)',
-                  borderRadius: 'var(--radius-sm)',
-                  fontWeight: 'var(--font-medium)',
-                  border: '1px solid var(--border-color)'
-                }}
-              >
-                취소
-              </button>
-            </div>
           </div>
         </div>
       )}
 
       {/* Legend */}
       <div
-        className="p-4 flex flex-wrap gap-4"
+        className="p-md flex flex-wrap gap-md"
         style={{
           borderTop: '1px solid var(--border-color)'
         }}
       >
-        <div className="text-sm" style={{ color: 'var(--text-secondary)' }}>
+        <div className="text-base" style={{ color: 'var(--text-secondary)' }}>
           <span style={{ fontWeight: 'var(--font-medium)' }}>사용법:</span>
           {' '}드래그로 범위 선택 • 더블클릭으로 개별 수정 • 대량 등록으로 빠른 입력
         </div>

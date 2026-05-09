@@ -2,160 +2,152 @@
 
 import { Accommodation } from '@/lib/types/accommodation'
 import { Building2, Search } from 'lucide-react'
-import { useState } from 'react'
+import { ChangeEvent, KeyboardEvent, useId, useState } from 'react'
+import { Button, Card } from '@creami/ui'
 
 interface AccommodationSelectorProps {
   accommodations: Accommodation[]
   selectedId: string | null
   onSelect: (accommodationId: string | null) => void
+  compact?: boolean
 }
 
-export function AccommodationSelector({ accommodations, selectedId, onSelect }: AccommodationSelectorProps) {
+export function AccommodationSelector({ accommodations, selectedId, onSelect, compact = false }: AccommodationSelectorProps) {
   const [searchQuery, setSearchQuery] = useState('')
+  const accommodationListId = useId()
 
-  const filteredAccommodations = accommodations.filter(acc =>
-    acc.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    acc.address?.toLowerCase().includes(searchQuery.toLowerCase())
-  )
+  const normalizedSearchQuery = searchQuery.trim().toLowerCase()
+
+  const filteredAccommodations = accommodations.filter(acc => {
+    const label = `${acc.id} ${acc.name}`.toLowerCase()
+
+    return (
+      acc.id.toLowerCase().includes(normalizedSearchQuery) ||
+      acc.name.toLowerCase().includes(normalizedSearchQuery) ||
+      label.includes(normalizedSearchQuery)
+    )
+  })
 
   const selectedAccommodation = accommodations.find(acc => acc.id === selectedId)
 
+  const handleSearchChange = (event: ChangeEvent<HTMLInputElement>) => {
+    const value = event.target.value
+    const normalizedValue = value.trim().toLowerCase()
+    setSearchQuery(value)
+
+    const matchedAccommodation = accommodations.find(acc =>
+      acc.id.toLowerCase() === normalizedValue ||
+      acc.name.toLowerCase() === normalizedValue ||
+      `${acc.id} ${acc.name}`.toLowerCase() === normalizedValue
+    )
+
+    if (matchedAccommodation) {
+      setSearchQuery(`${matchedAccommodation.id} ${matchedAccommodation.name}`)
+      onSelect(matchedAccommodation.id)
+    }
+  }
+
+  const handleSearchKeyDown = (event: KeyboardEvent<HTMLInputElement>) => {
+    if (event.key !== 'Enter') return
+
+    selectFirstAccommodation()
+  }
+
+  const selectFirstAccommodation = () => {
+    const firstAccommodation = filteredAccommodations[0]
+    if (firstAccommodation) {
+      setSearchQuery(`${firstAccommodation.id} ${firstAccommodation.name}`)
+      onSelect(firstAccommodation.id)
+    }
+  }
+
+  const handleClearSelection = () => {
+    setSearchQuery('')
+    onSelect(null)
+  }
+
   return (
-    <div
-      className="p-6 rounded-lg"
-      style={{
-        backgroundColor: 'var(--bg-primary)',
-        borderRadius: 'var(--radius)',
-        border: '1px solid var(--border-color)',
-        boxShadow: 'var(--shadow)'
-      }}
-    >
-      <div className="flex items-center justify-between mb-4">
-        <h2 className="text-xl flex items-center gap-2" style={{ fontWeight: 'var(--font-bold)', color: 'var(--text-primary)' }}>
-          <Building2 className="w-5 h-5" style={{ color: 'var(--primary)' }} />
+    <Card className={compact ? 'p-md' : 'p-lg'} hover={false}>
+      <div className={`flex items-center justify-between ${compact ? 'mb-sm' : 'mb-md'}`}>
+        <h2 className="text-xl flex items-center gap-sm font-bold text-text-primary">
+          <Building2 className="h-icon-md w-icon-md text-primary" />
           숙소 선택
         </h2>
         {selectedId && (
-          <button
-            onClick={() => onSelect(null)}
-            className="text-sm px-3 py-1 rounded transition-colors"
-            style={{
-              backgroundColor: 'var(--bg-secondary)',
-              border: '1px solid var(--border-color)',
-              color: 'var(--text-primary)',
-              borderRadius: 'var(--radius-sm)',
-              fontWeight: 'var(--font-medium)'
-            }}
+          <Button
+            type="button"
+            onClick={handleClearSelection}
+            variant="secondary"
+            size="small"
           >
             선택 해제
-          </button>
+          </Button>
         )}
       </div>
 
       {/* Search */}
-      <div className="mb-4 relative">
-        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4" style={{ color: 'var(--text-tertiary)' }} />
-        <input
-          type="text"
-          placeholder="숙소명 또는 주소로 검색..."
-          value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
-          className="w-full pl-10 pr-4 py-2 rounded-lg"
-          style={{
-            backgroundColor: 'var(--bg-secondary)',
-            border: '1px solid var(--border-color)',
-            color: 'var(--text-primary)',
-            borderRadius: 'var(--radius-sm)'
-          }}
-        />
+      <div className={`${compact ? 'mb-sm max-w-[var(--modal-md)]' : 'mb-md'} flex gap-sm`}>
+        <div className="relative flex-1">
+          <Search className="absolute left-md top-1/2 -translate-y-1/2 h-md w-md" style={{ color: 'var(--text-tertiary)' }} />
+          <input
+            type="text"
+            placeholder="ID 또는 숙소명으로 검색..."
+            list={accommodationListId}
+            value={searchQuery}
+            onChange={handleSearchChange}
+            onKeyDown={handleSearchKeyDown}
+            className="h-control-md w-full rounded pr-control-px-md text-base"
+            style={{
+              backgroundColor: 'var(--bg-secondary)',
+              border: '1px solid var(--border-color)',
+              color: 'var(--text-primary)',
+              paddingLeft: 'var(--control-search-padding)'
+            }}
+          />
+          <datalist id={accommodationListId}>
+            {filteredAccommodations.map(accommodation => (
+              <option
+                key={accommodation.id}
+                value={`${accommodation.id} ${accommodation.name}`}
+              />
+            ))}
+          </datalist>
+        </div>
       </div>
 
       {/* Selected Accommodation Display */}
       {selectedAccommodation && (
         <div
-          className="mb-4 p-4 rounded-lg"
+          className={`${compact ? 'mb-none' : 'mb-md'} inline-flex max-w-full flex-wrap items-center gap-md rounded px-md py-sm`}
           style={{
-            backgroundColor: 'var(--primary)',
-            borderRadius: 'var(--radius-sm)'
+            backgroundColor: 'var(--primary)'
           }}
         >
-          <div className="flex items-center justify-between">
-            <div>
-              <h3 className="text-base mb-1" style={{ fontWeight: 'var(--font-bold)', color: '#ffffff' }}>
-                선택된 숙소: {selectedAccommodation.name}
-              </h3>
-              {selectedAccommodation.address && (
-                <p className="text-sm" style={{ color: 'rgba(255, 255, 255, 0.8)', fontWeight: 'var(--font-light)' }}>
-                  {selectedAccommodation.address}
-                </p>
-              )}
-            </div>
-          </div>
+          <span className="text-base font-light text-text-on-primary-muted">
+            {selectedAccommodation.id}
+          </span>
+          <span className="text-base font-bold text-text-on-primary">
+            {selectedAccommodation.name}
+          </span>
+          <span
+            className="rounded px-sm py-xs text-xs font-medium"
+            style={{
+              backgroundColor: 'var(--primary-bg)',
+              color: 'var(--text-on-primary)'
+            }}
+          >
+            {selectedAccommodation.type}
+          </span>
         </div>
       )}
 
-      {/* Accommodation List */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 max-h-64 overflow-y-auto">
-        {filteredAccommodations.map((accommodation) => {
-          const isSelected = selectedId === accommodation.id
-
-          return (
-            <button
-              key={accommodation.id}
-              onClick={() => onSelect(accommodation.id)}
-              disabled={isSelected}
-              className="p-4 rounded-lg text-left transition-all"
-              style={{
-                backgroundColor: isSelected ? 'var(--bg-tertiary)' : 'var(--bg-secondary)',
-                border: `2px solid ${isSelected ? 'var(--primary)' : 'var(--border-color)'}`,
-                borderRadius: 'var(--radius-sm)',
-                cursor: isSelected ? 'default' : 'pointer',
-                opacity: isSelected ? 0.6 : 1
-              }}
-            >
-              <h3
-                className="text-sm mb-1"
-                style={{
-                  fontWeight: 'var(--font-bold)',
-                  color: 'var(--text-primary)'
-                }}
-              >
-                {accommodation.name}
-              </h3>
-              {accommodation.address && (
-                <p
-                  className="text-xs"
-                  style={{
-                    color: 'var(--text-secondary)',
-                    fontWeight: 'var(--font-light)'
-                  }}
-                >
-                  {accommodation.address}
-                </p>
-              )}
-              <div className="mt-2">
-                <span
-                  className="text-xs px-2 py-0.5 rounded"
-                  style={{
-                    backgroundColor: 'var(--bg-tertiary)',
-                    color: 'var(--text-secondary)'
-                  }}
-                >
-                  {accommodation.type}
-                </span>
-              </div>
-            </button>
-          )
-        })}
-      </div>
-
-      {filteredAccommodations.length === 0 && (
-        <div className="text-center py-8">
+      {searchQuery && !selectedAccommodation && filteredAccommodations.length === 0 && (
+        <div className="text-center py-xl">
           <p style={{ color: 'var(--text-secondary)', fontWeight: 'var(--font-light)' }}>
             검색 결과가 없습니다
           </p>
         </div>
       )}
-    </div>
+    </Card>
   )
 }

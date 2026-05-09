@@ -33,6 +33,20 @@ export const APPS = [
     url: 'http://localhost:3004',
     icon: 'Calendar',
     color: '#fa8383'
+  },
+  {
+    id: 'invoice',
+    name: 'Creami Invoice',
+    url: 'http://localhost:3005',
+    icon: 'ReceiptText',
+    color: '#fa8383'
+  },
+  {
+    id: 'setting',
+    name: 'Creami Setting',
+    url: 'http://localhost:3006',
+    icon: 'Settings',
+    color: '#fa8383'
   }
 ] as const
 

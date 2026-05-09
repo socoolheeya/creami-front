@@ -13,60 +13,59 @@ export function RoomRateCard({ roomRate, isSelected, onSelect }: RoomRateCardPro
   return (
     <div
       onClick={onSelect}
-      className="p-4 rounded-lg transition-all cursor-pointer"
+      className="p-md rounded transition-all cursor-pointer"
       style={{
         backgroundColor: isSelected ? 'var(--primary-bg)' : 'var(--bg-primary)',
-        border: `2px solid ${isSelected ? 'var(--primary)' : 'var(--border-color)'}`,
+        border: `1px solid ${isSelected ? 'var(--primary)' : 'var(--border-color)'}`,
         position: 'relative'
       }}
     >
       {isSelected && (
         <div
-          className="absolute top-3 right-3 p-1 rounded-full"
+          className="absolute right-sm top-sm flex h-control-mini w-control-mini items-center justify-center rounded"
           style={{
             backgroundColor: 'var(--primary)',
             color: '#ffffff'
           }}
         >
-          <Check className="w-4 h-4" />
+          <Check className="w-icon-mini h-icon-mini" />
         </div>
       )}
 
-      <div className="mb-3">
-        <h3 style={{ fontWeight: 'var(--font-bold)', color: 'var(--text-primary)', marginBottom: '4px' }}>
+      <div className="mb-sm">
+        <h3 className="mb-xs text-base" style={{ fontWeight: 'var(--font-bold)', color: 'var(--text-primary)' }}>
           {roomRate.roomName}
         </h3>
-        <p style={{ fontSize: '14px', color: 'var(--text-secondary)' }}>
+        <p className="text-base" style={{ color: 'var(--text-secondary)', fontWeight: 'var(--font-light)' }}>
           {roomRate.roomType}
         </p>
       </div>
 
       <div
-        className="mb-3 p-2 rounded"
+        className="mb-sm rounded p-sm"
         style={{
-          backgroundColor: 'var(--bg-secondary)',
-          fontSize: '14px'
+          backgroundColor: 'var(--bg-secondary)'
         }}
       >
-        <p style={{ color: 'var(--primary)', fontWeight: 'var(--font-medium)' }}>
+        <p className="text-base" style={{ color: 'var(--primary)', fontWeight: 'var(--font-medium)' }}>
           {roomRate.ratePlanName}
         </p>
-        <p style={{ color: 'var(--text-secondary)', fontSize: '12px', marginTop: '2px' }}>
+        <p className="mt-xs text-base" style={{ color: 'var(--text-secondary)', fontWeight: 'var(--font-light)' }}>
           {roomRate.mealPlan}
         </p>
       </div>
 
       <div className="flex items-center justify-between">
-        <div className="flex items-center gap-1" style={{ color: 'var(--text-tertiary)', fontSize: '14px' }}>
-          <Users className="w-4 h-4" />
+        <div className="flex items-center gap-xs text-base" style={{ color: 'var(--text-tertiary)', fontWeight: 'var(--font-light)' }}>
+          <Users className="w-md h-md" />
           <span>최대 {roomRate.maxOccupancy}명</span>
         </div>
 
         <div className="text-right">
-          <p style={{ fontSize: '12px', color: 'var(--text-secondary)' }}>
+          <p className="text-base" style={{ color: 'var(--text-secondary)', fontWeight: 'var(--font-light)' }}>
             {roomRate.nights}박
           </p>
-          <p style={{ fontSize: '20px', fontWeight: 'var(--font-bold)', color: 'var(--primary)' }}>
+          <p className="text-xl" style={{ fontWeight: 'var(--font-bold)', color: 'var(--primary)' }}>
             ₩{roomRate.totalPrice.toLocaleString()}
           </p>
         </div>

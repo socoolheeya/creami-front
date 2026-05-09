@@ -66,9 +66,9 @@ export default function NewBookingPage() {
   return (
     <div>
       {/* Header */}
-      <div className="mb-6">
-        <div className="flex items-center gap-3 mb-2">
-          <CalendarCheck className="w-8 h-8" style={{ color: 'var(--primary)' }} />
+      <div className="mb-lg">
+        <div className="flex items-center gap-md mb-sm">
+          <CalendarCheck className="w-icon-lg h-icon-lg" style={{ color: 'var(--primary)' }} />
           <h1 className="text-2xl" style={{ fontWeight: 'var(--font-bold)', color: 'var(--text-primary)' }}>
             예약하기
           </h1>
@@ -79,35 +79,35 @@ export default function NewBookingPage() {
       </div>
 
       {/* 2단 레이아웃 */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-lg">
         {/* 왼쪽: 검색 폼 */}
         <div className="lg:col-span-1">
           <SearchForm onSearch={handleSearch} isLoading={isSearching} />
         </div>
 
         {/* 오른쪽: 검색 결과 + 예약자 정보 */}
-        <div className="lg:col-span-2 space-y-6">
+        <div className="lg:col-span-2 space-y-lg">
           {/* 검색 결과 */}
           {searchResult && (
             <div
-              className="p-6 rounded-lg"
+              className="p-lg rounded"
               style={{
                 backgroundColor: 'var(--bg-primary)',
                 border: '1px solid var(--border-color)'
               }}
             >
-              <div className="mb-4">
-                <h2 className="text-lg mb-1" style={{ fontWeight: 'var(--font-bold)', color: 'var(--text-primary)' }}>
+              <div className="mb-md">
+                <h2 className="text-lg mb-xs" style={{ fontWeight: 'var(--font-bold)', color: 'var(--text-primary)' }}>
                   예약 가능한 객실 ({searchResult.results.length})
                 </h2>
-                <p style={{ fontSize: '14px', color: 'var(--text-secondary)' }}>
+                <p className="text-base" style={{ color: 'var(--text-secondary)', fontWeight: 'var(--font-light)' }}>
                   {searchResult.accommodationName} · {searchResult.checkIn} ~ {searchResult.checkOut} ({searchResult.nights}박)
                 </p>
               </div>
 
               {searchResult.results.length === 0 ? (
                 <div
-                  className="text-center py-12 rounded-lg"
+                  className="text-center py-3xl rounded"
                   style={{
                     backgroundColor: 'var(--bg-secondary)',
                     border: '1px dashed var(--border-color)'
@@ -130,14 +130,14 @@ export default function NewBookingPage() {
           {/* 검색 전 안내 */}
           {!searchResult && !isSearching && (
             <div
-              className="text-center py-16 rounded-lg"
+              className="text-center py-3xl rounded"
               style={{
                 backgroundColor: 'var(--bg-primary)',
                 border: '2px dashed var(--border-color)'
               }}
             >
-              <CalendarCheck className="w-16 h-16 mx-auto mb-4" style={{ color: 'var(--text-tertiary)' }} />
-              <p style={{ color: 'var(--text-secondary)', fontSize: '16px' }}>
+              <CalendarCheck className="w-3xl h-3xl mx-auto mb-md" style={{ color: 'var(--text-tertiary)' }} />
+              <p className="text-base" style={{ color: 'var(--text-secondary)', fontWeight: 'var(--font-light)' }}>
                 왼쪽 검색 폼에서 숙소와 날짜를 선택하여 검색해주세요
               </p>
             </div>
@@ -146,7 +146,7 @@ export default function NewBookingPage() {
           {/* 로딩 */}
           {isSearching && (
             <div
-              className="text-center py-16 rounded-lg"
+              className="text-center py-3xl rounded"
               style={{
                 backgroundColor: 'var(--bg-primary)',
                 border: '1px solid var(--border-color)'

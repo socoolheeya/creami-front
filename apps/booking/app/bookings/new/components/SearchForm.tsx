@@ -5,6 +5,7 @@ import { SearchRequest, RoomOccupancy } from '@/lib/types/search'
 import { mockAccommodations } from '@/lib/data/mock-accommodations'
 import { OccupancyInput } from './OccupancyInput'
 import { useState, useRef, useEffect } from 'react'
+import { Button, DatePicker } from '@creami/ui'
 
 interface SearchFormProps {
   onSearch: (request: SearchRequest) => void
@@ -74,7 +75,7 @@ export function SearchForm({ onSearch, isLoading }: SearchFormProps) {
 
   return (
     <div
-      className="p-6 rounded-lg h-fit"
+      className="p-lg rounded h-fit"
       style={{
         backgroundColor: 'var(--bg-primary)',
         border: '1px solid var(--border-color)',
@@ -82,14 +83,14 @@ export function SearchForm({ onSearch, isLoading }: SearchFormProps) {
         top: '80px'
       }}
     >
-      <h2 className="text-xl mb-6" style={{ fontWeight: 'var(--font-bold)', color: 'var(--text-primary)' }}>
+      <h2 className="text-xl mb-lg" style={{ fontWeight: 'var(--font-bold)', color: 'var(--text-primary)' }}>
         예약 검색
       </h2>
 
-      <form onSubmit={handleSubmit} className="space-y-4">
+      <form onSubmit={handleSubmit} className="space-y-md">
         {/* 숙소 검색 */}
         <div ref={dropdownRef} style={{ position: 'relative' }}>
-          <label className="block mb-2" style={{ color: 'var(--text-primary)', fontWeight: 'var(--font-bold)' }}>
+          <label className="block mb-sm text-base" style={{ color: 'var(--text-primary)', fontWeight: 'var(--font-bold)' }}>
             숙소 *
           </label>
           <div style={{ position: 'relative' }}>
@@ -100,16 +101,18 @@ export function SearchForm({ onSearch, isLoading }: SearchFormProps) {
               onFocus={() => setShowDropdown(true)}
               placeholder="숙소명 또는 숙소ID 검색..."
               required={!accommodationId && !searchQuery}
-              className="w-full px-3 py-2 rounded-lg"
+              className="w-full h-control-md px-control-px-md py-none rounded text-base leading-none"
               style={{
                 backgroundColor: 'var(--bg-secondary)',
                 border: '1px solid var(--border-color)',
                 color: 'var(--text-primary)',
-                paddingRight: '32px'
+                borderRadius: 'var(--radius)',
+                paddingRight: 'var(--control-search-padding)',
+                fontWeight: 'var(--font-medium)'
               }}
             />
             <ChevronDown
-              className="absolute right-3 top-1/2 transform -translate-y-1/2 w-4 h-4 pointer-events-none"
+              className="absolute right-md top-1/2 transform -translate-y-1/2 w-icon-md h-icon-md pointer-events-none"
               style={{ color: 'var(--text-tertiary)' }}
             />
           </div>
@@ -117,12 +120,12 @@ export function SearchForm({ onSearch, isLoading }: SearchFormProps) {
           {/* 드롭다운 */}
           {showDropdown && (
             <div
-              className="absolute w-full mt-1 rounded-lg overflow-hidden z-10"
+              className="absolute w-full mt-xs rounded overflow-hidden z-10"
               style={{
                 backgroundColor: 'var(--bg-primary)',
                 border: '1px solid var(--border-color)',
                 boxShadow: 'var(--shadow)',
-                maxHeight: '240px',
+                maxHeight: '15rem',
                 overflowY: 'auto'
               }}
             >
@@ -131,7 +134,7 @@ export function SearchForm({ onSearch, isLoading }: SearchFormProps) {
                   <div
                     key={acc.id}
                     onClick={() => handleAccommodationSelect(acc.id, acc.name)}
-                    className="px-3 py-2 cursor-pointer transition-colors"
+                    className="px-md py-sm cursor-pointer transition-colors"
                     style={{
                       color: 'var(--text-primary)',
                       borderBottom: '1px solid var(--border-color)'
@@ -143,16 +146,16 @@ export function SearchForm({ onSearch, isLoading }: SearchFormProps) {
                       e.currentTarget.style.backgroundColor = 'transparent'
                     }}
                   >
-                    <div style={{ fontWeight: 'var(--font-medium)' }}>{acc.name}</div>
-                    <div style={{ fontSize: '12px', color: 'var(--text-tertiary)', marginTop: '2px' }}>
+                    <div className="text-base" style={{ fontWeight: 'var(--font-medium)' }}>{acc.name}</div>
+                    <div className="text-base mt-xs" style={{ color: 'var(--text-tertiary)', fontWeight: 'var(--font-light)' }}>
                       ID: {acc.id} · {acc.address}
                     </div>
                   </div>
                 ))
               ) : (
                 <div
-                  className="px-3 py-4 text-center"
-                  style={{ color: 'var(--text-tertiary)', fontSize: '14px' }}
+                  className="px-md py-lg text-center text-base"
+                  style={{ color: 'var(--text-tertiary)', fontWeight: 'var(--font-light)' }}
                 >
                   검색 결과가 없습니다
                 </div>
@@ -163,40 +166,21 @@ export function SearchForm({ onSearch, isLoading }: SearchFormProps) {
 
         {/* 체크인 */}
         <div>
-          <label className="block mb-2" style={{ color: 'var(--text-primary)', fontWeight: 'var(--font-bold)' }}>
-            체크인 *
-          </label>
-          <input
-            type="date"
+          <DatePicker
+            label="체크인 *"
             value={checkIn}
-            onChange={(e) => setCheckIn(e.target.value)}
-            required
-            className="w-full px-3 py-2 rounded-lg"
-            style={{
-              backgroundColor: 'var(--bg-secondary)',
-              border: '1px solid var(--border-color)',
-              color: 'var(--text-primary)'
-            }}
+            onChange={setCheckIn}
+            placeholder="체크인 선택"
           />
         </div>
 
         {/* 체크아웃 */}
         <div>
-          <label className="block mb-2" style={{ color: 'var(--text-primary)', fontWeight: 'var(--font-bold)' }}>
-            체크아웃 *
-          </label>
-          <input
-            type="date"
+          <DatePicker
+            label="체크아웃 *"
             value={checkOut}
-            onChange={(e) => setCheckOut(e.target.value)}
-            required
-            min={checkIn}
-            className="w-full px-3 py-2 rounded-lg"
-            style={{
-              backgroundColor: 'var(--bg-secondary)',
-              border: '1px solid var(--border-color)',
-              color: 'var(--text-primary)'
-            }}
+            onChange={setCheckOut}
+            placeholder="체크아웃 선택"
           />
         </div>
 
@@ -204,20 +188,15 @@ export function SearchForm({ onSearch, isLoading }: SearchFormProps) {
         <OccupancyInput occupancies={occupancies} onChange={setOccupancies} />
 
         {/* 검색 버튼 */}
-        <button
+        <Button
           type="submit"
           disabled={isLoading}
-          className="w-full flex items-center justify-center gap-2 px-4 py-3 rounded-lg transition-colors"
-          style={{
-            backgroundColor: isLoading ? 'var(--text-tertiary)' : 'var(--primary)',
-            color: '#ffffff',
-            fontWeight: 'var(--font-bold)',
-            cursor: isLoading ? 'not-allowed' : 'pointer'
-          }}
+          fullWidth
+          size="large"
         >
-          <Search className="w-5 h-5" />
+          <Search className="w-icon-md h-icon-md" />
           {isLoading ? '검색 중...' : '검색하기'}
-        </button>
+        </Button>
       </form>
     </div>
   )

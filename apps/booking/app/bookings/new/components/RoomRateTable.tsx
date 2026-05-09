@@ -19,65 +19,59 @@ export function RoomRateTable({ roomRates, selectedRoomRate, onSelect }: RoomRat
           <tr
             style={{
               backgroundColor: 'var(--bg-tertiary)',
-              borderBottom: '2px solid var(--border-color)'
+              borderBottom: '1px solid var(--border-color)'
             }}
           >
             <th
-              className="text-left py-3 px-4"
+              className="text-left py-sm px-md text-base"
               style={{
                 fontWeight: 'var(--font-bold)',
-                color: 'var(--text-primary)',
-                fontSize: '0.875rem'
+                color: 'var(--text-primary)'
               }}
             >
               객실명 / ID
             </th>
             <th
-              className="text-left py-3 px-4"
+              className="text-left py-sm px-md text-base"
               style={{
                 fontWeight: 'var(--font-bold)',
-                color: 'var(--text-primary)',
-                fontSize: '0.875rem'
+                color: 'var(--text-primary)'
               }}
             >
               요금제 / ID
             </th>
             <th
-              className="text-center py-3 px-4"
+              className="text-center py-sm px-md text-base"
               style={{
                 fontWeight: 'var(--font-bold)',
-                color: 'var(--text-primary)',
-                fontSize: '0.875rem'
+                color: 'var(--text-primary)'
               }}
             >
               식사
             </th>
             <th
-              className="text-center py-3 px-4"
+              className="text-center py-sm px-md text-base"
               style={{
                 fontWeight: 'var(--font-bold)',
-                color: 'var(--text-primary)',
-                fontSize: '0.875rem'
+                color: 'var(--text-primary)'
               }}
             >
               최대인원
             </th>
             <th
-              className="text-center py-3 px-4"
+              className="text-center py-sm px-md text-base"
               style={{
                 fontWeight: 'var(--font-bold)',
-                color: 'var(--text-primary)',
-                fontSize: '0.875rem'
+                color: 'var(--text-primary)'
               }}
             >
               무료취소
             </th>
             <th
-              className="text-right py-3 px-4"
+              className="text-right py-sm px-md text-base"
               style={{
                 fontWeight: 'var(--font-bold)',
-                color: 'var(--text-primary)',
-                fontSize: '0.875rem'
+                color: 'var(--text-primary)'
               }}
             >
               총 금액
@@ -96,7 +90,7 @@ export function RoomRateTable({ roomRates, selectedRoomRate, onSelect }: RoomRat
                 style={{
                   backgroundColor: isSelected ? 'var(--primary-bg)' : 'var(--bg-primary)',
                   borderBottom: index === roomRates.length - 1 ? 'none' : '1px solid var(--border-color)',
-                  borderLeft: isSelected ? '3px solid var(--primary)' : '3px solid transparent',
+                  borderLeft: isSelected ? '1px solid var(--primary)' : '1px solid transparent',
                   cursor: 'pointer',
                   transition: 'all 0.2s'
                 }}
@@ -112,58 +106,58 @@ export function RoomRateTable({ roomRates, selectedRoomRate, onSelect }: RoomRat
                   }
                 }}
               >
-                <td className="py-4 px-4">
-                  <div style={{ fontWeight: 'var(--font-medium)', color: 'var(--text-primary)', fontSize: '0.875rem' }}>
+                <td className="py-md px-md">
+                  <div className="text-base" style={{ fontWeight: 'var(--font-medium)', color: 'var(--text-primary)' }}>
                     {roomRate.roomName}
                   </div>
-                  <div style={{ color: 'var(--text-tertiary)', fontSize: '0.75rem', marginTop: '4px' }}>
+                  <div className="text-base mt-xs" style={{ color: 'var(--text-tertiary)', fontWeight: 'var(--font-light)' }}>
                     ID: {roomRate.roomId} · {roomRate.roomType}
                   </div>
                 </td>
-                <td className="py-4 px-4">
-                  <div style={{ color: 'var(--text-primary)', fontSize: '0.875rem' }}>
+                <td className="py-md px-md">
+                  <div className="text-base" style={{ color: 'var(--text-primary)', fontWeight: 'var(--font-medium)' }}>
                     {roomRate.ratePlanName}
                   </div>
-                  <div style={{ color: 'var(--text-tertiary)', fontSize: '0.75rem', marginTop: '4px' }}>
+                  <div className="text-base mt-xs" style={{ color: 'var(--text-tertiary)', fontWeight: 'var(--font-light)' }}>
                     ID: {roomRate.ratePlanId}
                   </div>
                 </td>
-                <td className="py-4 px-4 text-center">
-                  <div style={{ color: 'var(--text-secondary)', fontSize: '0.875rem' }}>
+                <td className="py-md px-md text-center">
+                  <div className="text-base" style={{ color: 'var(--text-secondary)', fontWeight: 'var(--font-medium)' }}>
                     {roomRate.mealPlan}
                   </div>
                 </td>
-                <td className="py-4 px-4 text-center">
-                  <div className="inline-flex items-center gap-1" style={{ color: 'var(--text-secondary)', fontSize: '0.875rem' }}>
-                    <Users className="w-4 h-4" />
+                <td className="py-md px-md text-center">
+                  <div className="inline-flex items-center gap-xs text-base" style={{ color: 'var(--text-secondary)', fontWeight: 'var(--font-medium)' }}>
+                    <Users className="w-md h-md" />
                     <span>{roomRate.maxOccupancy}명</span>
                   </div>
                 </td>
-                <td className="py-4 px-4 text-center">
+                <td className="py-md px-md text-center">
                   {roomRate.freeCancellation ? (
-                    <div className="inline-flex flex-col items-center gap-1">
-                      <div className="inline-flex items-center gap-1" style={{ color: 'var(--success)' }}>
-                        <Check className="w-5 h-5" />
-                        <span style={{ fontSize: '0.875rem', fontWeight: 'var(--font-medium)' }}>가능</span>
+                    <div className="inline-flex flex-col items-center gap-xs">
+                      <div className="inline-flex items-center gap-xs text-base" style={{ color: 'var(--success)', fontWeight: 'var(--font-medium)' }}>
+                        <Check className="w-icon-md h-icon-md" />
+                        <span>가능</span>
                       </div>
                       {roomRate.cancellationDeadline && (
-                        <div style={{ color: 'var(--text-tertiary)', fontSize: '0.75rem' }}>
+                        <div className="text-base" style={{ color: 'var(--text-tertiary)', fontWeight: 'var(--font-light)' }}>
                           ~{roomRate.cancellationDeadline}
                         </div>
                       )}
                     </div>
                   ) : (
-                    <div className="inline-flex items-center gap-1" style={{ color: 'var(--error)' }}>
-                      <X className="w-5 h-5" />
-                      <span style={{ fontSize: '0.875rem', fontWeight: 'var(--font-medium)' }}>불가</span>
+                    <div className="inline-flex items-center gap-xs text-base" style={{ color: 'var(--error)', fontWeight: 'var(--font-medium)' }}>
+                      <X className="w-icon-md h-icon-md" />
+                      <span>불가</span>
                     </div>
                   )}
                 </td>
-                <td className="py-4 px-4 text-right">
-                  <div style={{ fontWeight: 'var(--font-bold)', color: 'var(--text-primary)', fontSize: '1rem' }}>
+                <td className="py-md px-md text-right">
+                  <div className="text-base" style={{ fontWeight: 'var(--font-bold)', color: 'var(--text-primary)' }}>
                     ₩{formatPrice(roomRate.totalPrice)}
                   </div>
-                  <div style={{ color: 'var(--text-tertiary)', fontSize: '0.75rem', marginTop: '4px' }}>
+                  <div className="text-base mt-xs" style={{ color: 'var(--text-tertiary)', fontWeight: 'var(--font-light)' }}>
                     (1박 ₩{formatPrice(roomRate.basePrice)})
                   </div>
                 </td>

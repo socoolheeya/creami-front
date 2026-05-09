@@ -4,8 +4,26 @@ module.exports = {
     './pages/**/*.{js,ts,jsx,tsx,mdx}',
     './components/**/*.{js,ts,jsx,tsx,mdx}',
     './app/**/*.{js,ts,jsx,tsx,mdx}',
+    '../../packages/ui/components/**/*.{js,ts,jsx,tsx}',
   ],
   darkMode: ['class', '[data-theme="dark"]'],
+  safelist: [
+    // Sidebar 필수 클래스
+    'px-lg', 'py-xl', 'gap-sm', 'gap-md', 'py-md',
+    'shadow-md', 'scale-[1.02]',
+    'w-lg', 'h-lg', 'max-w-none',
+    'transition-[width]', 'transition-[opacity,max-width]',
+    'w-[var(--sidebar-collapsed)]', 'w-[var(--sidebar-width)]',
+    'top-[var(--header-height)]',
+    // ViewToggle 필수 클래스
+    'w-view-toggle', 'h-control-md', 'box-border', 'overflow-hidden',
+    'top-0', 'left-0', 'left-1/2', 'w-1/2', 'h-full', 'w-md', 'h-md', 'w-icon-md', 'h-icon-md',
+    // Input 필수 클래스
+    'pr-control-search', 'right-md',
+    // Layout 필수 클래스
+    'mb-lg', 'mb-md', 'gap-lg', 'gap-md', 'gap-sm',
+    'text-primary', 'text-text-primary', 'text-2xl',
+  ],
   theme: {
     // 숫자 유틸리티 완전 제거 - 토큰만 사용
     colors: {
@@ -20,9 +38,21 @@ module.exports = {
         DEFAULT: 'var(--success)',
         bg: 'var(--success-bg)',
       },
+      info: {
+        DEFAULT: 'var(--info)',
+        bg: 'var(--info-bg)',
+      },
+      warning: {
+        DEFAULT: 'var(--warning)',
+        bg: 'var(--warning-bg)',
+      },
       error: {
         DEFAULT: 'var(--error)',
         bg: 'var(--error-bg)',
+      },
+      neutral: {
+        DEFAULT: 'var(--neutral)',
+        bg: 'var(--neutral-bg)',
       },
       bg: {
         primary: 'var(--bg-primary)',
@@ -33,8 +63,11 @@ module.exports = {
         primary: 'var(--text-primary)',
         secondary: 'var(--text-secondary)',
         tertiary: 'var(--text-tertiary)',
+        'on-primary': 'var(--text-on-primary)',
+        'on-primary-muted': 'var(--text-on-primary-muted)',
       },
       border: 'var(--border-color)',
+      white: '#ffffff',
       transparent: 'transparent',
       current: 'currentColor',
     },
@@ -46,6 +79,26 @@ module.exports = {
       xl: 'var(--spacing-xl)',
       '2xl': 'var(--spacing-2xl)',
       '3xl': 'var(--spacing-3xl)',
+      none: '0',
+      'control-mini': 'var(--control-height-mini)',
+      'control-sm': 'var(--control-height-sm)',
+      'control-md': 'var(--control-height-md)',
+      'control-lg': 'var(--control-height-lg)',
+      'control-px-mini': 'var(--control-padding-x-mini)',
+      'control-px-sm': 'var(--control-padding-x-sm)',
+      'control-px-md': 'var(--control-padding-x-md)',
+      'control-px-lg': 'var(--control-padding-x-lg)',
+      'control-search': 'var(--control-search-padding)',
+      'icon-md': 'var(--icon-size-md)',
+      'icon-lg': 'var(--icon-size-lg)',
+      datepicker: 'var(--datepicker-width)',
+      'view-toggle': 'var(--view-toggle-width)',
+      'app-switcher': 'var(--app-switcher-width)',
+      'modal-sm': 'var(--modal-width-sm)',
+      'modal-md': 'var(--modal-width-md)',
+      'modal-lg': 'var(--modal-width-lg)',
+      'modal-max': 'var(--modal-max-height)',
+      'modal-action': 'var(--modal-action-width)',
       0: '0',
       auto: 'auto',
     },
@@ -66,10 +119,6 @@ module.exports = {
     },
     borderRadius: {
       DEFAULT: 'var(--radius)',
-      sm: 'var(--radius-sm)',
-      md: 'var(--radius-md)',
-      lg: 'var(--radius-lg)',
-      full: 'var(--radius-full)',
       none: '0',
     },
     boxShadow: {

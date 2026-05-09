@@ -1,50 +1,53 @@
 import React from 'react'
 
 export interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
-  variant?: 'primary' | 'secondary' | 'tertiary'
-  size?: 'sm' | 'md' | 'lg'
+  variant?: 'primary' | 'secondary' | 'tertiary' | 'ghost'
+  size?: 'lg' | 'large' | 'normal' | 'md' | 'medium' | 'sm' | 'small' | 'mini'
+  iconOnly?: boolean
+  fullWidth?: boolean
   children: React.ReactNode
 }
 
 export function Button({
   variant = 'primary',
-  size = 'md',
+  size = 'medium',
+  iconOnly = false,
+  fullWidth = false,
   className = '',
   children,
   disabled,
-  style,
   ...props
 }: ButtonProps) {
-  const baseStyles = 'flex items-center gap-2 rounded-lg transition-colors'
+  const normalizedSize =
+    size === 'lg' ? 'large' :
+    size === 'normal' || size === 'md' ? 'medium' :
+    size === 'sm' ? 'small' :
+    size
+
+  const baseStyles = 'inline-flex shrink-0 cursor-pointer items-center justify-center gap-sm rounded transition-colors box-border m-none border-none text-base leading-none font-medium'
 
   const sizeStyles = {
-    sm: 'px-3 py-1.5 text-sm',
-    md: 'px-4 py-2 text-sm',
-    lg: 'px-6 py-3 text-base'
+    large: iconOnly ? 'h-control-lg w-control-lg p-none' : 'h-control-lg px-control-px-lg py-none',
+    medium: iconOnly ? 'h-control-md w-control-md p-none' : 'h-control-md px-control-px-md py-none',
+    small: iconOnly ? 'h-control-sm w-control-sm p-none' : 'h-control-sm px-control-px-sm py-none',
+    mini: iconOnly ? 'h-control-mini w-control-mini p-none' : 'h-control-mini px-control-px-mini py-none'
   }
 
-  const variantStyles = {
-    primary: disabled
-      ? 'bg-[var(--bg-tertiary)] text-[var(--text-tertiary)] cursor-not-allowed'
-      : 'bg-[var(--primary)] text-white hover:opacity-90',
-    secondary: disabled
-      ? 'bg-[var(--bg-tertiary)] text-[var(--text-tertiary)] cursor-not-allowed border border-[var(--border-color)]'
-      : 'bg-[var(--bg-secondary)] text-[var(--text-primary)] border border-[var(--border-color)] hover:bg-[var(--bg-tertiary)]',
-    tertiary: disabled
-      ? 'bg-transparent text-[var(--text-tertiary)] cursor-not-allowed'
-      : 'bg-[var(--bg-tertiary)] text-[var(--text-primary)] hover:bg-[var(--bg-secondary)]'
-  }
+  const variantStyles = disabled
+    ? 'bg-bg-tertiary text-text-tertiary cursor-not-allowed'
+    : {
+        primary: 'bg-primary text-white hover:opacity-90',
+        secondary: 'bg-bg-secondary text-text-primary hover:bg-bg-tertiary',
+        tertiary: 'bg-bg-tertiary text-text-primary hover:bg-bg-secondary',
+        ghost: 'bg-transparent text-text-primary hover:bg-bg-tertiary'
+      }[variant]
 
-  const combinedStyles = {
-    borderRadius: 'var(--radius)',
-    ...style
-  }
+  const widthStyle = fullWidth ? 'w-full' : ''
 
   return (
     <button
-      className={`${baseStyles} ${sizeStyles[size]} ${variantStyles[variant]} ${className}`}
+      className={`${baseStyles} ${sizeStyles[normalizedSize]} ${variantStyles} ${widthStyle} ${className}`}
       disabled={disabled}
-      style={combinedStyles}
       {...props}
     >
       {children}

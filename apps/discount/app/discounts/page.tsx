@@ -3,6 +3,7 @@
 import { Tag, Plus } from 'lucide-react'
 import Link from 'next/link'
 import { useState } from 'react'
+import { Button, Input } from '@creami/ui'
 import { mockDiscounts } from '@/lib/data/mock-discounts'
 import { DiscountCard } from './components/DiscountCard'
 import { DiscountTable } from './components/DiscountTable'
@@ -26,44 +27,30 @@ export default function DiscountsPage() {
   return (
     <div>
       {/* Header */}
-      <div className="flex items-center justify-between mb-6">
-        <div className="flex items-center gap-3">
-          <Tag className="w-8 h-8" style={{ color: 'var(--primary)' }} />
-          <h1 className="text-2xl" style={{ fontWeight: 'var(--font-bold)', color: 'var(--text-primary)' }}>
+      <div className="flex items-center justify-between mb-lg">
+        <div className="flex items-center gap-md">
+          <Tag className="h-icon-lg w-icon-lg text-primary" />
+          <h1 className="text-2xl font-bold text-text-primary">
             할인 관리
           </h1>
         </div>
 
         <Link href="/discounts/new">
-          <button
-            className="flex items-center gap-2 px-4 py-2 rounded-lg transition-colors"
-            style={{
-              backgroundColor: 'var(--primary)',
-              color: '#ffffff',
-              borderRadius: 'var(--radius-sm)',
-              fontWeight: 'var(--font-medium)'
-            }}
-          >
-            <Plus className="w-5 h-5" />
+          <Button type="button" variant="primary" size="medium">
+            <Plus className="h-icon-md w-icon-md" />
             신규 등록
-          </button>
+          </Button>
         </Link>
       </div>
 
       {/* Search and View Toggle */}
-      <div className="mb-6 flex gap-4">
-        <input
+      <div className="mb-lg flex gap-md">
+        <Input
           type="text"
           placeholder="할인명 또는 코드로 검색..."
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
-          className="flex-1 px-4 py-2 rounded-lg"
-          style={{
-            backgroundColor: 'var(--bg-primary)',
-            border: '1px solid var(--border-color)',
-            color: 'var(--text-primary)',
-            borderRadius: 'var(--radius-sm)'
-          }}
+          className="flex-1"
         />
 
         {/* View Toggle */}
@@ -73,41 +60,32 @@ export default function DiscountsPage() {
       {/* Discount List */}
       {filteredDiscounts.length === 0 ? (
         <div
-          className="flex flex-col items-center justify-center py-16 rounded-lg"
+          className="flex flex-col items-center justify-center rounded py-3xl"
           style={{
             backgroundColor: 'var(--bg-primary)',
-            borderRadius: 'var(--radius)',
             border: '2px dashed var(--border-color)'
           }}
         >
-          <Tag className="w-16 h-16 mb-4" style={{ color: 'var(--text-tertiary)' }} />
-          <h3 className="text-xl mb-2" style={{ fontWeight: 'var(--font-bold)', color: 'var(--text-primary)' }}>
+          <Tag className="h-3xl w-3xl mb-md text-text-tertiary" />
+          <h3 className="text-xl mb-sm font-bold text-text-primary">
             {searchQuery ? '검색 결과가 없습니다' : '등록된 할인이 없습니다'}
           </h3>
           {!searchQuery && (
             <>
-              <p className="mb-6" style={{ color: 'var(--text-secondary)', fontWeight: 'var(--font-light)' }}>
+              <p className="mb-lg font-light text-text-secondary">
                 첫 번째 할인을 등록해보세요
               </p>
               <Link href="/discounts/new">
-                <button
-                  className="flex items-center gap-2 px-4 py-2 rounded-lg"
-                  style={{
-                    backgroundColor: 'var(--primary)',
-                    color: '#ffffff',
-                    borderRadius: 'var(--radius-sm)',
-                    fontWeight: 'var(--font-medium)'
-                  }}
-                >
-                  <Plus className="w-5 h-5" />
+                <Button type="button" variant="primary" size="medium">
+                  <Plus className="h-icon-md w-icon-md" />
                   할인 등록하기
-                </button>
+                </Button>
               </Link>
             </>
           )}
         </div>
       ) : viewMode === 'grid' ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 gap-lg md:grid-cols-2 lg:grid-cols-3">
           {filteredDiscounts.map((discount) => (
             <DiscountCard key={discount.id} discount={discount} />
           ))}

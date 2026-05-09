@@ -1,3 +1,34 @@
+@config "../tailwind.config.js";
+@source "../../../packages/ui/components";
+@source "../../../packages/ui/dist";
+
 @import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.min.css');
 @import "tailwindcss";
 @import "./styles.css";
+
+.booking-cancel-modal-overlay {
+  position: fixed;
+  inset: var(--spacing-none);
+  z-index: var(--z-modal);
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  overflow-y: auto;
+  background-color: var(--modal-overlay);
+  padding: var(--spacing-lg);
+}
+
+.booking-cancel-modal {
+  width: min(100%, var(--modal-width-md));
+  margin-top: var(--spacing-3xl);
+  border: var(--border-width) solid var(--border-color);
+  border-radius: var(--radius);
+  background-color: var(--bg-primary);
+  box-shadow: var(--shadow-lg);
+}
+
+.booking-cancel-rule-card {
+  border: var(--border-width) solid var(--border-color);
+  border-radius: var(--radius);
+  background-color: var(--bg-secondary);
+}

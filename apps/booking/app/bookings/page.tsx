@@ -1,55 +1,127 @@
 'use client'
 
-import { Calendar, User, Building2, Clock } from 'lucide-react'
+import { useMemo, useState } from 'react'
+import type { ReactNode } from 'react'
+import { Calendar, User, Building2, X } from 'lucide-react'
 import Link from 'next/link'
 import { mockBookings } from '@/lib/data/mock-bookings'
+import {
+  Button,
+  DatePicker,
+  Input,
+  Select,
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow
+} from '@creami/ui'
+
+const BOOKING_LIST_FILTER_ENABLED = true
+
+function FilterControl({
+  children,
+  onClear,
+  disabled,
+  label
+}: {
+  children: ReactNode
+  onClear: () => void
+  disabled: boolean
+  label: string
+}) {
+  return (
+    <div className="flex items-center gap-xs">
+      <div className="min-w-0 flex-1">
+        {children}
+      </div>
+      <Button
+        type="button"
+        variant="ghost"
+        size="mini"
+        iconOnly
+        onClick={onClear}
+        disabled={disabled}
+        aria-label={label}
+        title={label}
+      >
+        <X className="h-md w-md" />
+      </Button>
+    </div>
+  )
+}
 
 export default function BookingsPage() {
-  const bookings = mockBookings
+  const [bookingNumberFilter, setBookingNumberFilter] = useState('')
+  const [guestNameFilter, setGuestNameFilter] = useState('')
+  const [stayFilter, setStayFilter] = useState('')
+  const [bookingDateFilter, setBookingDateFilter] = useState('')
+  const [checkInFilter, setCheckInFilter] = useState('')
+  const [checkOutFilter, setCheckOutFilter] = useState('')
+  const [statusFilter, setStatusFilter] = useState('all')
 
   const statusConfig = {
-    confirmed: { label: '확정', color: '#10b981', bgColor: '#d1fae5' },
-    pending: { label: '대기', color: '#f59e0b', bgColor: '#fef3c7' },
-    cancelled: { label: '취소', color: '#ef4444', bgColor: '#fee2e2' }
+    confirmed: { label: '확정', color: 'var(--success)', bgColor: 'var(--success-bg)' },
+    pending: { label: '대기', color: 'var(--warning)', bgColor: 'var(--warning-bg)' },
+    cancelled: { label: '취소', color: 'var(--error)', bgColor: 'var(--error-bg)' }
+  }
+
+  const bookings = useMemo(() => {
+    const bookingNumber = bookingNumberFilter.trim().toLowerCase()
+    const guestName = guestNameFilter.trim().toLowerCase()
+    const stayKeyword = stayFilter.trim().toLowerCase()
+
+    return mockBookings.filter((booking) => {
+      const matchesBookingNumber = !bookingNumber || booking.bookingNumber.toLowerCase().includes(bookingNumber)
+      const matchesGuestName = !guestName || booking.guestName.toLowerCase().includes(guestName)
+      const matchesStay = !stayKeyword || [
+        booking.accommodation,
+        booking.roomType,
+        booking.ratePlan
+      ].some((value) => value.toLowerCase().includes(stayKeyword))
+      const matchesBookingDate = !bookingDateFilter || booking.bookingDate === bookingDateFilter
+      const matchesCheckIn = !checkInFilter || booking.checkIn === checkInFilter
+      const matchesCheckOut = !checkOutFilter || booking.checkOut === checkOutFilter
+      const matchesStatus = statusFilter === 'all' || booking.status === statusFilter
+
+      return matchesBookingNumber && matchesGuestName && matchesStay && matchesBookingDate && matchesCheckIn && matchesCheckOut && matchesStatus
+    })
+  }, [bookingDateFilter, bookingNumberFilter, checkInFilter, checkOutFilter, guestNameFilter, statusFilter, stayFilter])
+
+  const resetFilters = () => {
+    setBookingNumberFilter('')
+    setGuestNameFilter('')
+    setStayFilter('')
+    setBookingDateFilter('')
+    setCheckInFilter('')
+    setCheckOutFilter('')
+    setStatusFilter('all')
   }
 
   return (
     <div>
-      <div className="mb-8 flex items-center justify-between">
+      <div className="mb-lg flex flex-col gap-md xl:flex-row xl:items-end xl:justify-between">
         <div>
-          <div className="flex items-center gap-3 mb-2">
-            <Calendar className="w-8 h-8" style={{ color: 'var(--primary)' }} />
+          <div className="flex items-center gap-md mb-sm">
+            <Calendar className="w-icon-lg h-icon-lg" style={{ color: 'var(--primary)' }} />
             <h1 className="text-2xl" style={{ fontWeight: 'var(--font-bold)', color: 'var(--text-primary)' }}>
               예약 목록
             </h1>
           </div>
-          <p style={{ color: 'var(--text-secondary)' }}>
+          <p className="text-base" style={{ color: 'var(--text-secondary)', fontWeight: 'var(--font-light)' }}>
             전체 예약 내역을 확인하고 관리하세요
           </p>
         </div>
         <Link href="/bookings/new">
-          <button
-            className="px-4 py-2 rounded-lg transition-colors"
-            style={{
-              backgroundColor: 'var(--primary)',
-              color: '#ffffff',
-              borderRadius: 'var(--radius-sm)',
-              fontWeight: 'var(--font-medium)'
-            }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.backgroundColor = 'var(--primary-hover)'
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.backgroundColor = 'var(--primary)'
-            }}
-          >
+          <Button size="medium">
             새 예약 추가
-          </button>
+          </Button>
         </Link>
       </div>
 
       <div
-        className="rounded-lg overflow-hidden"
+        className="rounded"
         style={{
           backgroundColor: 'var(--bg-primary)',
           borderRadius: 'var(--radius)',
@@ -57,48 +129,146 @@ export default function BookingsPage() {
           boxShadow: 'var(--shadow)'
         }}
       >
-        <table className="w-full">
-          <thead>
-            <tr style={{ backgroundColor: 'var(--bg-tertiary)', borderBottom: '1px solid var(--border-color)' }}>
-              <th className="px-6 py-4 text-left" style={{ color: 'var(--text-primary)', fontWeight: 'var(--font-bold)' }}>
-                예약 번호
-              </th>
-              <th className="px-6 py-4 text-left" style={{ color: 'var(--text-primary)', fontWeight: 'var(--font-bold)' }}>
-                고객명
-              </th>
-              <th className="px-6 py-4 text-left" style={{ color: 'var(--text-primary)', fontWeight: 'var(--font-bold)' }}>
-                숙소 / 객실 / 요금제
-              </th>
-              <th className="px-6 py-4 text-left" style={{ color: 'var(--text-primary)', fontWeight: 'var(--font-bold)' }}>
-                체크인/아웃
-              </th>
-              <th className="px-6 py-4 text-left" style={{ color: 'var(--text-primary)', fontWeight: 'var(--font-bold)' }}>
-                상태
-              </th>
-              <th className="px-6 py-4 text-right" style={{ color: 'var(--text-primary)', fontWeight: 'var(--font-bold)' }}>
-                금액
-              </th>
-            </tr>
-          </thead>
-          <tbody>
+        <Table overflow="visible">
+          <TableHeader className="border-b border-border">
+            <TableRow className="bg-bg-tertiary">
+              <TableHead className="py-sm">예약 번호</TableHead>
+              <TableHead className="py-sm">고객명</TableHead>
+              <TableHead className="py-sm">숙소 / 객실 / 요금제</TableHead>
+              <TableHead className="py-sm">예약일</TableHead>
+              <TableHead className="py-sm">체크인</TableHead>
+              <TableHead className="py-sm">체크아웃</TableHead>
+              <TableHead className="py-sm">상태</TableHead>
+              <TableHead className="py-sm" align="right">금액</TableHead>
+            </TableRow>
+            {BOOKING_LIST_FILTER_ENABLED && (
+              <TableRow className="bg-bg-primary">
+                <TableHead className="py-sm">
+                  <FilterControl
+                    onClear={() => setBookingNumberFilter('')}
+                    disabled={!bookingNumberFilter}
+                    label="예약 번호 필터 초기화"
+                  >
+                    <Input
+                      size="small"
+                      value={bookingNumberFilter}
+                      onChange={(event) => setBookingNumberFilter(event.target.value)}
+                      placeholder="예약번호"
+                      aria-label="예약 번호 필터"
+                    />
+                  </FilterControl>
+                </TableHead>
+                <TableHead className="py-sm">
+                  <FilterControl
+                    onClear={() => setGuestNameFilter('')}
+                    disabled={!guestNameFilter}
+                    label="고객명 필터 초기화"
+                  >
+                    <Input
+                      size="small"
+                      value={guestNameFilter}
+                      onChange={(event) => setGuestNameFilter(event.target.value)}
+                      placeholder="고객명"
+                      aria-label="고객명 필터"
+                    />
+                  </FilterControl>
+                </TableHead>
+                <TableHead className="py-sm">
+                  <FilterControl
+                    onClear={() => setStayFilter('')}
+                    disabled={!stayFilter}
+                    label="숙소 객실 요금제 필터 초기화"
+                  >
+                    <Input
+                      size="small"
+                      value={stayFilter}
+                      onChange={(event) => setStayFilter(event.target.value)}
+                      placeholder="숙소, 객실, 요금제"
+                      aria-label="숙소 객실 요금제 필터"
+                    />
+                  </FilterControl>
+                </TableHead>
+                <TableHead className="py-sm">
+                  <FilterControl
+                    onClear={() => setBookingDateFilter('')}
+                    disabled={!bookingDateFilter}
+                    label="예약일 필터 초기화"
+                  >
+                    <DatePicker
+                      size="small"
+                      value={bookingDateFilter}
+                      onChange={setBookingDateFilter}
+                      placeholder="예약일"
+                    />
+                  </FilterControl>
+                </TableHead>
+                <TableHead className="py-sm">
+                  <FilterControl
+                    onClear={() => setCheckInFilter('')}
+                    disabled={!checkInFilter}
+                    label="체크인 필터 초기화"
+                  >
+                    <DatePicker
+                      size="small"
+                      value={checkInFilter}
+                      onChange={setCheckInFilter}
+                      placeholder="체크인"
+                    />
+                  </FilterControl>
+                </TableHead>
+                <TableHead className="py-sm">
+                  <FilterControl
+                    onClear={() => setCheckOutFilter('')}
+                    disabled={!checkOutFilter}
+                    label="체크아웃 필터 초기화"
+                  >
+                    <DatePicker
+                      size="small"
+                      value={checkOutFilter}
+                      onChange={setCheckOutFilter}
+                      placeholder="체크아웃"
+                      align="right"
+                    />
+                  </FilterControl>
+                </TableHead>
+                <TableHead className="py-sm">
+                  <FilterControl
+                    onClear={() => setStatusFilter('all')}
+                    disabled={statusFilter === 'all'}
+                    label="예약 상태 필터 초기화"
+                  >
+                    <Select
+                      size="small"
+                      value={statusFilter}
+                      onChange={(event) => setStatusFilter(event.target.value)}
+                      aria-label="예약 상태 필터"
+                    >
+                      <option value="all">전체 상태</option>
+                      <option value="confirmed">확정</option>
+                      <option value="pending">대기</option>
+                      <option value="cancelled">취소</option>
+                    </Select>
+                  </FilterControl>
+                </TableHead>
+                <TableHead className="py-sm" align="right">
+                  <Button type="button" size="small" variant="secondary" onClick={resetFilters}>
+                    초기화
+                  </Button>
+                </TableHead>
+              </TableRow>
+            )}
+          </TableHeader>
+          <TableBody>
             {bookings.map((booking) => {
               const status = statusConfig[booking.status]
               return (
-                <tr
+                <TableRow
                   key={booking.id}
-                  className="transition-colors"
-                  style={{ borderBottom: '1px solid var(--border-color)' }}
-                  onMouseEnter={(e) => {
-                    e.currentTarget.style.backgroundColor = 'var(--bg-secondary)'
-                  }}
-                  onMouseLeave={(e) => {
-                    e.currentTarget.style.backgroundColor = 'transparent'
-                  }}
                 >
-                  <td className="px-6 py-4">
+                  <TableCell className="py-sm">
                     <Link
                       href={`/bookings/${booking.id}`}
-                      className="flex items-center gap-2 transition-colors"
+                      className="flex items-center gap-sm text-base transition-colors"
                       style={{ color: 'var(--primary)' }}
                       onMouseEnter={(e) => {
                         e.currentTarget.style.textDecoration = 'underline'
@@ -107,44 +277,51 @@ export default function BookingsPage() {
                         e.currentTarget.style.textDecoration = 'none'
                       }}
                     >
-                      <Calendar className="w-4 h-4" />
+                      <Calendar className="w-md h-md" />
                       <span style={{ fontWeight: 'var(--font-medium)' }}>
                         {booking.bookingNumber}
                       </span>
                     </Link>
-                  </td>
-                  <td className="px-6 py-4">
-                    <div className="flex items-center gap-2">
-                      <User className="w-4 h-4" style={{ color: 'var(--text-tertiary)' }} />
-                      <span style={{ color: 'var(--text-primary)' }}>
+                  </TableCell>
+                  <TableCell className="py-sm">
+                    <div className="flex items-center gap-sm">
+                      <User className="w-md h-md" style={{ color: 'var(--text-tertiary)' }} />
+                      <span className="text-base" style={{ color: 'var(--text-primary)', fontWeight: 'var(--font-medium)' }}>
                         {booking.guestName}
                       </span>
                     </div>
-                  </td>
-                  <td className="px-6 py-4">
-                    <div className="flex items-start gap-2">
-                      <Building2 className="w-4 h-4 mt-0.5" style={{ color: 'var(--text-tertiary)' }} />
+                  </TableCell>
+                  <TableCell className="py-sm">
+                    <div className="flex items-start gap-sm">
+                      <Building2 className="w-md h-md mt-xs" style={{ color: 'var(--text-tertiary)' }} />
                       <div>
-                        <div style={{ color: 'var(--text-primary)', fontWeight: 'var(--font-medium)' }}>
+                        <div className="text-base" style={{ color: 'var(--text-primary)', fontWeight: 'var(--font-medium)' }}>
                           {booking.accommodation}
                         </div>
-                        <div className="text-xs mt-0.5" style={{ color: 'var(--text-tertiary)' }}>
+                        <div className="text-base mt-xs" style={{ color: 'var(--text-tertiary)', fontWeight: 'var(--font-light)' }}>
                           {booking.roomType} • {booking.ratePlan}
                         </div>
                       </div>
                     </div>
-                  </td>
-                  <td className="px-6 py-4">
-                    <div className="flex items-center gap-2">
-                      <Clock className="w-4 h-4" style={{ color: 'var(--text-tertiary)' }} />
-                      <span className="text-sm" style={{ color: 'var(--text-secondary)' }}>
-                        {booking.checkIn} ~ {booking.checkOut}
-                      </span>
-                    </div>
-                  </td>
-                  <td className="px-6 py-4">
+                  </TableCell>
+                  <TableCell className="py-sm">
+                    <span className="text-base" style={{ color: 'var(--text-secondary)', fontWeight: 'var(--font-medium)' }}>
+                      {booking.bookingDate}
+                    </span>
+                  </TableCell>
+                  <TableCell className="py-sm">
+                    <span className="text-base" style={{ color: 'var(--text-secondary)', fontWeight: 'var(--font-medium)' }}>
+                      {booking.checkIn}
+                    </span>
+                  </TableCell>
+                  <TableCell className="py-sm">
+                    <span className="text-base" style={{ color: 'var(--text-secondary)', fontWeight: 'var(--font-medium)' }}>
+                      {booking.checkOut}
+                    </span>
+                  </TableCell>
+                  <TableCell className="py-sm">
                     <span
-                      className="px-3 py-1 rounded-full text-sm"
+                      className="inline-flex h-control-sm items-center rounded px-control-px-sm py-none text-base leading-none"
                       style={{
                         backgroundColor: status.bgColor,
                         color: status.color,
@@ -153,17 +330,26 @@ export default function BookingsPage() {
                     >
                       {status.label}
                     </span>
-                  </td>
-                  <td className="px-6 py-4 text-right">
-                    <span style={{ fontWeight: 'var(--font-bold)', color: 'var(--text-primary)' }}>
+                  </TableCell>
+                  <TableCell className="py-sm" align="right">
+                    <span className="text-base" style={{ fontWeight: 'var(--font-bold)', color: 'var(--text-primary)' }}>
                       ₩{booking.pricing.totalAmount.toLocaleString()}
                     </span>
-                  </td>
-                </tr>
+                  </TableCell>
+                </TableRow>
               )
             })}
-          </tbody>
-        </table>
+            {bookings.length === 0 && (
+              <TableRow>
+                <TableCell className="py-lg" align="center" colSpan={8}>
+                  <span className="text-base" style={{ color: 'var(--text-tertiary)', fontWeight: 'var(--font-light)' }}>
+                    검색 결과가 없습니다.
+                  </span>
+                </TableCell>
+              </TableRow>
+            )}
+          </TableBody>
+        </Table>
       </div>
     </div>
   )

@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { Check } from 'lucide-react'
+import { Button } from '@creami/ui'
 
 interface BookingFormData {
   guestName: string
@@ -36,20 +37,20 @@ export function BookingForm({ onSubmit, isLoading }: BookingFormProps) {
 
   return (
     <div
-      className="p-6 rounded-lg"
+      className="p-lg rounded"
       style={{
         backgroundColor: 'var(--bg-primary)',
         border: '1px solid var(--border-color)'
       }}
     >
-      <h3 className="text-lg mb-4" style={{ fontWeight: 'var(--font-bold)', color: 'var(--text-primary)' }}>
+      <h3 className="text-lg mb-md" style={{ fontWeight: 'var(--font-bold)', color: 'var(--text-primary)' }}>
         예약자 정보
       </h3>
 
-      <form onSubmit={handleSubmit} className="space-y-4">
+      <form onSubmit={handleSubmit} className="space-y-md">
         {/* 이름 */}
         <div>
-          <label className="block mb-2" style={{ fontSize: '14px', color: 'var(--text-primary)', fontWeight: 'var(--font-medium)' }}>
+          <label className="block mb-sm text-base" style={{ color: 'var(--text-primary)', fontWeight: 'var(--font-medium)' }}>
             이름 *
           </label>
           <input
@@ -58,7 +59,7 @@ export function BookingForm({ onSubmit, isLoading }: BookingFormProps) {
             onChange={(e) => setFormData({ ...formData, guestName: e.target.value })}
             placeholder="홍길동"
             required
-            className="w-full px-3 py-2 rounded-lg"
+            className="w-full h-control-md rounded px-control-px-md py-none text-base leading-none"
             style={{
               backgroundColor: 'var(--bg-secondary)',
               border: '1px solid var(--border-color)',
@@ -69,7 +70,7 @@ export function BookingForm({ onSubmit, isLoading }: BookingFormProps) {
 
         {/* 이메일 */}
         <div>
-          <label className="block mb-2" style={{ fontSize: '14px', color: 'var(--text-primary)', fontWeight: 'var(--font-medium)' }}>
+          <label className="block mb-sm text-base" style={{ color: 'var(--text-primary)', fontWeight: 'var(--font-medium)' }}>
             이메일 *
           </label>
           <input
@@ -78,7 +79,7 @@ export function BookingForm({ onSubmit, isLoading }: BookingFormProps) {
             onChange={(e) => setFormData({ ...formData, guestEmail: e.target.value })}
             placeholder="hong@example.com"
             required
-            className="w-full px-3 py-2 rounded-lg"
+            className="w-full h-control-md rounded px-control-px-md py-none text-base leading-none"
             style={{
               backgroundColor: 'var(--bg-secondary)',
               border: '1px solid var(--border-color)',
@@ -89,7 +90,7 @@ export function BookingForm({ onSubmit, isLoading }: BookingFormProps) {
 
         {/* 핸드폰 */}
         <div>
-          <label className="block mb-2" style={{ fontSize: '14px', color: 'var(--text-primary)', fontWeight: 'var(--font-medium)' }}>
+          <label className="block mb-sm text-base" style={{ color: 'var(--text-primary)', fontWeight: 'var(--font-medium)' }}>
             핸드폰 *
           </label>
           <input
@@ -98,7 +99,7 @@ export function BookingForm({ onSubmit, isLoading }: BookingFormProps) {
             onChange={(e) => setFormData({ ...formData, guestPhone: e.target.value })}
             placeholder="010-1234-5678"
             required
-            className="w-full px-3 py-2 rounded-lg"
+            className="w-full h-control-md rounded px-control-px-md py-none text-base leading-none"
             style={{
               backgroundColor: 'var(--bg-secondary)',
               border: '1px solid var(--border-color)',
@@ -109,7 +110,7 @@ export function BookingForm({ onSubmit, isLoading }: BookingFormProps) {
 
         {/* 특별 요청사항 */}
         <div>
-          <label className="block mb-2" style={{ fontSize: '14px', color: 'var(--text-primary)', fontWeight: 'var(--font-medium)' }}>
+          <label className="block mb-sm text-base" style={{ color: 'var(--text-primary)', fontWeight: 'var(--font-medium)' }}>
             특별 요청사항 (선택)
           </label>
           <textarea
@@ -117,7 +118,7 @@ export function BookingForm({ onSubmit, isLoading }: BookingFormProps) {
             onChange={(e) => setFormData({ ...formData, specialRequests: e.target.value })}
             placeholder="금연 객실 요청 등"
             rows={3}
-            className="w-full px-3 py-2 rounded-lg"
+            className="w-full rounded px-control-px-md py-sm text-base leading-normal"
             style={{
               backgroundColor: 'var(--bg-secondary)',
               border: '1px solid var(--border-color)',
@@ -128,20 +129,15 @@ export function BookingForm({ onSubmit, isLoading }: BookingFormProps) {
         </div>
 
         {/* 예약하기 버튼 */}
-        <button
+        <Button
           type="submit"
           disabled={isLoading}
-          className="w-full flex items-center justify-center gap-2 px-4 py-3 rounded-lg transition-colors"
-          style={{
-            backgroundColor: isLoading ? 'var(--text-tertiary)' : 'var(--primary)',
-            color: '#ffffff',
-            fontWeight: 'var(--font-bold)',
-            cursor: isLoading ? 'not-allowed' : 'pointer'
-          }}
+          fullWidth
+          size="large"
         >
-          <Check className="w-5 h-5" />
+          <Check className="w-icon-md h-icon-md" />
           {isLoading ? '예약 중...' : '예약하기'}
-        </button>
+        </Button>
       </form>
     </div>
   )

@@ -18,9 +18,17 @@
 
   --success: #51cf66;
   --success-bg: rgba(81, 207, 102, 0.1);
+  --info: #60a5fa;
+  --info-bg: rgba(96, 165, 250, 0.1);
+  --warning: #f59f00;
+  --warning-bg: rgba(245, 159, 0, 0.1);
 
   --error: #ff6b6b;
   --error-bg: rgba(255, 107, 107, 0.1);
+  --neutral: #868e96;
+  --neutral-bg: rgba(134, 142, 150, 0.1);
+  --text-on-primary: #ffffff;
+  --text-on-primary-muted: rgba(255, 255, 255, 0.78);
 
   /* ========== Spacing (rem) ========== */
   --spacing-xs: 0.25rem;    /* 4px */
@@ -30,6 +38,28 @@
   --spacing-xl: 2rem;       /* 32px */
   --spacing-2xl: 3rem;      /* 48px */
   --spacing-3xl: 4rem;      /* 64px */
+
+  /* ========== Component Sizes ========== */
+  --control-height-mini: 1.65rem;
+  --control-height-sm: 1.925rem;
+  --control-height-md: 2.2rem;
+  --control-height-lg: 2.75rem;
+  --control-padding-x-mini: 0.4rem;
+  --control-padding-x-sm: 0.5375rem;
+  --control-padding-x-md: 0.675rem;
+  --control-padding-x-lg: 0.95rem;
+  --control-search-padding: 2.5rem;
+  --icon-size-md: 1.25rem;
+  --icon-size-lg: 1.5rem;
+  --datepicker-width: 20rem;
+  --view-toggle-width: 4rem;
+  --app-switcher-width: 24rem;
+  --app-switcher-dropdown-height: calc(100vh - var(--header-height) - var(--spacing-lg));
+  --modal-width-sm: 24rem;
+  --modal-width-md: 37.5rem;
+  --modal-width-lg: 48rem;
+  --modal-max-height: 90vh;
+  --modal-action-width: 8rem;
 
   /* ========== Font Sizes (rem) ========== */
   --font-size-xs: 0.75rem;    /* 12px */
@@ -59,6 +89,10 @@
   --header-height: 4rem;        /* 64px */
   --sidebar-width: 18rem;       /* 288px */
   --sidebar-collapsed: 5rem;    /* 80px */
+  --content-padding: var(--spacing-lg);
+  --content-gap: var(--spacing-md);
+  --section-gap: var(--spacing-lg);
+  --card-padding: var(--spacing-lg);
 
   /* ========== Light Mode Colors ========== */
   --bg-primary: #ffffff;
@@ -82,7 +116,10 @@
 
   --primary-bg: rgba(250, 131, 131, 0.15);
   --success-bg: rgba(81, 207, 102, 0.15);
+  --info-bg: rgba(96, 165, 250, 0.15);
+  --warning-bg: rgba(245, 159, 0, 0.15);
   --error-bg: rgba(255, 107, 107, 0.15);
+  --neutral-bg: rgba(134, 142, 150, 0.15);
 
   --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.2);
   --shadow: 0 1px 3px 0 rgb(0 0 0 / 0.3);

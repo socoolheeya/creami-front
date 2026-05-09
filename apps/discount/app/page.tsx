@@ -1,72 +1,63 @@
+'use client'
+
 import { Tag, Percent, TrendingUp, Users } from "lucide-react";
+import { Card } from "@creami/ui";
 
 export default function Dashboard() {
   const stats = [
     { icon: Tag, label: '활성 할인', value: '15', color: 'var(--primary)' },
-    { icon: Percent, label: '평균 할인율', value: '18%', color: '#4ade80' },
-    { icon: TrendingUp, label: '할인 매출', value: '₩8.2M', color: '#60a5fa' },
-    { icon: Users, label: '사용 고객', value: '523', color: '#f59e0b' },
+    { icon: Percent, label: '평균 할인율', value: '18%', color: 'var(--success)' },
+    { icon: TrendingUp, label: '할인 매출', value: '₩8.2M', color: 'var(--primary-dark)' },
+    { icon: Users, label: '사용 고객', value: '523', color: 'var(--warning)' },
   ];
 
   return (
     <div>
-      <h1 className="text-2xl mb-6" style={{ fontWeight: 'var(--font-bold)', color: 'var(--text-primary)' }}>
+      <h1 className="text-2xl mb-lg font-bold text-text-primary">
         할인 대시보드
       </h1>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+      <div className="grid grid-cols-1 gap-lg md:grid-cols-2 lg:grid-cols-4 mb-xl">
         {stats.map((stat) => {
           const Icon = stat.icon;
           return (
-            <div
+            <Card
               key={stat.label}
-              className="p-6 rounded-lg"
-              style={{
-                backgroundColor: 'var(--bg-primary)',
-                borderRadius: 'var(--radius)',
-                boxShadow: 'var(--shadow)'
-              }}
+              className="p-lg"
+              hover={false}
             >
-              <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center justify-between mb-md">
                 <div
-                  className="p-3 rounded-lg"
+                  className="flex h-control-lg w-control-lg items-center justify-center rounded bg-bg-tertiary"
                   style={{
-                    backgroundColor: 'var(--bg-tertiary)',
-                    borderRadius: 'var(--radius-sm)'
+                    color: stat.color
                   }}
                 >
-                  <Icon className="w-6 h-6" style={{ color: stat.color }} />
+                  <Icon className="h-icon-lg w-icon-lg" />
                 </div>
               </div>
-              <div style={{ color: 'var(--text-secondary)', fontWeight: 'var(--font-light)' }} className="text-sm mb-1">
+              <div className="mb-xs text-base font-light text-text-secondary">
                 {stat.label}
               </div>
-              <div className="text-2xl" style={{ fontWeight: 'var(--font-bold)', color: 'var(--text-primary)' }}>
+              <div className="text-2xl font-bold text-text-primary">
                 {stat.value}
               </div>
-            </div>
+            </Card>
           );
         })}
       </div>
 
-      <div className="grid grid-cols-1 gap-6">
-        <div
-          className="p-6 rounded-lg"
-          style={{
-            backgroundColor: 'var(--bg-primary)',
-            borderRadius: 'var(--radius)',
-            boxShadow: 'var(--shadow)'
-          }}
-        >
-          <h2 className="text-xl mb-4" style={{ fontWeight: 'var(--font-bold)', color: 'var(--text-primary)' }}>
+      <div className="grid grid-cols-1 gap-lg">
+        <Card className="p-lg" hover={false}>
+          <h2 className="text-xl mb-md font-bold text-text-primary">
             공지사항
           </h2>
-          <div className="space-y-3">
-            <p style={{ color: 'var(--text-secondary)', fontWeight: 'var(--font-light)' }}>
+          <div className="space-y-sm">
+            <p className="font-light text-text-secondary">
               Creami Discount에 오신 것을 환영합니다.
             </p>
           </div>
-        </div>
+        </Card>
       </div>
     </div>
   );

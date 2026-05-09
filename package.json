@@ -3,16 +3,21 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
+    "dev:all": "npm run dev:home & npm run dev:accommodation & npm run dev:ari & npm run dev:discount & npm run dev:booking & npm run dev:invoice & npm run dev:setting & wait",
     "dev:home": "pnpm --filter home dev",
     "dev:accommodation": "pnpm --filter accommodation exec next dev -p 3001",
     "dev:ari": "pnpm --filter ari exec next dev -p 3002",
     "dev:discount": "pnpm --filter discount exec next dev -p 3003",
     "dev:booking": "pnpm --filter booking exec next dev -p 3004",
+    "dev:invoice": "pnpm --filter invoice exec next dev -p 3005",
+    "dev:setting": "pnpm --filter setting exec next dev -p 3006",
     "build:home": "pnpm --filter home build",
     "build:accommodation": "pnpm --filter accommodation build",
     "build:booking": "pnpm --filter booking build",
     "build:ari": "pnpm --filter ari build",
     "build:discount": "pnpm --filter discount build",
+    "build:invoice": "pnpm --filter invoice build",
+    "build:setting": "pnpm --filter setting build",
     "build:all": "pnpm -r build",
     "lint:all": "pnpm -r lint"
   },
@@ -22,5 +27,12 @@
   },
   "devDependencies": {
     "sharp": "^0.34.5"
+  },
+  "pnpm": {
+    "overrides": {
+      "esbuild": "0.25.12",
+      "vite": "6.4.2",
+      "postcss": ">=8.5.10"
+    }
   }
 }

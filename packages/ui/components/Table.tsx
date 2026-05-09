@@ -3,13 +3,12 @@ import React from 'react'
 export interface TableProps {
   children: React.ReactNode
   className?: string
-  style?: React.CSSProperties
+  overflow?: 'auto' | 'visible'
 }
 
 export interface TableHeaderProps {
   children: React.ReactNode
   className?: string
-  style?: React.CSSProperties
 }
 
 export interface TableBodyProps {
@@ -21,51 +20,36 @@ export interface TableRowProps {
   children: React.ReactNode
   onClick?: () => void
   className?: string
-  style?: React.CSSProperties
   isSelected?: boolean
 }
 
-export interface TableCellProps {
+export interface TableCellProps extends React.TdHTMLAttributes<HTMLTableCellElement> {
   children: React.ReactNode
   className?: string
-  style?: React.CSSProperties
   align?: 'left' | 'center' | 'right'
 }
 
-export interface TableHeadProps {
+export interface TableHeadProps extends React.ThHTMLAttributes<HTMLTableHeaderCellElement> {
   children: React.ReactNode
   className?: string
-  style?: React.CSSProperties
   align?: 'left' | 'center' | 'right'
 }
 
-export function Table({ children, className = '', style }: TableProps) {
+export function Table({ children, className = '', overflow = 'auto' }: TableProps) {
+  const overflowClass = overflow === 'visible' ? 'overflow-visible' : 'overflow-x-auto'
+
   return (
-    <div className="overflow-x-auto">
-      <table
-        className={`w-full ${className}`}
-        style={{
-          borderCollapse: 'separate',
-          borderSpacing: 0,
-          ...style
-        }}
-      >
+    <div className={overflowClass}>
+      <table className={`w-full border-separate border-spacing-0 ${className}`}>
         {children}
       </table>
     </div>
   )
 }
 
-export function TableHeader({ children, className = '', style }: TableHeaderProps) {
+export function TableHeader({ children, className = '' }: TableHeaderProps) {
   return (
-    <thead
-      className={className}
-      style={{
-        backgroundColor: 'var(--bg-tertiary)',
-        borderBottom: '2px solid var(--border-color)',
-        ...style
-      }}
-    >
+    <thead className={`bg-bg-tertiary border-b-2 border-border ${className}`}>
       {children}
     </thead>
   )
@@ -79,33 +63,16 @@ export function TableRow({
   children,
   onClick,
   className = '',
-  style,
   isSelected = false
 }: TableRowProps) {
-  const baseStyles = {
-    backgroundColor: isSelected ? 'var(--primary-bg)' : 'var(--bg-primary)',
-    borderLeft: isSelected ? '3px solid var(--primary)' : '3px solid transparent',
-    cursor: onClick ? 'pointer' : 'default',
-    transition: 'all 0.2s',
-    ...style
-  }
+  const baseClasses = `transition-all ${
+    isSelected
+      ? 'bg-primary-bg border-l border-l-primary'
+      : 'bg-bg-primary border-l border-l-transparent'
+  } ${onClick ? 'cursor-pointer hover:bg-bg-secondary' : 'cursor-default'}`
 
   return (
-    <tr
-      className={className}
-      style={baseStyles}
-      onClick={onClick}
-      onMouseEnter={(e) => {
-        if (onClick && !isSelected) {
-          e.currentTarget.style.backgroundColor = 'var(--bg-secondary)'
-        }
-      }}
-      onMouseLeave={(e) => {
-        if (onClick && !isSelected) {
-          e.currentTarget.style.backgroundColor = 'var(--bg-primary)'
-        }
-      }}
-    >
+    <tr className={`${baseClasses} ${className}`} onClick={onClick}>
       {children}
     </tr>
   )
@@ -114,20 +81,13 @@ export function TableRow({
 export function TableCell({
   children,
   className = '',
-  style,
-  align = 'left'
+  align = 'left',
+  ...props
 }: TableCellProps) {
   const alignClass = align === 'center' ? 'text-center' : align === 'right' ? 'text-right' : 'text-left'
 
   return (
-    <td
-      className={`px-3 py-3 text-sm ${alignClass} ${className}`}
-      style={{
-        color: 'var(--text-primary)',
-        borderBottom: '1px solid var(--border-color)',
-        ...style
-      }}
-    >
+    <td className={`px-md py-md text-base text-text-primary border-b border-border ${alignClass} ${className}`} {...props}>
       {children}
     </td>
   )
@@ -136,20 +96,13 @@ export function TableCell({
 export function TableHead({
   children,
   className = '',
-  style,
-  align = 'left'
+  align = 'left',
+  ...props
 }: TableHeadProps) {
   const alignClass = align === 'center' ? 'text-center' : align === 'right' ? 'text-right' : 'text-left'
 
   return (
-    <th
-      className={`px-3 py-3 text-sm ${alignClass} ${className}`}
-      style={{
-        fontWeight: 'var(--font-bold)',
-        color: 'var(--text-primary)',
-        ...style
-      }}
-    >
+    <th className={`px-md py-md text-base font-bold text-text-primary ${alignClass} ${className}`} {...props}>
       {children}
     </th>
   )

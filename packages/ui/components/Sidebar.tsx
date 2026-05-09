@@ -5,7 +5,6 @@ export interface SidebarProps {
   children: React.ReactNode
   isCollapsed?: boolean
   className?: string
-  style?: React.CSSProperties
 }
 
 export interface SidebarMenuProps {
@@ -24,20 +23,13 @@ export interface SidebarMenuItemProps {
 export function Sidebar({
   children,
   isCollapsed = false,
-  className = '',
-  style
+  className = ''
 }: SidebarProps) {
   return (
     <aside
-      className={`fixed left-0 bottom-0 z-30 ${className}`}
-      style={{
-        top: 'var(--header-height)',
-        width: isCollapsed ? 'var(--sidebar-collapsed)' : 'var(--sidebar-width)',
-        backgroundColor: 'var(--bg-primary)',
-        borderRight: '1px solid var(--border-color)',
-        transition: 'width 300ms ease-in-out',
-        ...style
-      }}
+      className={`fixed left-0 bottom-0 z-30 top-[var(--header-height)] overflow-hidden bg-bg-primary border-r border-border transition-[width] duration-300 ease-in-out ${
+        isCollapsed ? 'w-[var(--sidebar-collapsed)]' : 'w-[var(--sidebar-width)]'
+      } ${className}`}
     >
       {children}
     </aside>
@@ -46,17 +38,8 @@ export function Sidebar({
 
 export function SidebarMenu({ children }: SidebarMenuProps) {
   return (
-    <nav style={{ padding: 'var(--spacing-md)' }}>
-      <ul
-        style={{
-          display: 'flex',
-          flexDirection: 'column',
-          gap: 'var(--spacing-sm)',
-          listStyle: 'none',
-          margin: 0,
-          padding: 0
-        }}
-      >
+    <nav className="h-full w-[var(--sidebar-width)] px-md py-lg overflow-y-auto overflow-x-hidden">
+      <ul className="flex w-full flex-col gap-xs list-none m-0 p-0">
         {children}
       </ul>
     </nav>
@@ -80,52 +63,53 @@ export function SidebarMenuItem({
 
   const content = (
     <>
-      <Icon style={{ width: '1.25rem', height: '1.25rem', flexShrink: 0 }} />
       <span
-        className="whitespace-nowrap"
-        style={{
-          opacity: isCollapsed ? 0 : 1,
-          maxWidth: isCollapsed ? '0' : '200px',
-          transition: 'opacity 300ms, max-width 300ms'
-        }}
+        aria-hidden="true"
+        className={`absolute left-0 top-0 h-full rounded transition-[width,background-color] duration-300 ${
+          isCollapsed ? 'w-[calc(var(--sidebar-collapsed)-var(--spacing-lg))]' : 'w-full'
+        } ${
+          isActive ? 'bg-primary' : 'bg-transparent group-hover:bg-bg-tertiary'
+        }`}
+      />
+      <div
+        className="absolute left-md top-1/2 z-10 -translate-y-1/2 w-lg h-lg flex items-center justify-center"
+      >
+        <Icon className="w-lg h-lg shrink-0" />
+      </div>
+      <span
+        className="pointer-events-none absolute left-[calc(var(--sidebar-collapsed)-var(--spacing-md))] top-1/2 z-10 -translate-y-1/2 whitespace-nowrap"
       >
         {label}
       </span>
     </>
   )
 
-  const itemStyle = {
-    gap: 'var(--spacing-sm)',
-    padding: 'var(--spacing-sm) var(--spacing-md)',
-    backgroundColor: isActive ? 'var(--primary)' : 'transparent',
-    color: isActive ? '#ffffff' : 'var(--text-primary)',
-    borderRadius: 'var(--radius)',
-    fontSize: 'var(--font-size-sm)',
-    fontWeight: 'var(--font-medium)',
-    textDecoration: 'none',
-    display: 'flex',
-    alignItems: 'center',
-    overflow: 'hidden',
-    transition: 'colors 200ms'
-  }
+  const listItemClasses = 'group w-full rounded'
+
+  const itemClasses = `relative flex min-h-2xl w-full items-center bg-transparent text-base font-medium no-underline transition-colors duration-200 focus-visible:outline focus-visible:outline-primary ${
+    isActive
+      ? 'text-white'
+      : 'text-text-secondary group-hover:text-text-primary'
+  }`
 
   return (
-    <li>
+    <li className={listItemClasses}>
       {href ? (
         <a
           href={href}
-          className="flex items-center overflow-hidden transition-colors"
-          style={itemStyle}
+          className={itemClasses}
           title={isCollapsed ? label : undefined}
+          aria-current={isActive ? 'page' : undefined}
           onClick={handleClick}
         >
           {content}
         </a>
       ) : (
         <button
-          className="flex items-center overflow-hidden transition-colors w-full"
-          style={itemStyle}
+          type="button"
+          className={`${itemClasses} border-0 text-left cursor-pointer w-full`}
           title={isCollapsed ? label : undefined}
+          aria-pressed={isActive}
           onClick={onClick}
         >
           {content}

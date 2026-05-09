@@ -1,16 +1,42 @@
 'use client'
 
 import { RatePlan } from '@/lib/types/rateplan'
-import { Check } from 'lucide-react'
+import { Search } from 'lucide-react'
+import { ChangeEvent, useState } from 'react'
+import { Button, Card } from '@creami/ui'
 
 interface RatePlanSelectorProps {
   ratePlans: RatePlan[]
   selectedIds: string[]
   onSelectionChange: (selectedIds: string[]) => void
+  compact?: boolean
+  disabled?: boolean
+  onApply?: () => void
 }
 
-export function RatePlanSelector({ ratePlans, selectedIds, onSelectionChange }: RatePlanSelectorProps) {
+export function RatePlanSelector({
+  ratePlans,
+  selectedIds,
+  onSelectionChange,
+  compact = false,
+  disabled = false,
+  onApply
+}: RatePlanSelectorProps) {
+  const [searchQuery, setSearchQuery] = useState('')
+
+  const filteredRatePlans = ratePlans.filter(ratePlan => {
+    const normalizedQuery = searchQuery.trim().toLowerCase()
+    if (!normalizedQuery) return true
+
+    return (
+      ratePlan.id.toLowerCase().includes(normalizedQuery) ||
+      ratePlan.name.toLowerCase().includes(normalizedQuery)
+    )
+  })
+
   const toggleRatePlan = (ratePlanId: string) => {
+    if (disabled) return
+
     if (selectedIds.includes(ratePlanId)) {
       onSelectionChange(selectedIds.filter(id => id !== ratePlanId))
     } else {
@@ -19,121 +45,117 @@ export function RatePlanSelector({ ratePlans, selectedIds, onSelectionChange }: 
   }
 
   const selectAll = () => {
-    onSelectionChange(ratePlans.map(rp => rp.id))
+    if (disabled) return
+
+    const visibleIds = filteredRatePlans.map(ratePlan => ratePlan.id)
+    onSelectionChange(Array.from(new Set([...selectedIds, ...visibleIds])))
   }
 
   const clearAll = () => {
+    if (disabled) return
+
     onSelectionChange([])
   }
 
+  const handleSearchChange = (event: ChangeEvent<HTMLInputElement>) => {
+    setSearchQuery(event.target.value)
+  }
+
   return (
-    <div
-      className="p-6 rounded-lg"
-      style={{
-        backgroundColor: 'var(--bg-primary)',
-        borderRadius: 'var(--radius)',
-        border: '1px solid var(--border-color)',
-        boxShadow: 'var(--shadow)'
-      }}
-    >
-      <div className="flex items-center justify-between mb-4">
-        <h2 className="text-xl" style={{ fontWeight: 'var(--font-bold)', color: 'var(--text-primary)' }}>
+    <Card className={compact ? 'p-md' : 'p-lg'} hover={false}>
+      <div className={`flex items-center justify-between ${compact ? 'mb-sm' : 'mb-md'}`}>
+        <h2 className="text-xl font-bold text-text-primary">
           요금제 선택 ({selectedIds.length}/{ratePlans.length})
         </h2>
-        <div className="flex gap-2">
-          <button
+        <div className="flex gap-sm">
+          <Button
+            type="button"
             onClick={selectAll}
-            className="px-3 py-1 rounded text-sm transition-colors"
-            style={{
-              backgroundColor: 'var(--bg-secondary)',
-              border: '1px solid var(--border-color)',
-              color: 'var(--text-primary)',
-              borderRadius: 'var(--radius-sm)',
-              fontWeight: 'var(--font-medium)'
-            }}
+            disabled={disabled || filteredRatePlans.length === 0}
+            variant="secondary"
+            size="small"
           >
             전체 선택
-          </button>
-          <button
+          </Button>
+          <Button
+            type="button"
             onClick={clearAll}
-            disabled={selectedIds.length === 0}
-            className="px-3 py-1 rounded text-sm transition-colors"
-            style={{
-              backgroundColor: selectedIds.length === 0 ? 'var(--bg-tertiary)' : 'var(--bg-secondary)',
-              border: '1px solid var(--border-color)',
-              color: selectedIds.length === 0 ? 'var(--text-tertiary)' : 'var(--text-primary)',
-              borderRadius: 'var(--radius-sm)',
-              fontWeight: 'var(--font-medium)',
-              cursor: selectedIds.length === 0 ? 'not-allowed' : 'pointer'
-            }}
+            disabled={disabled || selectedIds.length === 0}
+            variant="secondary"
+            size="small"
           >
             선택 해제
-          </button>
+          </Button>
+          {onApply && (
+            <Button
+              type="button"
+              onClick={onApply}
+              disabled={disabled || selectedIds.length === 0}
+              variant="primary"
+              size="small"
+            >
+              적용
+            </Button>
+          )}
         </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">
-        {ratePlans.map((ratePlan) => {
+      <div className={`${compact ? 'mb-sm' : 'mb-md'} relative`}>
+        <Search className="absolute left-md top-1/2 h-md w-md -translate-y-1/2 text-text-tertiary" />
+        <input
+          type="text"
+          value={searchQuery}
+          onChange={handleSearchChange}
+          disabled={disabled}
+          placeholder={disabled ? '숙소를 먼저 선택하세요' : 'ID 또는 요금제명으로 검색...'}
+          className="h-control-md w-full rounded pr-control-px-md text-base"
+          style={{
+            backgroundColor: disabled ? 'var(--bg-tertiary)' : 'var(--bg-secondary)',
+            border: '1px solid var(--border-color)',
+            color: 'var(--text-primary)',
+            paddingLeft: 'var(--control-search-padding)'
+          }}
+        />
+      </div>
+
+      <div className="flex flex-wrap gap-sm">
+        {filteredRatePlans.map((ratePlan) => {
           const isSelected = selectedIds.includes(ratePlan.id)
 
           return (
             <button
               key={ratePlan.id}
+              type="button"
               onClick={() => toggleRatePlan(ratePlan.id)}
-              className="p-4 rounded-lg text-left transition-all"
+              disabled={disabled}
+              className="rounded px-md py-sm text-left transition-colors"
               style={{
                 backgroundColor: isSelected ? 'var(--primary)' : 'var(--bg-secondary)',
-                border: `2px solid ${isSelected ? 'var(--primary)' : 'var(--border-color)'}`,
-                borderRadius: 'var(--radius-sm)',
-                color: isSelected ? '#ffffff' : 'var(--text-primary)'
+                border: `1px solid ${isSelected ? 'var(--primary)' : 'var(--border-color)'}`,
+                color: isSelected ? 'var(--text-on-primary)' : 'var(--text-primary)'
               }}
+              aria-pressed={isSelected}
+              title={isSelected ? '선택 해제' : '선택'}
             >
-              <div className="flex items-start justify-between mb-2">
-                <div className="flex-1">
-                  <h3
-                    className="text-sm mb-1"
-                    style={{
-                      fontWeight: 'var(--font-bold)',
-                      color: isSelected ? '#ffffff' : 'var(--text-primary)'
-                    }}
-                  >
-                    {ratePlan.name}
-                  </h3>
-                  <p
-                    className="text-xs"
-                    style={{
-                      color: isSelected ? 'rgba(255, 255, 255, 0.8)' : 'var(--text-secondary)',
-                      fontWeight: 'var(--font-light)'
-                    }}
-                  >
-                    {ratePlan.accommodationName}
-                  </p>
-                </div>
-                <div
-                  className="flex-shrink-0 w-5 h-5 rounded flex items-center justify-center"
-                  style={{
-                    backgroundColor: isSelected ? '#ffffff' : 'var(--bg-tertiary)',
-                    border: `2px solid ${isSelected ? '#ffffff' : 'var(--border-color)'}`
-                  }}
-                >
-                  {isSelected && <Check className="w-3 h-3" style={{ color: 'var(--primary)' }} />}
-                </div>
-              </div>
-              {ratePlan.roomName && (
-                <p
-                  className="text-xs"
-                  style={{
-                    color: isSelected ? 'rgba(255, 255, 255, 0.7)' : 'var(--text-tertiary)',
-                    fontWeight: 'var(--font-light)'
-                  }}
-                >
-                  {ratePlan.roomName}
-                </p>
-              )}
+              <span
+                className="mr-sm text-xs font-light"
+                style={{ color: isSelected ? 'var(--text-on-primary-muted)' : 'var(--text-secondary)' }}
+              >
+                {ratePlan.id}
+              </span>
+              <span className="text-base font-bold">
+                {ratePlan.name}
+              </span>
             </button>
           )
         })}
       </div>
-    </div>
+
+      {!disabled && searchQuery && filteredRatePlans.length === 0 && (
+        <div className="py-md text-center text-base font-light text-text-secondary">
+          검색 결과가 없습니다
+        </div>
+      )}
+    </Card>
   )
 }

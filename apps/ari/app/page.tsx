@@ -9,36 +9,36 @@ export default function Dashboard() {
   ];
 
   return (
-    <div>
-      <h1 className="text-2xl mb-6" style={{ fontWeight: 'var(--font-bold)', color: 'var(--text-primary)' }}>
+    <div className="flex flex-col gap-xl">
+      <h1 className="text-2xl" style={{ fontWeight: 'var(--font-bold)', color: 'var(--text-primary)' }}>
         ARI 대시보드
       </h1>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+      <div className="grid grid-cols-1 gap-lg md:grid-cols-2 lg:grid-cols-4">
         {stats.map((stat) => {
           const Icon = stat.icon;
           return (
             <div
               key={stat.label}
-              className="p-6 rounded-lg"
+              className="rounded p-lg"
               style={{
                 backgroundColor: 'var(--bg-primary)',
                 borderRadius: 'var(--radius)',
                 boxShadow: 'var(--shadow)'
               }}
             >
-              <div className="flex items-center justify-between mb-4">
+              <div className="mb-md flex items-center justify-between">
                 <div
-                  className="p-3 rounded-lg"
+                  className="rounded p-sm"
                   style={{
                     backgroundColor: 'var(--bg-tertiary)',
-                    borderRadius: 'var(--radius-sm)'
+                    borderRadius: 'var(--radius)'
                   }}
                 >
-                  <Icon className="w-6 h-6" style={{ color: stat.color }} />
+                  <Icon className="h-xl w-xl" style={{ color: stat.color }} />
                 </div>
               </div>
-              <div style={{ color: 'var(--text-secondary)', fontWeight: 'var(--font-light)' }} className="text-sm mb-1">
+              <div style={{ color: 'var(--text-secondary)', fontWeight: 'var(--font-light)' }} className="mb-xs text-base">
                 {stat.label}
               </div>
               <div className="text-2xl" style={{ fontWeight: 'var(--font-bold)', color: 'var(--text-primary)' }}>
@@ -49,19 +49,19 @@ export default function Dashboard() {
         })}
       </div>
 
-      <div className="grid grid-cols-1 gap-6">
+      <div className="grid grid-cols-1 gap-lg">
         <div
-          className="p-6 rounded-lg"
+          className="rounded p-lg"
           style={{
             backgroundColor: 'var(--bg-primary)',
             borderRadius: 'var(--radius)',
             boxShadow: 'var(--shadow)'
           }}
         >
-          <h2 className="text-xl mb-4" style={{ fontWeight: 'var(--font-bold)', color: 'var(--text-primary)' }}>
+          <h2 className="mb-md text-xl" style={{ fontWeight: 'var(--font-bold)', color: 'var(--text-primary)' }}>
             공지사항
           </h2>
-          <div className="space-y-3">
+          <div className="space-y-sm">
             <p style={{ color: 'var(--text-secondary)', fontWeight: 'var(--font-light)' }}>
               Creami ARI에 오신 것을 환영합니다.
             </p>

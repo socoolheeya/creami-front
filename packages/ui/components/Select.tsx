@@ -1,28 +1,28 @@
 import React from 'react'
 
-export interface SelectProps extends React.SelectHTMLAttributes<HTMLSelectElement> {
+export interface SelectProps extends Omit<React.SelectHTMLAttributes<HTMLSelectElement>, 'size'> {
+  size?: 'large' | 'medium' | 'small' | 'mini'
   children: React.ReactNode
 }
 
 export function Select({
+  size = 'medium',
   className = '',
-  style,
   children,
   ...props
 }: SelectProps) {
-  const baseStyles = 'w-full px-3 py-2 text-sm rounded-lg'
-  const defaultStyles = {
-    backgroundColor: 'var(--bg-secondary)',
-    border: '1px solid var(--border-color)',
-    color: 'var(--text-primary)',
-    borderRadius: 'var(--radius)',
-    ...style
+  const sizeStyles = {
+    large: 'h-control-lg px-control-px-lg text-base leading-none',
+    medium: 'h-control-md px-control-px-md text-base leading-none',
+    small: 'h-control-sm px-control-px-sm text-base leading-none',
+    mini: 'h-control-mini px-control-px-mini text-base leading-none'
   }
+
+  const baseStyles = `w-full ${sizeStyles[size]} rounded border border-border bg-bg-secondary text-text-primary box-border font-medium`
 
   return (
     <select
       className={`${baseStyles} ${className}`}
-      style={defaultStyles}
       {...props}
     >
       {children}

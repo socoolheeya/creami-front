@@ -61,44 +61,44 @@ export function OccupancyInput({ occupancies, onChange }: OccupancyInputProps) {
 
   return (
     <div>
-      <label className="block mb-2" style={{ color: 'var(--text-primary)', fontWeight: 'var(--font-bold)' }}>
+      <label className="block mb-sm text-base" style={{ color: 'var(--text-primary)', fontWeight: 'var(--font-bold)' }}>
         인원 설정
       </label>
 
-      <div className="space-y-3">
+      <div className="space-y-md">
         {occupancies.map((room, roomIndex) => (
           <div
             key={roomIndex}
-            className="p-4 rounded-lg"
+            className="p-md rounded"
             style={{
               backgroundColor: 'var(--bg-secondary)',
               border: '1px solid var(--border-color)'
             }}
           >
-            <div className="flex items-center justify-between mb-3">
-              <span style={{ fontWeight: 'var(--font-bold)', color: 'var(--text-primary)' }}>
+            <div className="flex items-center justify-between mb-md">
+              <span className="text-base" style={{ fontWeight: 'var(--font-bold)', color: 'var(--text-primary)' }}>
                 방 {room.roomNumber}
               </span>
               {occupancies.length > 1 && (
                 <button
                   onClick={() => removeRoom(roomIndex)}
-                  className="p-1"
+                  className="p-xs rounded"
                   style={{ color: 'var(--text-tertiary)' }}
                   title="방 제거"
                 >
-                  <X className="w-4 h-4" />
+                  <X className="w-md h-md" />
                 </button>
               )}
             </div>
 
             {/* Adults */}
-            <div className="flex items-center justify-between mb-3">
-              <span style={{ color: 'var(--text-secondary)', fontSize: '14px' }}>성인</span>
-              <div className="flex items-center gap-2">
+            <div className="flex items-center justify-between mb-md">
+              <span className="text-base" style={{ color: 'var(--text-secondary)', fontWeight: 'var(--font-medium)' }}>성인</span>
+              <div className="flex items-center gap-sm">
                 <button
                   onClick={() => updateAdults(roomIndex, -1)}
                   disabled={room.adults <= 1}
-                  className="p-1 rounded"
+                  className="h-control-md w-control-md rounded"
                   style={{
                     backgroundColor: 'var(--bg-primary)',
                     border: '1px solid var(--border-color)',
@@ -106,36 +106,36 @@ export function OccupancyInput({ occupancies, onChange }: OccupancyInputProps) {
                     cursor: room.adults <= 1 ? 'not-allowed' : 'pointer'
                   }}
                 >
-                  <Minus className="w-4 h-4" />
+                  <Minus className="w-md h-md" />
                 </button>
-                <span style={{ width: '30px', textAlign: 'center', fontWeight: 'var(--font-medium)' }}>
+                <span className="text-base" style={{ width: 'var(--control-height-md)', textAlign: 'center', fontWeight: 'var(--font-medium)', color: 'var(--text-primary)' }}>
                   {room.adults}
                 </span>
                 <button
                   onClick={() => updateAdults(roomIndex, 1)}
-                  className="p-1 rounded"
+                  className="h-control-md w-control-md rounded"
                   style={{
                     backgroundColor: 'var(--bg-primary)',
                     border: '1px solid var(--border-color)',
                     color: 'var(--text-primary)'
                   }}
                 >
-                  <Plus className="w-4 h-4" />
+                  <Plus className="w-md h-md" />
                 </button>
               </div>
             </div>
 
             {/* Children */}
-            <div className="mb-2">
-              <div className="flex items-center justify-between mb-2">
-                <span style={{ color: 'var(--text-secondary)', fontSize: '14px' }}>어린이</span>
+            <div className="mb-sm">
+              <div className="flex items-center justify-between mb-sm">
+                <span className="text-base" style={{ color: 'var(--text-secondary)', fontWeight: 'var(--font-medium)' }}>어린이</span>
                 <button
                   onClick={() => addChild(roomIndex)}
-                  className="px-2 py-1 text-xs rounded"
+                  className="h-control-sm px-control-px-sm py-none text-base rounded leading-none"
                   style={{
                     backgroundColor: 'var(--primary)',
                     color: '#ffffff',
-                    fontSize: '12px'
+                    fontWeight: 'var(--font-medium)'
                   }}
                 >
                   + 추가
@@ -143,11 +143,11 @@ export function OccupancyInput({ occupancies, onChange }: OccupancyInputProps) {
               </div>
 
               {room.children.map((child, childIndex) => (
-                <div key={childIndex} className="flex items-center gap-2 mb-2">
+                <div key={childIndex} className="flex items-center gap-sm mb-sm">
                   <select
                     value={child.age || 5}
                     onChange={(e) => updateChildAge(roomIndex, childIndex, Number(e.target.value))}
-                    className="flex-1 px-2 py-1 rounded text-sm"
+                    className="flex-1 h-control-md px-control-px-md py-none rounded text-base leading-none"
                     style={{
                       backgroundColor: 'var(--bg-primary)',
                       border: '1px solid var(--border-color)',
@@ -162,16 +162,16 @@ export function OccupancyInput({ occupancies, onChange }: OccupancyInputProps) {
                   </select>
                   <button
                     onClick={() => removeChild(roomIndex, childIndex)}
-                    className="p-1"
+                    className="p-xs rounded"
                     style={{ color: 'var(--text-tertiary)' }}
                   >
-                    <X className="w-4 h-4" />
+                    <X className="w-md h-md" />
                   </button>
                 </div>
               ))}
 
               {room.children.length === 0 && (
-                <p style={{ color: 'var(--text-tertiary)', fontSize: '12px' }}>
+                <p className="text-base" style={{ color: 'var(--text-tertiary)', fontWeight: 'var(--font-light)' }}>
                   어린이 없음
                 </p>
               )}
@@ -182,12 +182,12 @@ export function OccupancyInput({ occupancies, onChange }: OccupancyInputProps) {
 
       <button
         onClick={addRoom}
-        className="w-full mt-3 py-2 rounded-lg"
+        className="w-full mt-md h-control-md py-none rounded text-base leading-none"
         style={{
           backgroundColor: 'var(--bg-secondary)',
           border: '1px dashed var(--border-color)',
           color: 'var(--text-secondary)',
-          fontSize: '14px'
+          fontWeight: 'var(--font-medium)'
         }}
       >
         + 방 추가

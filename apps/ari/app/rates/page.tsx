@@ -5,10 +5,62 @@ import { useState } from 'react'
 import { mockProperties } from '@/lib/data/mock-properties'
 import { mockRoomTypes } from '@/lib/data/mock-rooms'
 import { mockPackages } from '@/lib/data/mock-packages'
-import { DatePicker } from '@/components/ui/DatePicker'
 import { RateGrid } from './components/RateGrid'
+import { Button, DatePicker, Input, SearchableSelect } from '@creami/ui'
 
 type CriteriaType = 'package' | 'room'
+type RateType = 'net_rate' | 'sell_rate_no_commission' | 'commission_included' | 'net_and_sell'
+
+const ratePlanPricingSettings: Record<string, {
+  rateType: RateType
+  commission: {
+    type: 'percentage' | 'fixed'
+    value: number
+  }
+}> = {
+  pkg1: {
+    rateType: 'commission_included',
+    commission: {
+      type: 'percentage',
+      value: 10
+    }
+  },
+  pkg2: {
+    rateType: 'net_rate',
+    commission: {
+      type: 'percentage',
+      value: 12
+    }
+  },
+  pkg3: {
+    rateType: 'sell_rate_no_commission',
+    commission: {
+      type: 'percentage',
+      value: 0
+    }
+  },
+  pkg4: {
+    rateType: 'commission_included',
+    commission: {
+      type: 'percentage',
+      value: 12
+    }
+  },
+  pkg5: {
+    rateType: 'net_rate',
+    commission: {
+      type: 'fixed',
+      value: 5000
+    }
+  },
+  pkg6: {
+    rateType: 'commission_included',
+    commission: {
+      type: 'fixed',
+      value: 3000
+    }
+  }
+}
 
 export default function RatesPage() {
 
@@ -16,15 +68,21 @@ export default function RatesPage() {
   const [selectedPropertyId, setSelectedPropertyId] = useState<string>('')
   const [criteriaType, setCriteriaType] = useState<CriteriaType>('package')
   const [selectedPackageId, setSelectedPackageId] = useState<string>('')
+  const [selectedPackageIds, setSelectedPackageIds] = useState<string[]>([])
   const [selectedRoomIds, setSelectedRoomIds] = useState<string[]>([])
   const [startDate, setStartDate] = useState<string>('')
   const [endDate, setEndDate] = useState<string>('')
+  const [selectedQuickRange, setSelectedQuickRange] = useState<number | null>(null)
   const [showResults, setShowResults] = useState(false)
   const [isCollapsed, setIsCollapsed] = useState(false)
 
   // Room multi-select dropdown state
   const [roomDropdownOpen, setRoomDropdownOpen] = useState(false)
   const [tempSelectedRoomIds, setTempSelectedRoomIds] = useState<string[]>([])
+  const [roomSearchQuery, setRoomSearchQuery] = useState('')
+  const [packageDropdownOpen, setPackageDropdownOpen] = useState(false)
+  const [tempSelectedPackageIds, setTempSelectedPackageIds] = useState<string[]>([])
+  const [packageSearchQuery, setPackageSearchQuery] = useState('')
 
   // Get available data based on property selection
   const availableRooms = selectedPropertyId
@@ -35,22 +93,76 @@ export default function RatesPage() {
     ? mockPackages.filter(pkg => pkg.propertyId === selectedPropertyId)
     : []
 
+  const propertyOptions = mockProperties.map((property) => ({
+    value: property.id,
+    label: `${property.id} / ${property.name}`,
+    searchText: `${property.id} ${property.name} ${property.code}`
+  }))
+
+  const packageOptions = availablePackages.map((pkg) => ({
+    value: pkg.id,
+    label: `${pkg.id} / ${pkg.name}`,
+    searchText: `${pkg.id} ${pkg.name} ${pkg.code}`
+  }))
+
+  const roomOptions = availableRooms.map((room) => ({
+    value: room.id,
+    label: `${room.id} / ${room.name}`,
+    searchText: `${room.id} ${room.name} ${room.code}`
+  }))
+
+  const filteredRooms = availableRooms.filter((room) => {
+    const query = roomSearchQuery.trim().toLowerCase()
+
+    if (!query) {
+      return true
+    }
+
+    return `${room.id} ${room.name} ${room.code}`.toLowerCase().includes(query)
+  })
+
+  const filteredPackages = availablePackages.filter((pkg) => {
+    const query = packageSearchQuery.trim().toLowerCase()
+
+    if (!query) {
+      return true
+    }
+
+    return `${pkg.id} ${pkg.name} ${pkg.code}`.toLowerCase().includes(query)
+  })
+
   // Get selected data for display
   const selectedRooms = mockRoomTypes.filter(room => selectedRoomIds.includes(room.id))
   const selectedPackage = mockPackages.find(pkg => pkg.id === selectedPackageId)
+  const selectedPackages = mockPackages.filter(pkg => selectedPackageIds.includes(pkg.id))
   const selectedProperty = mockProperties.find(p => p.id === selectedPropertyId)
+  const resultRows = criteriaType === 'package'
+    ? selectedRooms
+    : selectedPackages.map((pkg) => ({ id: pkg.id, name: pkg.name }))
+  const resultContextName = criteriaType === 'package'
+    ? selectedPackage?.name || ''
+    : selectedRooms[0]?.name || ''
+  const activeRatePlanPricing = criteriaType === 'package'
+    ? ratePlanPricingSettings[selectedPackageId]
+    : ratePlanPricingSettings[selectedPackageIds[0] ?? '']
 
   // Handlers
   const handlePropertyChange = (propertyId: string) => {
     setSelectedPropertyId(propertyId)
     setSelectedPackageId('')
+    setSelectedPackageIds([])
     setSelectedRoomIds([])
+    setRoomSearchQuery('')
+    setPackageSearchQuery('')
   }
 
   const handleCriteriaTypeChange = (type: CriteriaType) => {
     setCriteriaType(type)
     setSelectedPackageId('')
+    setSelectedPackageIds([])
     setSelectedRoomIds([])
+    setRoomSearchQuery('')
+    setPackageSearchQuery('')
   }
 
   const handlePackageSelect = (packageId: string) => {
@@ -63,14 +175,33 @@ export default function RatesPage() {
     }
   }
 
+  const handleSingleRoomSelect = (roomId: string) => {
+    setSelectedRoomIds(roomId ? [roomId] : [])
+  }
+
   const handleRoomRemove = (roomId: string) => {
     setSelectedRoomIds(selectedRoomIds.filter(id => id !== roomId))
   }
 
   // Room multi-select dropdown handlers
   const handleOpenRoomDropdown = () => {
+    if (!selectedPropertyId) {
+      return
+    }
+
     setTempSelectedRoomIds([...selectedRoomIds])
+    setRoomSearchQuery('')
     setRoomDropdownOpen(true)
+  }
+
+  const handleOpenPackageDropdown = () => {
+    if (!selectedPropertyId) {
+      return
+    }
+
+    setTempSelectedPackageIds([...selectedPackageIds])
+    setPackageSearchQuery('')
+    setPackageDropdownOpen(true)
   }
 
   const handleToggleRoomInDropdown = (roomId: string) => {
@@ -81,21 +212,46 @@ export default function RatesPage() {
     }
   }
 
+  const handleTogglePackageInDropdown = (packageId: string) => {
+    if (tempSelectedPackageIds.includes(packageId)) {
+      setTempSelectedPackageIds(tempSelectedPackageIds.filter(id => id !== packageId))
+    } else {
+      setTempSelectedPackageIds([...tempSelectedPackageIds, packageId])
+    }
+  }
+
   const handleApplyRoomSelection = () => {
     setSelectedRoomIds([...tempSelectedRoomIds])
     setRoomDropdownOpen(false)
+  }
+
+  const handleApplyPackageSelection = () => {
+    setSelectedPackageIds([...tempSelectedPackageIds])
+    setPackageDropdownOpen(false)
   }
 
   const handleCancelRoomSelection = () => {
     setRoomDropdownOpen(false)
   }
 
+  const handleCancelPackageSelection = () => {
+    setPackageDropdownOpen(false)
+  }
+
   const handleSelectAllRooms = () => {
     setTempSelectedRoomIds(availableRooms.map(room => room.id))
   }
 
+  const handleSelectAllPackages = () => {
+    setTempSelectedPackageIds(availablePackages.map(pkg => pkg.id))
+  }
+
   const handleDeselectAllRooms = () => {
     setTempSelectedRoomIds([])
+  }
+
+  const handleDeselectAllPackages = () => {
+    setTempSelectedPackageIds([])
   }
 
   // Quick date range selection
@@ -106,11 +262,12 @@ export default function RatesPage() {
 
     setStartDate(today.toISOString().split('T')[0])
     setEndDate(end.toISOString().split('T')[0])
+    setSelectedQuickRange(days)
   }
 
   const handleSearch = () => {
     const isPackageBased = criteriaType === 'package' && selectedPackageId && selectedRoomIds.length > 0
-    const isRoomBased = criteriaType === 'room' && selectedRoomIds.length > 0 && selectedPackageId
+    const isRoomBased = criteriaType === 'room' && selectedRoomIds.length === 1 && selectedPackageIds.length > 0
 
     if (selectedPropertyId && (isPackageBased || isRoomBased) && startDate && endDate) {
       setShowResults(true)
@@ -121,9 +278,13 @@ export default function RatesPage() {
   const handleReset = () => {
     setSelectedPropertyId('')
     setSelectedPackageId('')
+    setSelectedPackageIds([])
     setSelectedRoomIds([])
     setStartDate('')
     setEndDate('')
+    setSelectedQuickRange(null)
+    setRoomSearchQuery('')
+    setPackageSearchQuery('')
     setShowResults(false)
     setIsCollapsed(false)
   }
@@ -132,12 +293,428 @@ export default function RatesPage() {
     setIsCollapsed(!isCollapsed)
   }
 
-  return (
+  const roomSelector = (
+    <div className="flex flex-col gap-sm">
+      <label
+        className="block text-base"
+        style={{ color: 'var(--text-secondary)', fontWeight: 'var(--font-medium)' }}
+      >
+        객실 타입 선택
+      </label>
+
+      <div className="relative">
+        <Button
+          onClick={handleOpenRoomDropdown}
+          variant="secondary"
+          disabled={!selectedPropertyId}
+          className="w-full justify-between"
+        >
+          <span style={{ color: selectedRoomIds.length > 0 ? 'var(--text-primary)' : 'var(--text-tertiary)' }}>
+            {selectedRoomIds.length > 0
+              ? `${selectedRoomIds.length}개 객실 선택됨`
+              : '객실 타입을 선택하세요'}
+          </span>
+          <ChevronDown className="h-lg w-lg" />
+        </Button>
+
+        {roomDropdownOpen && (
+          <div
+            className="absolute z-50 mt-xs w-full rounded shadow-lg"
+            style={{
+              backgroundColor: 'var(--bg-primary)',
+              border: '1px solid var(--border-color)',
+              borderRadius: 'var(--radius)',
+              maxHeight: '320px',
+              overflow: 'hidden',
+              display: 'flex',
+              flexDirection: 'column'
+            }}
+          >
+            <div
+              className="flex items-center justify-between px-md py-sm"
+              style={{
+                borderBottom: '1px solid var(--border-color)',
+                backgroundColor: 'var(--bg-secondary)'
+              }}
+            >
+              <span style={{ fontWeight: 'var(--font-medium)', color: 'var(--text-primary)' }}>
+                {tempSelectedRoomIds.length}/{availableRooms.length} 선택됨
+              </span>
+              <div className="flex gap-sm">
+                <Button
+                  onClick={handleSelectAllRooms}
+                  variant="tertiary"
+                  size="sm"
+                  style={{ color: 'var(--primary)' }}
+                >
+                  전체선택
+                </Button>
+                <Button
+                  onClick={handleDeselectAllRooms}
+                  variant="tertiary"
+                  size="sm"
+                  style={{ color: 'var(--text-secondary)' }}
+                >
+                  선택해제
+                </Button>
+              </div>
+            </div>
+
+            <div className="px-md py-sm" style={{ borderBottom: '1px solid var(--border-color)' }}>
+              <Input
+                value={roomSearchQuery}
+                onChange={(event) => setRoomSearchQuery(event.target.value)}
+                placeholder="객실 ID, 코드 또는 이름으로 검색"
+                showSearchIcon
+              />
+            </div>
+
+            <div
+              style={{
+                overflowY: 'auto',
+                flex: 1
+              }}
+            >
+              {filteredRooms.length > 0 ? (
+                filteredRooms.map((room) => (
+                  <label
+                    key={room.id}
+                    className="flex cursor-pointer items-center px-md py-sm hover:bg-opacity-50"
+                    style={{
+                      borderBottom: '1px solid var(--border-color)'
+                    }}
+                    onMouseEnter={(event) => {
+                      event.currentTarget.style.backgroundColor = 'var(--bg-tertiary)'
+                    }}
+                    onMouseLeave={(event) => {
+                      event.currentTarget.style.backgroundColor = 'transparent'
+                    }}
+                  >
+                    <Input
+                      type="checkbox"
+                      checked={tempSelectedRoomIds.includes(room.id)}
+                      onChange={() => handleToggleRoomInDropdown(room.id)}
+                      className="mr-sm"
+                      style={{
+                        width: '18px',
+                        height: '18px',
+                        cursor: 'pointer',
+                        accentColor: 'var(--primary)'
+                      }}
+                    />
+                    <span style={{ fontWeight: 'var(--font-medium)', color: 'var(--text-primary)' }}>
+                      {room.id} / {room.name}
+                    </span>
+                  </label>
+                ))
+              ) : (
+                <div className="rounded py-sm text-center text-base" style={{ color: 'var(--text-tertiary)' }}>
+                  검색 결과가 없습니다
+                </div>
+              )}
+            </div>
+
+            <div
+              className="flex gap-sm px-md py-sm"
+              style={{
+                borderTop: '1px solid var(--border-color)',
+                backgroundColor: 'var(--bg-secondary)'
+              }}
+            >
+              <Button
+                onClick={handleCancelRoomSelection}
+                variant="secondary"
+                className="flex-1"
+              >
+                취소
+              </Button>
+              <Button
+                onClick={handleApplyRoomSelection}
+                variant="primary"
+                className="flex-1"
+              >
+                적용 ({tempSelectedRoomIds.length}개)
+              </Button>
+            </div>
+          </div>
+        )}
+      </div>
+
+      {selectedRooms.length > 0 && (
+        <div className="flex flex-wrap gap-sm">
+          {selectedRooms.map((room) => (
+            <div
+              key={room.id}
+              className="flex items-center gap-sm rounded px-sm py-xs"
+              style={{
+                backgroundColor: 'var(--primary)',
+                color: '#ffffff',
+                borderRadius: 'var(--radius)',
+                fontWeight: 'var(--font-medium)'
+              }}
+            >
+              <span className="text-base">{room.name}</span>
+              <Button
+                onClick={() => handleRoomRemove(room.id)}
+                variant="tertiary"
+                size="sm"
+                className="bg-transparent p-none transition-opacity hover:opacity-80"
+              >
+                <X className="h-md w-md" />
+              </Button>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {selectedRooms.length === 0 && (
+        <div
+          className="rounded py-sm text-center text-base"
+          style={{
+            backgroundColor: 'var(--bg-secondary)',
+            color: 'var(--text-tertiary)',
+            borderRadius: 'var(--radius)'
+          }}
+        >
+          선택된 객실이 없습니다
+        </div>
+      )}
+    </div>
+  )
+
+  const packageSelector = (
     <div>
+      <label
+        className="mb-sm block text-base"
+        style={{ color: 'var(--text-secondary)', fontWeight: 'var(--font-medium)' }}
+      >
+        패키지 선택
+      </label>
+      <SearchableSelect
+        value={selectedPackageId}
+        onChange={handlePackageSelect}
+        options={packageOptions}
+        placeholder="패키지를 선택하세요"
+        searchPlaceholder="패키지 ID, 코드 또는 이름으로 검색"
+        disabled={!selectedPropertyId}
+      />
+    </div>
+  )
+
+  const singleRoomSelector = (
+    <div>
+      <label
+        className="mb-sm block text-base"
+        style={{ color: 'var(--text-secondary)', fontWeight: 'var(--font-medium)' }}
+      >
+        객실 타입 선택
+      </label>
+      <SearchableSelect
+        value={selectedRoomIds[0] || ''}
+        onChange={handleSingleRoomSelect}
+        options={roomOptions}
+        placeholder="객실 타입을 선택하세요"
+        searchPlaceholder="객실 ID, 코드 또는 이름으로 검색"
+        disabled={!selectedPropertyId}
+      />
+    </div>
+  )
+
+  const packageMultiSelector = (
+    <div className="flex flex-col gap-sm">
+      <label
+        className="block text-base"
+        style={{ color: 'var(--text-secondary)', fontWeight: 'var(--font-medium)' }}
+      >
+        패키지 선택
+      </label>
+
+      <div className="relative">
+        <Button
+          onClick={handleOpenPackageDropdown}
+          variant="secondary"
+          disabled={!selectedPropertyId}
+          className="w-full justify-between"
+        >
+          <span style={{ color: selectedPackageIds.length > 0 ? 'var(--text-primary)' : 'var(--text-tertiary)' }}>
+            {selectedPackageIds.length > 0
+              ? `${selectedPackageIds.length}개 패키지 선택됨`
+              : '패키지를 선택하세요'}
+          </span>
+          <ChevronDown className="h-lg w-lg" />
+        </Button>
+
+        {packageDropdownOpen && (
+          <div
+            className="absolute z-50 mt-xs w-full rounded shadow-lg"
+            style={{
+              backgroundColor: 'var(--bg-primary)',
+              border: '1px solid var(--border-color)',
+              borderRadius: 'var(--radius)',
+              maxHeight: '320px',
+              overflow: 'hidden',
+              display: 'flex',
+              flexDirection: 'column'
+            }}
+          >
+            <div
+              className="flex items-center justify-between px-md py-sm"
+              style={{
+                borderBottom: '1px solid var(--border-color)',
+                backgroundColor: 'var(--bg-secondary)'
+              }}
+            >
+              <span style={{ fontWeight: 'var(--font-medium)', color: 'var(--text-primary)' }}>
+                {tempSelectedPackageIds.length}/{availablePackages.length} 선택됨
+              </span>
+              <div className="flex gap-sm">
+                <Button
+                  onClick={handleSelectAllPackages}
+                  variant="tertiary"
+                  size="sm"
+                  style={{ color: 'var(--primary)' }}
+                >
+                  전체선택
+                </Button>
+                <Button
+                  onClick={handleDeselectAllPackages}
+                  variant="tertiary"
+                  size="sm"
+                  style={{ color: 'var(--text-secondary)' }}
+                >
+                  선택해제
+                </Button>
+              </div>
+            </div>
+
+            <div className="px-md py-sm" style={{ borderBottom: '1px solid var(--border-color)' }}>
+              <Input
+                value={packageSearchQuery}
+                onChange={(event) => setPackageSearchQuery(event.target.value)}
+                placeholder="패키지 ID, 코드 또는 이름으로 검색"
+                showSearchIcon
+              />
+            </div>
+
+            <div
+              style={{
+                overflowY: 'auto',
+                flex: 1
+              }}
+            >
+              {filteredPackages.length > 0 ? (
+                filteredPackages.map((pkg) => (
+                  <label
+                    key={pkg.id}
+                    className="flex cursor-pointer items-center px-md py-sm hover:bg-opacity-50"
+                    style={{
+                      borderBottom: '1px solid var(--border-color)'
+                    }}
+                    onMouseEnter={(event) => {
+                      event.currentTarget.style.backgroundColor = 'var(--bg-tertiary)'
+                    }}
+                    onMouseLeave={(event) => {
+                      event.currentTarget.style.backgroundColor = 'transparent'
+                    }}
+                  >
+                    <Input
+                      type="checkbox"
+                      checked={tempSelectedPackageIds.includes(pkg.id)}
+                      onChange={() => handleTogglePackageInDropdown(pkg.id)}
+                      className="mr-sm"
+                      style={{
+                        width: '18px',
+                        height: '18px',
+                        cursor: 'pointer',
+                        accentColor: 'var(--primary)'
+                      }}
+                    />
+                    <span style={{ fontWeight: 'var(--font-medium)', color: 'var(--text-primary)' }}>
+                      {pkg.id} / {pkg.name}
+                    </span>
+                  </label>
+                ))
+              ) : (
+                <div className="rounded py-sm text-center text-base" style={{ color: 'var(--text-tertiary)' }}>
+                  검색 결과가 없습니다
+                </div>
+              )}
+            </div>
+
+            <div
+              className="flex gap-sm px-md py-sm"
+              style={{
+                borderTop: '1px solid var(--border-color)',
+                backgroundColor: 'var(--bg-secondary)'
+              }}
+            >
+              <Button
+                onClick={handleCancelPackageSelection}
+                variant="secondary"
+                className="flex-1"
+              >
+                취소
+              </Button>
+              <Button
+                onClick={handleApplyPackageSelection}
+                variant="primary"
+                className="flex-1"
+              >
+                적용 ({tempSelectedPackageIds.length}개)
+              </Button>
+            </div>
+          </div>
+        )}
+      </div>
+
+      {selectedPackages.length > 0 && (
+        <div className="flex flex-wrap gap-sm">
+          {selectedPackages.map((pkg) => (
+            <div
+              key={pkg.id}
+              className="flex items-center gap-sm rounded px-sm py-xs"
+              style={{
+                backgroundColor: 'var(--primary)',
+                color: '#ffffff',
+                borderRadius: 'var(--radius)',
+                fontWeight: 'var(--font-medium)'
+              }}
+            >
+              <span className="text-base">{pkg.name}</span>
+              <Button
+                onClick={() => setSelectedPackageIds(selectedPackageIds.filter(id => id !== pkg.id))}
+                variant="tertiary"
+                size="sm"
+                className="bg-transparent p-none transition-opacity hover:opacity-80"
+              >
+                <X className="h-md w-md" />
+              </Button>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {selectedPackages.length === 0 && (
+        <div
+          className="rounded py-sm text-center text-base"
+          style={{
+            backgroundColor: 'var(--bg-secondary)',
+            color: 'var(--text-tertiary)',
+            borderRadius: 'var(--radius)'
+          }}
+        >
+          선택된 패키지가 없습니다
+        </div>
+      )}
+    </div>
+  )
+
+  return (
+    <div className="flex flex-col gap-xl">
       {/* Header */}
-      <div className="flex items-center justify-between mb-6">
-        <div className="flex items-center gap-3">
-          <DollarSign className="w-8 h-8" style={{ color: 'var(--primary)' }} />
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-md">
+          <DollarSign className="h-lg w-lg" style={{ color: 'var(--primary)' }} />
           <h1 className="text-2xl" style={{ fontWeight: 'var(--font-bold)', color: 'var(--text-primary)' }}>
             요금 관리
           </h1>
@@ -146,7 +723,7 @@ export default function RatesPage() {
 
       {/* Selection Panel */}
       <div
-        className="rounded-lg mb-6"
+        className="rounded"
         style={{
           backgroundColor: 'var(--bg-primary)',
           borderRadius: 'var(--radius)',
@@ -156,49 +733,56 @@ export default function RatesPage() {
       >
         {/* Panel Header */}
         <div
-          className="flex items-center justify-between p-4 cursor-pointer"
+          className="flex cursor-pointer items-center justify-between p-lg"
           onClick={toggleCollapse}
           style={{
             borderBottom: isCollapsed ? 'none' : '1px solid var(--border-color)'
           }}
         >
           <div className="flex-1">
-            <h2 className="text-xl mb-1" style={{ fontWeight: 'var(--font-bold)', color: 'var(--text-primary)' }}>
+            <h2 className="mb-xs text-xl" style={{ fontWeight: 'var(--font-bold)', color: 'var(--text-primary)' }}>
               조회 조건
             </h2>
             {showResults && selectedProperty && isCollapsed && (
               <div
-                className="flex items-center gap-3 text-sm flex-wrap"
+                className="flex flex-wrap items-center gap-md text-base"
                 style={{
                   color: 'var(--text-secondary)',
                   fontWeight: 'var(--font-light)'
                 }}
               >
                 {/* Property */}
-                <div className="flex items-center gap-1.5">
-                  <Building2 className="w-4 h-4" style={{ color: '#3b82f6' }} />
+                <div className="flex items-center gap-xs">
+                  <Building2 className="h-md w-md" style={{ color: '#3b82f6' }} />
                   <span style={{ fontWeight: 'var(--font-medium)' }}>{selectedProperty.name}</span>
                 </div>
 
                 {/* Package */}
-                {selectedPackage && (
-                  <div className="flex items-center gap-1.5">
-                    <Package2 className="w-4 h-4" style={{ color: '#8b5cf6' }} />
+                {criteriaType === 'package' && selectedPackage && (
+                  <div className="flex items-center gap-xs">
+                    <Package2 className="h-md w-md" style={{ color: '#8b5cf6' }} />
                     <span>{selectedPackage.name}</span>
+                  </div>
+                )}
+
+                {criteriaType === 'room' && selectedPackages.length > 0 && (
+                  <div className="flex items-center gap-xs">
+                    <Package2 className="h-md w-md" style={{ color: '#8b5cf6' }} />
+                    <span>{selectedPackages.map(pkg => pkg.name).join(', ')}</span>
                   </div>
                 )}
 
                 {/* Rooms */}
                 {selectedRooms.length > 0 && (
-                  <div className="flex items-center gap-1.5">
-                    <Bed className="w-4 h-4" style={{ color: '#10b981' }} />
+                  <div className="flex items-center gap-xs">
+                    <Bed className="h-md w-md" style={{ color: '#10b981' }} />
                     <span>{selectedRooms.map(r => r.name).join(', ')}</span>
                   </div>
                 )}
 
                 {/* Date Range */}
                 {startDate && endDate && (
-                  <div className="flex items-center gap-1.5">
+                  <div className="flex items-center gap-xs">
                     <span>📅</span>
                     <span>{startDate} ~ {endDate}</span>
                   </div>
@@ -206,568 +790,122 @@ export default function RatesPage() {
               </div>
             )}
           </div>
-          <button
-            className="p-2 rounded-lg transition-colors"
-            style={{
-              backgroundColor: 'var(--bg-secondary)',
-              color: 'var(--text-primary)'
-            }}
+          <Button
+            variant="secondary"
+            size="sm"
+            iconOnly
           >
-            {isCollapsed ? <ChevronDown className="w-5 h-5" /> : <ChevronUp className="w-5 h-5" />}
-          </button>
+            {isCollapsed ? <ChevronDown className="h-lg w-lg" /> : <ChevronUp className="h-lg w-lg" />}
+          </Button>
         </div>
 
         {/* Panel Content */}
         {!isCollapsed && (
-          <div className="p-6 pt-4">
-            {/* Property Selection */}
-            <div className="mb-4">
-              <label
-                className="block text-sm mb-2"
-                style={{ color: 'var(--text-secondary)', fontWeight: 'var(--font-medium)' }}
-              >
-                숙소 선택
-              </label>
-              <select
-                value={selectedPropertyId}
-                onChange={(e) => handlePropertyChange(e.target.value)}
-                className="w-full px-4 py-2 rounded-lg"
-                style={{
-                  backgroundColor: 'var(--bg-secondary)',
-                  border: '1px solid var(--border-color)',
-                  color: 'var(--text-primary)',
-                  borderRadius: 'var(--radius-sm)',
-                  fontWeight: 'var(--font-medium)'
-                }}
-              >
-                <option value="">숙소를 선택하세요</option>
-                {mockProperties.map((property) => (
-                  <option key={property.id} value={property.id}>
-                    {property.name} ({property.code})
-                  </option>
-                ))}
-              </select>
-            </div>
-
+          <div className="flex flex-col gap-lg p-lg pt-md">
             {/* Criteria Type Selection */}
-            {selectedPropertyId && (
-              <div className="mb-4">
+            <div className="flex flex-wrap items-end justify-between gap-md">
+              <div>
                 <label
-                  className="block text-sm mb-2"
+                  className="mb-sm block text-base"
                   style={{ color: 'var(--text-secondary)', fontWeight: 'var(--font-medium)' }}
                 >
                   조회 기준
                 </label>
-                <div className="flex gap-2">
-                  <button
+                <div className="flex gap-sm">
+                  <Button
                     onClick={() => handleCriteriaTypeChange('package')}
-                    className="flex-1 px-4 py-2 rounded-lg transition-colors"
-                    style={{
-                      backgroundColor: criteriaType === 'package' ? 'var(--primary)' : 'var(--bg-tertiary)',
-                      color: criteriaType === 'package' ? '#ffffff' : 'var(--text-primary)',
-                      borderRadius: 'var(--radius-sm)',
-                      fontWeight: 'var(--font-medium)',
-                      border: criteriaType === 'package' ? 'none' : '1px solid var(--border-color)'
-                    }}
+                    variant={criteriaType === 'package' ? 'primary' : 'tertiary'}
+                    size="sm"
                   >
                     패키지 기준
-                  </button>
-                  <button
+                  </Button>
+                  <Button
                     onClick={() => handleCriteriaTypeChange('room')}
-                    className="flex-1 px-4 py-2 rounded-lg transition-colors"
-                    style={{
-                      backgroundColor: criteriaType === 'room' ? 'var(--primary)' : 'var(--bg-tertiary)',
-                      color: criteriaType === 'room' ? '#ffffff' : 'var(--text-primary)',
-                      borderRadius: 'var(--radius-sm)',
-                      fontWeight: 'var(--font-medium)',
-                      border: criteriaType === 'room' ? 'none' : '1px solid var(--border-color)'
-                    }}
+                    variant={criteriaType === 'room' ? 'primary' : 'tertiary'}
+                    size="sm"
                   >
                     객실 기준
-                  </button>
+                  </Button>
                 </div>
               </div>
-            )}
 
-            {/* Package-based Selection */}
-            {selectedPropertyId && criteriaType === 'package' && (
-              <>
-                {/* Package Selection */}
-                <div className="mb-4">
-                  <label
-                    className="block text-sm mb-2"
-                    style={{ color: 'var(--text-secondary)', fontWeight: 'var(--font-medium)' }}
+              <div className="flex flex-wrap gap-sm">
+                {[
+                  { label: '30일', days: 30 },
+                  { label: '60일', days: 60 },
+                  { label: '90일', days: 90 },
+                  { label: '365일', days: 365 }
+                ].map(({ label, days }) => (
+                  <Button
+                    key={days}
+                    onClick={() => handleQuickDateSelect(days)}
+                    variant={selectedQuickRange === days ? 'primary' : 'tertiary'}
+                    size="sm"
                   >
-                    패키지 선택
-                  </label>
-                  <select
-                    value={selectedPackageId}
-                    onChange={(e) => handlePackageSelect(e.target.value)}
-                    className="w-full px-4 py-2 rounded-lg"
-                    style={{
-                      backgroundColor: 'var(--bg-secondary)',
-                      border: '1px solid var(--border-color)',
-                      color: 'var(--text-primary)',
-                      borderRadius: 'var(--radius-sm)',
-                      fontWeight: 'var(--font-medium)'
-                    }}
-                  >
-                    <option value="">패키지를 선택하세요</option>
-                    {availablePackages.map((pkg) => (
-                      <option key={pkg.id} value={pkg.id}>
-                        {pkg.name} ({pkg.code})
-                      </option>
-                    ))}
-                  </select>
-                </div>
+                    {label}
+                  </Button>
+                ))}
+                <Button
+                  onClick={handleSearch}
+                  disabled={
+                    !selectedPropertyId ||
+                    (criteriaType === 'package' ? !selectedPackageId : selectedPackageIds.length === 0) ||
+                    (criteriaType === 'package' ? selectedRoomIds.length === 0 : selectedRoomIds.length !== 1) ||
+                    !startDate ||
+                    !endDate
+                  }
+                  variant="primary"
+                  size="sm"
+                >
+                  <Search className="h-md w-md" />
+                  조회
+                </Button>
+              </div>
+            </div>
 
-                {/* Room Multi-Select */}
-                {selectedPackageId && (
-                  <div className="mb-4">
-                    <label
-                      className="block text-sm mb-2"
-                      style={{ color: 'var(--text-secondary)', fontWeight: 'var(--font-medium)' }}
-                    >
-                      객실 타입 선택
-                    </label>
+            <div className="grid grid-cols-1 gap-md lg:grid-cols-3">
+              <div>
+                <label
+                  className="mb-sm block text-base"
+                  style={{ color: 'var(--text-secondary)', fontWeight: 'var(--font-medium)' }}
+                >
+                  숙소 선택
+                </label>
+                <SearchableSelect
+                  value={selectedPropertyId}
+                  onChange={handlePropertyChange}
+                  options={propertyOptions}
+                  placeholder="숙소를 선택하세요"
+                  searchPlaceholder="숙소 ID, 코드 또는 이름으로 검색"
+                />
+              </div>
 
-                    {/* Custom Multi-Select Dropdown */}
-                    <div className="relative">
-                      <button
-                        onClick={handleOpenRoomDropdown}
-                        className="w-full px-4 py-2 rounded-lg flex items-center justify-between mb-3"
-                        style={{
-                          backgroundColor: 'var(--bg-secondary)',
-                          border: '1px solid var(--border-color)',
-                          color: 'var(--text-primary)',
-                          borderRadius: 'var(--radius-sm)',
-                          fontWeight: 'var(--font-medium)',
-                          textAlign: 'left'
-                        }}
-                      >
-                        <span style={{ color: selectedRoomIds.length > 0 ? 'var(--text-primary)' : 'var(--text-tertiary)' }}>
-                          {selectedRoomIds.length > 0
-                            ? `${selectedRoomIds.length}개 객실 선택됨`
-                            : '객실 타입을 선택하세요'}
-                        </span>
-                        <ChevronDown className="w-5 h-5" />
-                      </button>
-
-                      {/* Dropdown Panel */}
-                      {roomDropdownOpen && (
-                        <div
-                          className="absolute z-50 w-full mt-1 rounded-lg shadow-lg"
-                          style={{
-                            backgroundColor: 'var(--bg-primary)',
-                            border: '1px solid var(--border-color)',
-                            borderRadius: 'var(--radius)',
-                            maxHeight: '320px',
-                            overflow: 'hidden',
-                            display: 'flex',
-                            flexDirection: 'column'
-                          }}
-                        >
-                          {/* Header with Select All/Deselect All */}
-                          <div
-                            className="flex items-center justify-between px-4 py-3"
-                            style={{
-                              borderBottom: '1px solid var(--border-color)',
-                              backgroundColor: 'var(--bg-secondary)'
-                            }}
-                          >
-                            <span style={{ fontWeight: 'var(--font-medium)', color: 'var(--text-primary)' }}>
-                              {tempSelectedRoomIds.length}/{availableRooms.length} 선택됨
-                            </span>
-                            <div className="flex gap-2">
-                              <button
-                                onClick={handleSelectAllRooms}
-                                className="text-xs px-2 py-1 rounded"
-                                style={{
-                                  color: 'var(--primary)',
-                                  fontWeight: 'var(--font-medium)'
-                                }}
-                              >
-                                전체선택
-                              </button>
-                              <button
-                                onClick={handleDeselectAllRooms}
-                                className="text-xs px-2 py-1 rounded"
-                                style={{
-                                  color: 'var(--text-secondary)',
-                                  fontWeight: 'var(--font-medium)'
-                                }}
-                              >
-                                선택해제
-                              </button>
-                            </div>
-                          </div>
-
-                          {/* Room List with Checkboxes */}
-                          <div
-                            style={{
-                              overflowY: 'auto',
-                              flex: 1
-                            }}
-                          >
-                            {availableRooms.map((room) => (
-                              <label
-                                key={room.id}
-                                className="flex items-center px-4 py-3 cursor-pointer hover:bg-opacity-50"
-                                style={{
-                                  borderBottom: '1px solid var(--border-color)'
-                                }}
-                                onMouseEnter={(e) => {
-                                  e.currentTarget.style.backgroundColor = 'var(--bg-tertiary)'
-                                }}
-                                onMouseLeave={(e) => {
-                                  e.currentTarget.style.backgroundColor = 'transparent'
-                                }}
-                              >
-                                <input
-                                  type="checkbox"
-                                  checked={tempSelectedRoomIds.includes(room.id)}
-                                  onChange={() => handleToggleRoomInDropdown(room.id)}
-                                  className="mr-3"
-                                  style={{
-                                    width: '18px',
-                                    height: '18px',
-                                    cursor: 'pointer',
-                                    accentColor: 'var(--primary)'
-                                  }}
-                                />
-                                <span style={{ fontWeight: 'var(--font-medium)', color: 'var(--text-primary)' }}>
-                                  {room.name} <span style={{ color: 'var(--text-secondary)' }}>({room.code})</span>
-                                </span>
-                              </label>
-                            ))}
-                          </div>
-
-                          {/* Footer with Apply/Cancel Buttons */}
-                          <div
-                            className="flex gap-2 px-4 py-3"
-                            style={{
-                              borderTop: '1px solid var(--border-color)',
-                              backgroundColor: 'var(--bg-secondary)'
-                            }}
-                          >
-                            <button
-                              onClick={handleCancelRoomSelection}
-                              className="flex-1 px-4 py-2 rounded-lg"
-                              style={{
-                                backgroundColor: 'var(--bg-tertiary)',
-                                color: 'var(--text-primary)',
-                                borderRadius: 'var(--radius-sm)',
-                                fontWeight: 'var(--font-medium)',
-                                border: '1px solid var(--border-color)'
-                              }}
-                            >
-                              취소
-                            </button>
-                            <button
-                              onClick={handleApplyRoomSelection}
-                              className="flex-1 px-4 py-2 rounded-lg"
-                              style={{
-                                backgroundColor: 'var(--primary)',
-                                color: '#ffffff',
-                                borderRadius: 'var(--radius-sm)',
-                                fontWeight: 'var(--font-medium)'
-                              }}
-                            >
-                              적용 ({tempSelectedRoomIds.length}개)
-                            </button>
-                          </div>
-                        </div>
-                      )}
-                    </div>
-
-                    {/* Selected Room Tags */}
-                    {selectedRooms.length > 0 && (
-                      <div className="flex flex-wrap gap-2">
-                        {selectedRooms.map((room) => (
-                          <div
-                            key={room.id}
-                            className="flex items-center gap-2 px-3 py-1.5 rounded-lg"
-                            style={{
-                              backgroundColor: 'var(--primary)',
-                              color: '#ffffff',
-                              borderRadius: 'var(--radius-sm)',
-                              fontWeight: 'var(--font-medium)'
-                            }}
-                          >
-                            <span className="text-sm">{room.name}</span>
-                            <button
-                              onClick={() => handleRoomRemove(room.id)}
-                              className="hover:opacity-80 transition-opacity"
-                            >
-                              <X className="w-4 h-4" />
-                            </button>
-                          </div>
-                        ))}
-                      </div>
-                    )}
-
-                    {selectedRooms.length === 0 && (
-                      <div
-                        className="text-sm text-center py-3 rounded-lg"
-                        style={{
-                          backgroundColor: 'var(--bg-secondary)',
-                          color: 'var(--text-tertiary)',
-                          borderRadius: 'var(--radius-sm)'
-                        }}
-                      >
-                        선택된 객실이 없습니다
-                      </div>
-                    )}
-                  </div>
-                )}
-              </>
-            )}
-
-            {/* Room-based Selection */}
-            {selectedPropertyId && criteriaType === 'room' && (
-              <>
-                {/* Room Multi-Select */}
-                <div className="mb-4">
-                  <label
-                    className="block text-sm mb-2"
-                    style={{ color: 'var(--text-secondary)', fontWeight: 'var(--font-medium)' }}
-                  >
-                    객실 타입 선택
-                  </label>
-
-                  {/* Custom Multi-Select Dropdown */}
-                  <div className="relative">
-                    <button
-                      onClick={handleOpenRoomDropdown}
-                      className="w-full px-4 py-2 rounded-lg flex items-center justify-between mb-3"
-                      style={{
-                        backgroundColor: 'var(--bg-secondary)',
-                        border: '1px solid var(--border-color)',
-                        color: 'var(--text-primary)',
-                        borderRadius: 'var(--radius-sm)',
-                        fontWeight: 'var(--font-medium)',
-                        textAlign: 'left'
-                      }}
-                    >
-                      <span style={{ color: selectedRoomIds.length > 0 ? 'var(--text-primary)' : 'var(--text-tertiary)' }}>
-                        {selectedRoomIds.length > 0
-                          ? `${selectedRoomIds.length}개 객실 선택됨`
-                          : '객실 타입을 선택하세요'}
-                      </span>
-                      <ChevronDown className="w-5 h-5" />
-                    </button>
-
-                    {/* Dropdown Panel */}
-                    {roomDropdownOpen && (
-                      <div
-                        className="absolute z-50 w-full mt-1 rounded-lg shadow-lg"
-                        style={{
-                          backgroundColor: 'var(--bg-primary)',
-                          border: '1px solid var(--border-color)',
-                          borderRadius: 'var(--radius)',
-                          maxHeight: '320px',
-                          overflow: 'hidden',
-                          display: 'flex',
-                          flexDirection: 'column'
-                        }}
-                      >
-                        {/* Header with Select All/Deselect All */}
-                        <div
-                          className="flex items-center justify-between px-4 py-3"
-                          style={{
-                            borderBottom: '1px solid var(--border-color)',
-                            backgroundColor: 'var(--bg-secondary)'
-                          }}
-                        >
-                          <span style={{ fontWeight: 'var(--font-medium)', color: 'var(--text-primary)' }}>
-                            {tempSelectedRoomIds.length}/{availableRooms.length} 선택됨
-                          </span>
-                          <div className="flex gap-2">
-                            <button
-                              onClick={handleSelectAllRooms}
-                              className="text-xs px-2 py-1 rounded"
-                              style={{
-                                color: 'var(--primary)',
-                                fontWeight: 'var(--font-medium)'
-                              }}
-                            >
-                              전체선택
-                            </button>
-                            <button
-                              onClick={handleDeselectAllRooms}
-                              className="text-xs px-2 py-1 rounded"
-                              style={{
-                                color: 'var(--text-secondary)',
-                                fontWeight: 'var(--font-medium)'
-                              }}
-                            >
-                              선택해제
-                            </button>
-                          </div>
-                        </div>
-
-                        {/* Room List with Checkboxes */}
-                        <div
-                          style={{
-                            overflowY: 'auto',
-                            flex: 1
-                          }}
-                        >
-                          {availableRooms.map((room) => (
-                            <label
-                              key={room.id}
-                              className="flex items-center px-4 py-3 cursor-pointer hover:bg-opacity-50"
-                              style={{
-                                borderBottom: '1px solid var(--border-color)'
-                              }}
-                              onMouseEnter={(e) => {
-                                e.currentTarget.style.backgroundColor = 'var(--bg-tertiary)'
-                              }}
-                              onMouseLeave={(e) => {
-                                e.currentTarget.style.backgroundColor = 'transparent'
-                              }}
-                            >
-                              <input
-                                type="checkbox"
-                                checked={tempSelectedRoomIds.includes(room.id)}
-                                onChange={() => handleToggleRoomInDropdown(room.id)}
-                                className="mr-3"
-                                style={{
-                                  width: '18px',
-                                  height: '18px',
-                                  cursor: 'pointer',
-                                  accentColor: 'var(--primary)'
-                                }}
-                              />
-                              <span style={{ fontWeight: 'var(--font-medium)', color: 'var(--text-primary)' }}>
-                                {room.name} <span style={{ color: 'var(--text-secondary)' }}>({room.code})</span>
-                              </span>
-                            </label>
-                          ))}
-                        </div>
-
-                        {/* Footer with Apply/Cancel Buttons */}
-                        <div
-                          className="flex gap-2 px-4 py-3"
-                          style={{
-                            borderTop: '1px solid var(--border-color)',
-                            backgroundColor: 'var(--bg-secondary)'
-                          }}
-                        >
-                          <button
-                            onClick={handleCancelRoomSelection}
-                            className="flex-1 px-4 py-2 rounded-lg"
-                            style={{
-                              backgroundColor: 'var(--bg-tertiary)',
-                              color: 'var(--text-primary)',
-                              borderRadius: 'var(--radius-sm)',
-                              fontWeight: 'var(--font-medium)',
-                              border: '1px solid var(--border-color)'
-                            }}
-                          >
-                            취소
-                          </button>
-                          <button
-                            onClick={handleApplyRoomSelection}
-                            className="flex-1 px-4 py-2 rounded-lg"
-                            style={{
-                              backgroundColor: 'var(--primary)',
-                              color: '#ffffff',
-                              borderRadius: 'var(--radius-sm)',
-                              fontWeight: 'var(--font-medium)'
-                            }}
-                          >
-                            적용 ({tempSelectedRoomIds.length}개)
-                          </button>
-                        </div>
-                      </div>
-                    )}
-                  </div>
-
-                  {/* Selected Room Tags */}
-                  {selectedRooms.length > 0 && (
-                    <div className="flex flex-wrap gap-2">
-                      {selectedRooms.map((room) => (
-                        <div
-                          key={room.id}
-                          className="flex items-center gap-2 px-3 py-1.5 rounded-lg"
-                          style={{
-                            backgroundColor: 'var(--primary)',
-                            color: '#ffffff',
-                            borderRadius: 'var(--radius-sm)',
-                            fontWeight: 'var(--font-medium)'
-                          }}
-                        >
-                          <span className="text-sm">{room.name}</span>
-                          <button
-                            onClick={() => handleRoomRemove(room.id)}
-                            className="hover:opacity-80 transition-opacity"
-                          >
-                            <X className="w-4 h-4" />
-                          </button>
-                        </div>
-                      ))}
-                    </div>
-                  )}
-
-                  {selectedRooms.length === 0 && (
-                    <div
-                      className="text-sm text-center py-3 rounded-lg"
-                      style={{
-                        backgroundColor: 'var(--bg-secondary)',
-                        color: 'var(--text-tertiary)',
-                        borderRadius: 'var(--radius-sm)'
-                      }}
-                    >
-                      선택된 객실이 없습니다
-                    </div>
-                  )}
-                </div>
-
-                {/* Package Selection */}
-                {selectedRoomIds.length > 0 && (
-                  <div className="mb-4">
-                    <label
-                      className="block text-sm mb-2"
-                      style={{ color: 'var(--text-secondary)', fontWeight: 'var(--font-medium)' }}
-                    >
-                      패키지 선택
-                    </label>
-                    <select
-                      value={selectedPackageId}
-                      onChange={(e) => handlePackageSelect(e.target.value)}
-                      className="w-full px-4 py-2 rounded-lg"
-                      style={{
-                        backgroundColor: 'var(--bg-secondary)',
-                        border: '1px solid var(--border-color)',
-                        color: 'var(--text-primary)',
-                        borderRadius: 'var(--radius-sm)',
-                        fontWeight: 'var(--font-medium)'
-                      }}
-                    >
-                      <option value="">패키지를 선택하세요</option>
-                      {availablePackages.map((pkg) => (
-                        <option key={pkg.id} value={pkg.id}>
-                          {pkg.name} ({pkg.code})
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-                )}
-              </>
-            )}
+              {criteriaType === 'package' ? (
+                <>
+                  {packageSelector}
+                  {roomSelector}
+                </>
+              ) : (
+                <>
+                  {singleRoomSelector}
+                  {packageMultiSelector}
+                </>
+              )}
+            </div>
 
             {/* Date Range Selection */}
-            {selectedPropertyId && selectedPackageId && selectedRoomIds.length > 0 && (
+            {selectedPropertyId &&
+              (criteriaType === 'package' ? selectedPackageId : selectedPackageIds.length > 0) &&
+              (criteriaType === 'package' ? selectedRoomIds.length > 0 : selectedRoomIds.length === 1) && (
               <>
-                <div className="mb-4">
+                <div>
                   <label
-                    className="block text-sm mb-2"
+                    className="mb-sm block text-base"
                     style={{ color: 'var(--text-secondary)', fontWeight: 'var(--font-medium)' }}
                   >
                     기간 선택
                   </label>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="grid grid-cols-1 gap-md md:grid-cols-2">
                     <DatePicker
                       label="시작일"
                       value={startDate}
@@ -779,93 +917,22 @@ export default function RatesPage() {
                       value={endDate}
                       onChange={setEndDate}
                       placeholder="종료일 선택"
+                      align="right"
                     />
-                  </div>
-                </div>
-
-                {/* Quick Date Range Buttons */}
-                <div className="mb-6">
-                  <label
-                    className="block text-sm mb-2"
-                    style={{ color: 'var(--text-secondary)', fontWeight: 'var(--font-medium)' }}
-                  >
-                    빠른 기간 선택
-                  </label>
-                  <div className="flex flex-wrap gap-2">
-                    {[
-                      { label: '30일', days: 30 },
-                      { label: '60일', days: 60 },
-                      { label: '90일', days: 90 },
-                      { label: '365일', days: 365 }
-                    ].map(({ label, days }) => (
-                      <button
-                        key={days}
-                        onClick={() => handleQuickDateSelect(days)}
-                        className="px-4 py-2 rounded-lg transition-colors"
-                        style={{
-                          backgroundColor: 'var(--bg-tertiary)',
-                          color: 'var(--text-primary)',
-                          borderRadius: 'var(--radius-sm)',
-                          fontWeight: 'var(--font-medium)',
-                          border: '1px solid var(--border-color)'
-                        }}
-                        onMouseEnter={(e) => {
-                          e.currentTarget.style.backgroundColor = 'var(--primary)'
-                          e.currentTarget.style.color = '#ffffff'
-                          e.currentTarget.style.borderColor = 'var(--primary)'
-                        }}
-                        onMouseLeave={(e) => {
-                          e.currentTarget.style.backgroundColor = 'var(--bg-tertiary)'
-                          e.currentTarget.style.color = 'var(--text-primary)'
-                          e.currentTarget.style.borderColor = 'var(--border-color)'
-                        }}
-                      >
-                        {label}
-                      </button>
-                    ))}
                   </div>
                 </div>
               </>
             )}
 
             {/* Action Buttons */}
-            <div className="flex gap-3">
-              <button
-                onClick={handleSearch}
-                disabled={
-                  !selectedPropertyId ||
-                  !selectedPackageId ||
-                  selectedRoomIds.length === 0 ||
-                  !startDate ||
-                  !endDate
-                }
-                className="flex items-center gap-2 px-6 py-2 rounded-lg transition-colors"
-                style={{
-                  backgroundColor: (selectedPropertyId && selectedPackageId && selectedRoomIds.length > 0 && startDate && endDate) ? 'var(--primary)' : 'var(--bg-tertiary)',
-                  color: (selectedPropertyId && selectedPackageId && selectedRoomIds.length > 0 && startDate && endDate) ? '#ffffff' : 'var(--text-tertiary)',
-                  borderRadius: 'var(--radius-sm)',
-                  fontWeight: 'var(--font-medium)',
-                  cursor: (selectedPropertyId && selectedPackageId && selectedRoomIds.length > 0 && startDate && endDate) ? 'pointer' : 'not-allowed'
-                }}
-              >
-                <Search className="w-5 h-5" />
-                조회
-              </button>
-
+            <div className="flex gap-md pt-sm">
               {showResults && (
-                <button
+                <Button
                   onClick={handleReset}
-                  className="px-6 py-2 rounded-lg transition-colors"
-                  style={{
-                    backgroundColor: 'var(--bg-secondary)',
-                    color: 'var(--text-primary)',
-                    borderRadius: 'var(--radius-sm)',
-                    fontWeight: 'var(--font-medium)',
-                    border: '1px solid var(--border-color)'
-                  }}
+                  variant="secondary"
                 >
                   초기화
-                </button>
+                </Button>
               )}
             </div>
           </div>
@@ -875,15 +942,15 @@ export default function RatesPage() {
       {/* Rate Grid Results */}
       {!showResults ? (
         <div
-          className="flex flex-col items-center justify-center py-16 rounded-lg"
+          className="flex flex-col items-center justify-center gap-sm rounded py-3xl"
           style={{
             backgroundColor: 'var(--bg-primary)',
             borderRadius: 'var(--radius)',
             border: '2px dashed var(--border-color)'
           }}
         >
-          <DollarSign className="w-16 h-16 mb-4" style={{ color: 'var(--text-tertiary)' }} />
-          <h3 className="text-xl mb-2" style={{ fontWeight: 'var(--font-bold)', color: 'var(--text-primary)' }}>
+          <DollarSign className="h-3xl w-3xl" style={{ color: 'var(--text-tertiary)' }} />
+          <h3 className="text-xl" style={{ fontWeight: 'var(--font-bold)', color: 'var(--text-primary)' }}>
             조회 조건을 선택하세요
           </h3>
           <p style={{ color: 'var(--text-secondary)', fontWeight: 'var(--font-light)' }}>
@@ -894,8 +961,11 @@ export default function RatesPage() {
         <RateGrid
           startDate={startDate}
           endDate={endDate}
-          selectedRooms={selectedRooms}
-          packageName={selectedPackage?.name || ''}
+          selectedRooms={resultRows}
+          packageName={resultContextName}
+          rowHeaderLabel={criteriaType === 'package' ? '객실 타입' : '패키지'}
+          bulkTargetLabel={criteriaType === 'package' ? '객실' : '패키지'}
+          ratePlanPricing={activeRatePlanPricing}
         />
       )}
     </div>

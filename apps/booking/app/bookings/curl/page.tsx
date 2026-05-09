@@ -15,7 +15,7 @@ export default function CurlBookingPage() {
   const parseCurlCommand = (curl: string): CreateBookingRequest | null => {
     try {
       // cURL 명령어에서 JSON 데이터 추출
-      const dataMatch = curl.match(/--data(?:-raw)?\s+['"](.+)['"]/s) || curl.match(/-d\s+['"](.+)['"]/s)
+      const dataMatch = curl.match(/--data(?:-raw)?\s+['"]([\s\S]+)['"]/) || curl.match(/-d\s+['"]([\s\S]+)['"]/)
 
       if (!dataMatch) {
         throw new Error('cURL 명령어에서 데이터를 찾을 수 없습니다')

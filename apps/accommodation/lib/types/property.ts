@@ -208,3 +208,8 @@ export const PROPERTY_TYPE_LABELS: Record<PropertyType, string> = {
   eco_hotel: '에코 호텔',
   other: '기타'
 }
+
+// API Response Types
+export interface GetPropertiesResponse {
+  properties: Property[]
+}

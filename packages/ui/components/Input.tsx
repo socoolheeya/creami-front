@@ -1,39 +1,34 @@
 import React from 'react'
 import { Search } from 'lucide-react'
 
-export interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
+export interface InputProps extends Omit<React.InputHTMLAttributes<HTMLInputElement>, 'size'> {
+  size?: 'large' | 'medium' | 'small' | 'mini'
   showSearchIcon?: boolean
 }
 
 export function Input({
+  size = 'medium',
   showSearchIcon = false,
   className = '',
-  style,
   ...props
 }: InputProps) {
-  const baseStyles = 'w-full px-3 py-2 text-sm rounded-lg'
-  const defaultStyles = {
-    backgroundColor: 'var(--bg-primary)',
-    border: '1px solid var(--border-color)',
-    color: 'var(--text-primary)',
-    borderRadius: 'var(--radius)',
-    ...style
+  const sizeStyles = {
+    large: 'h-control-lg px-control-px-lg text-base leading-none',
+    medium: 'h-control-md px-control-px-md text-base leading-none',
+    small: 'h-control-sm px-control-px-sm text-base leading-none',
+    mini: 'h-control-mini px-control-px-mini text-base leading-none'
   }
 
-  if (showSearchIcon) {
-    const SearchIcon = Search as React.ComponentType<{ className?: string; style?: React.CSSProperties }>
+  const baseStyles = `w-full ${sizeStyles[size]} rounded border border-border bg-bg-primary text-text-primary box-border font-medium`
 
+  if (showSearchIcon) {
     return (
       <div className="relative w-full">
         <input
-          className={`${baseStyles} pr-10 ${className}`}
-          style={defaultStyles}
+          className={`${baseStyles} pr-control-search ${className}`}
           {...props}
         />
-        <SearchIcon
-          className="absolute right-3 top-1/2 transform -translate-y-1/2 w-5 h-5 pointer-events-none"
-          style={{ color: 'var(--text-tertiary)' }}
-        />
+        <Search className="absolute right-md top-1/2 h-icon-md w-icon-md -translate-y-1/2 transform pointer-events-none text-text-tertiary" />
       </div>
     )
   }
@@ -41,7 +36,6 @@ export function Input({
   return (
     <input
       className={`${baseStyles} ${className}`}
-      style={defaultStyles}
       {...props}
     />
   )

@@ -1,6 +1,7 @@
 export type DiscountType = 'percentage' | 'fixed' // 퍼센트 할인 또는 정액 할인
 export type DiscountTarget = 'all' | 'accommodation' | 'room' | 'rateplan' // 할인 적용 대상
 export type DiscountStatus = 'active' | 'scheduled' | 'expired' | 'disabled' // 할인 상태
+export type DiscountBusinessType = 'EARLYBIRD' | 'BASE_DISCOUNT' | 'LAST_MINUTES' | 'WELCOME' | 'VIP' | 'WEEKEND' | 'LONG_STAY' | 'SEASONAL' | 'TEST'
 
 export interface Discount {
   id: string
@@ -8,6 +9,7 @@ export interface Discount {
   // 기본 정보
   name: string                    // 할인명 (예: "여름 특가 할인", "조기 예약 할인")
   code: string                    // 할인 코드 (쿠폰 코드)
+  discountType?: DiscountBusinessType | string // 백엔드 할인 타입 (예: EARLYBIRD, BASE_DISCOUNT)
   description?: string            // 설명
 
   // 할인 타입

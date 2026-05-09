@@ -1,0 +1,116 @@
+:root {
+  --primary: #fa8383;
+  --primary-hover: #fb9999;
+  --primary-active: #f96d6d;
+  --primary-dark: #f85757;
+  --primary-bg: rgba(250, 131, 131, 0.1);
+
+  --success: #51cf66;
+  --success-bg: rgba(81, 207, 102, 0.1);
+  --warning: #f59f00;
+  --warning-bg: rgba(245, 159, 0, 0.1);
+  --error: #ff6b6b;
+  --error-bg: rgba(255, 107, 107, 0.1);
+
+  --spacing-xs: 0.25rem;
+  --spacing-sm: 0.5rem;
+  --spacing-md: 1rem;
+  --spacing-lg: 1.5rem;
+  --spacing-xl: 2rem;
+  --spacing-2xl: 3rem;
+  --spacing-3xl: 4rem;
+
+  --control-height-mini: 1.65rem;
+  --control-height-sm: 1.925rem;
+  --control-height-md: 2.2rem;
+  --control-height-lg: 2.75rem;
+  --control-padding-x-mini: 0.4rem;
+  --control-padding-x-sm: 0.5375rem;
+  --control-padding-x-md: 0.675rem;
+  --control-padding-x-lg: 0.95rem;
+  --control-search-padding: 2.5rem;
+  --icon-size-md: 1.25rem;
+  --icon-size-lg: 1.5rem;
+  --datepicker-width: 20rem;
+  --view-toggle-width: 4rem;
+  --app-switcher-width: 24rem;
+  --app-switcher-dropdown-height: calc(100vh - var(--header-height) - var(--spacing-lg));
+  --modal-width-sm: 24rem;
+  --modal-width-md: 37.5rem;
+  --modal-width-lg: 48rem;
+  --modal-max-height: 90vh;
+  --modal-action-width: 8rem;
+
+  --font-size-xs: 0.75rem;
+  --font-size-sm: 0.875rem;
+  --font-size-base: 1rem;
+  --font-size-lg: 1.125rem;
+  --font-size-xl: 1.25rem;
+  --font-size-2xl: 1.5rem;
+  --font-size-3xl: 1.875rem;
+  --font-size-4xl: 2.25rem;
+
+  --font-light: 300;
+  --font-medium: 500;
+  --font-bold: 700;
+  --radius: 8px;
+  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+  --shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1);
+  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+  --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+
+  --header-height: 4rem;
+  --sidebar-width: 18rem;
+  --sidebar-collapsed: 5rem;
+  --content-padding: var(--spacing-lg);
+  --content-gap: var(--spacing-md);
+  --section-gap: var(--spacing-lg);
+  --card-padding: var(--spacing-lg);
+
+  --bg-primary: #ffffff;
+  --bg-secondary: #f8f9fa;
+  --bg-tertiary: #e9ecef;
+  --text-primary: #212529;
+  --text-secondary: #6c757d;
+  --text-tertiary: #868e96;
+  --border-color: #dee2e6;
+}
+
+[data-theme='dark'] {
+  --bg-primary: #1a1d23;
+  --bg-secondary: #222630;
+  --bg-tertiary: #2c303a;
+  --text-primary: #f8f9fa;
+  --text-secondary: #adb5bd;
+  --text-tertiary: #868e96;
+  --border-color: #3a3f4b;
+
+  --primary-bg: rgba(250, 131, 131, 0.15);
+  --success-bg: rgba(81, 207, 102, 0.15);
+  --warning-bg: rgba(245, 159, 0, 0.15);
+  --error-bg: rgba(255, 107, 107, 0.15);
+
+  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.2);
+  --shadow: 0 1px 3px 0 rgb(0 0 0 / 0.3);
+  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.3);
+  --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.3);
+}
+
+* {
+  font-family: 'Pretendard Variable', -apple-system, BlinkMacSystemFont, system-ui, Roboto, sans-serif;
+  font-weight: var(--font-medium);
+}
+
+body {
+  background-color: var(--bg-secondary);
+  color: var(--text-primary);
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-weight: var(--font-bold);
+}

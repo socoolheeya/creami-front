@@ -7,55 +7,40 @@ export interface ViewToggleProps {
 }
 
 export function ViewToggle({ view, onViewChange }: ViewToggleProps) {
+  const toggleView = () => {
+    onViewChange(view === 'grid' ? 'table' : 'grid')
+  }
+
   return (
-    <div
-      className="relative flex items-center p-1"
-      style={{
-        border: '1px solid var(--border-color)',
-        backgroundColor: 'var(--bg-tertiary)',
-        borderRadius: 'var(--radius)',
-        width: '80px',
-        height: '40px'
-      }}
+    <button
+      onClick={toggleView}
+      className="relative inline-flex h-control-md w-view-toggle shrink-0 cursor-pointer items-center overflow-hidden rounded border border-border bg-bg-tertiary box-border"
+      title={view === 'grid' ? '테이블 뷰로 전환' : '카드 뷰로 전환'}
     >
       {/* Sliding Background */}
       <div
-        className="absolute top-1 transition-all duration-200"
-        style={{
-          left: view === 'grid' ? '4px' : 'calc(50% - 4px)',
-          width: 'calc(50% - 4px)',
-          height: 'calc(100% - 8px)',
-          backgroundColor: 'var(--primary)',
-          borderRadius: 'var(--radius)',
-          zIndex: 0
-        }}
+        className={`absolute top-0 h-full w-1/2 transition-all duration-200 pointer-events-none bg-primary z-0 ${
+          view === 'grid' ? 'left-0' : 'left-1/2'
+        }`}
       />
 
-      {/* Grid Button */}
-      <button
-        onClick={() => onViewChange('grid')}
-        className="relative flex-1 flex items-center justify-center transition-colors"
-        style={{
-          color: view === 'grid' ? '#ffffff' : 'var(--text-secondary)',
-          zIndex: 1
-        }}
-        title="카드 뷰"
+      {/* Grid Icon */}
+      <div
+        className={`relative flex-1 flex items-center justify-center transition-colors pointer-events-none z-10 ${
+          view === 'grid' ? 'text-white' : 'text-text-secondary'
+        }`}
       >
-        <LayoutGrid className="w-5 h-5" />
-      </button>
+        <LayoutGrid className="w-md h-md" />
+      </div>
 
-      {/* Table Button */}
-      <button
-        onClick={() => onViewChange('table')}
-        className="relative flex-1 flex items-center justify-center transition-colors"
-        style={{
-          color: view === 'table' ? '#ffffff' : 'var(--text-secondary)',
-          zIndex: 1
-        }}
-        title="테이블 뷰"
+      {/* Table Icon */}
+      <div
+        className={`relative flex-1 flex items-center justify-center transition-colors pointer-events-none z-10 ${
+          view === 'table' ? 'text-white' : 'text-text-secondary'
+        }`}
       >
-        <List className="w-5 h-5" />
-      </button>
-    </div>
+        <List className="w-md h-md" />
+      </div>
+    </button>
   )
 }

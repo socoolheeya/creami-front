@@ -3,6 +3,7 @@
 import { Discount, DISCOUNT_TYPE_LABELS, DISCOUNT_STATUS_LABELS, DISCOUNT_TARGET_LABELS } from '@/lib/types/discount'
 import { Tag, Percent, DollarSign, Calendar } from 'lucide-react'
 import Link from 'next/link'
+import { Card } from '@creami/ui'
 
 interface DiscountCardProps {
   discount: Discount
@@ -11,33 +12,25 @@ interface DiscountCardProps {
 export function DiscountCard({ discount }: DiscountCardProps) {
   const statusColor =
     discount.status === 'active' ? 'var(--primary)' :
-    discount.status === 'scheduled' ? '#3b82f6' :
+    discount.status === 'scheduled' ? 'var(--info)' :
     discount.status === 'expired' ? 'var(--text-tertiary)' :
-    '#6b7280'
+    'var(--neutral)'
 
   return (
     <Link href={`/discounts/${discount.id}`}>
-      <div
-        className="rounded-lg overflow-hidden transition-all hover:shadow-lg cursor-pointer"
-        style={{
-          backgroundColor: 'var(--bg-primary)',
-          borderRadius: 'var(--radius)',
-          boxShadow: 'var(--shadow)',
-          border: '1px solid var(--border-color)'
-        }}
-      >
+      <Card className="overflow-hidden transition-all hover:shadow-lg" hover={false}>
         {/* Header */}
         <div
-          className="p-4"
+          className="p-md"
           style={{
             backgroundColor: 'var(--bg-secondary)',
             borderBottom: '1px solid var(--border-color)'
           }}
         >
-          <div className="flex items-start justify-between mb-2">
+          <div className="flex items-start justify-between mb-sm">
             <div className="flex-1">
               <h3
-                className="text-lg mb-1"
+                className="text-lg mb-xs"
                 style={{
                   fontWeight: 'var(--font-bold)',
                   color: 'var(--text-primary)'
@@ -45,10 +38,10 @@ export function DiscountCard({ discount }: DiscountCardProps) {
               >
                 {discount.name}
               </h3>
-              <div className="flex items-center gap-2">
-                <Tag className="w-4 h-4" style={{ color: 'var(--text-secondary)' }} />
+              <div className="flex items-center gap-sm">
+                <Tag className="h-md w-md" style={{ color: 'var(--text-secondary)' }} />
                 <code
-                  className="text-sm px-2 py-0.5 rounded"
+                  className="text-xs px-sm py-xs rounded"
                   style={{
                     backgroundColor: 'var(--bg-tertiary)',
                     color: 'var(--text-secondary)',
@@ -62,10 +55,10 @@ export function DiscountCard({ discount }: DiscountCardProps) {
 
             {/* Status Badge */}
             <span
-              className="px-2 py-1 rounded text-xs whitespace-nowrap ml-2"
+              className="px-sm py-xs rounded text-xs whitespace-nowrap ml-sm"
               style={{
                 backgroundColor: statusColor,
-                color: '#ffffff',
+                color: 'var(--text-on-primary)',
                 fontWeight: 'var(--font-medium)'
               }}
             >
@@ -75,7 +68,7 @@ export function DiscountCard({ discount }: DiscountCardProps) {
 
           {discount.description && (
             <p
-              className="text-sm mt-2"
+              className="text-base mt-sm"
               style={{
                 color: 'var(--text-secondary)',
                 fontWeight: 'var(--font-light)'
@@ -87,35 +80,35 @@ export function DiscountCard({ discount }: DiscountCardProps) {
         </div>
 
         {/* Content */}
-        <div className="p-4">
+        <div className="p-md">
           {/* Discount Value */}
-          <div className="mb-4">
-            <div className="flex items-center gap-2 mb-1">
+          <div className="mb-md">
+            <div className="flex items-center gap-sm mb-xs">
               {discount.type === 'percentage' ? (
-                <Percent className="w-5 h-5" style={{ color: 'var(--primary)' }} />
+                <Percent className="h-icon-md w-icon-md" style={{ color: 'var(--primary)' }} />
               ) : (
-                <DollarSign className="w-5 h-5" style={{ color: 'var(--primary)' }} />
+                <DollarSign className="h-icon-md w-icon-md" style={{ color: 'var(--primary)' }} />
               )}
               <span className="text-2xl" style={{ fontWeight: 'var(--font-bold)', color: 'var(--text-primary)' }}>
                 {discount.type === 'percentage' ? `${discount.value}%` : `${discount.value.toLocaleString()}원`}
               </span>
             </div>
-            <span className="text-sm" style={{ color: 'var(--text-secondary)' }}>
+            <span className="text-base" style={{ color: 'var(--text-secondary)' }}>
               {DISCOUNT_TYPE_LABELS[discount.type]}
             </span>
           </div>
 
           {/* Details */}
-          <div className="space-y-2 text-sm">
-            <div className="flex items-center gap-2">
-              <Tag className="w-4 h-4" style={{ color: 'var(--text-secondary)' }} />
+          <div className="space-y-sm text-base">
+            <div className="flex items-center gap-sm">
+              <Tag className="h-md w-md" style={{ color: 'var(--text-secondary)' }} />
               <span style={{ color: 'var(--text-secondary)' }}>
                 대상: {DISCOUNT_TARGET_LABELS[discount.target]}
               </span>
             </div>
 
-            <div className="flex items-center gap-2">
-              <Calendar className="w-4 h-4" style={{ color: 'var(--text-secondary)' }} />
+            <div className="flex items-center gap-sm">
+              <Calendar className="h-md w-md" style={{ color: 'var(--text-secondary)' }} />
               <span style={{ color: 'var(--text-secondary)' }}>
                 {discount.startDate.toLocaleDateString('ko-KR', { month: 'short', day: 'numeric' })} ~ {' '}
                 {discount.endDate.toLocaleDateString('ko-KR', { month: 'short', day: 'numeric' })}
@@ -123,7 +116,7 @@ export function DiscountCard({ discount }: DiscountCardProps) {
             </div>
           </div>
         </div>
-      </div>
+      </Card>
     </Link>
   )
 }

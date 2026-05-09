@@ -1,6 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { api } from '@/lib/api/client'
-import { Property } from '../lib/types/property'
+import { Property, GetPropertiesResponse } from '../lib/types/property'
 
 // Query Keys (캐시 키 관리)
 export const propertyKeys = {
@@ -15,7 +15,10 @@ export const propertyKeys = {
 export function useProperties(filters?: Record<string, unknown>) {
   return useQuery({
     queryKey: propertyKeys.list(filters),
-    queryFn: () => api.get<Property[]>('/properties'),
+    queryFn: async () => {
+      const response = await api.get<GetPropertiesResponse>('/properties')
+      return response.properties
+    },
   })
 }
 
