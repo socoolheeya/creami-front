@@ -2,7 +2,8 @@
 
 import { Link2, Save, ChevronRight, ChevronLeft, Search } from 'lucide-react'
 import { useState, useMemo } from 'react'
-import { Button, Card } from '@creami/ui'
+import { useLocale, useTranslations } from 'next-intl'
+import { Button, Card, notification } from '@creami/ui'
 import { mockRatePlans, mockDiscountRatePlanMappings } from '@/lib/data/mock-rateplans'
 import { mockDiscounts } from '@/lib/data/mock-discounts'
 import { mockAccommodations } from '@/lib/data/mock-accommodations'
@@ -16,6 +17,8 @@ const AVAILABLE_DISCOUNT_PAGE_SIZE = 50
 const normalizeDiscountSearchTerm = (value: string) => value.trim().toLowerCase()
 
 export default function MappingsPage() {
+  const t = useTranslations()
+  const locale = useLocale()
   const [selectedAccommodationId, setSelectedAccommodationId] = useState<string | null>(null)
   const [selectedRatePlanIds, setSelectedRatePlanIds] = useState<string[]>([])
   const [mappings, setMappings] = useState<DiscountRatePlanMapping[]>(mockDiscountRatePlanMappings)
@@ -114,7 +117,7 @@ export default function MappingsPage() {
   // 할인을 매핑 후로 이동
   const handleMapDiscount = (discountId: string) => {
     if (selectedRatePlanIds.length === 0) {
-      alert('요금제를 먼저 선택해주세요')
+      alert(t('discount.mappings.selectRatePlanAlert'))
       return
     }
 
@@ -137,7 +140,7 @@ export default function MappingsPage() {
   // 할인을 매핑 전으로 이동
   const handleUnmapDiscount = (discountId: string) => {
     if (selectedRatePlanIds.length === 0) {
-      alert('요금제를 먼저 선택해주세요')
+      alert(t('discount.mappings.selectRatePlanAlert'))
       return
     }
 
@@ -157,7 +160,11 @@ export default function MappingsPage() {
   const handleSave = () => {
     // TODO: API 호출하여 저장
     console.log('Saving mappings:', mappings)
-    alert('매핑이 저장되었습니다!')
+    notification.success({
+      message: '저장이 완료되었습니다.',
+      placement: 'top-right',
+      direction: 'right'
+    })
   }
 
   return (
@@ -167,7 +174,7 @@ export default function MappingsPage() {
         <div className="flex items-center gap-md">
           <Link2 className="h-icon-lg w-icon-lg text-primary" />
           <h1 className="text-2xl font-bold text-text-primary">
-            할인-요금제 매핑
+            {t('discount.mappings.title')}
           </h1>
         </div>
 
@@ -179,7 +186,7 @@ export default function MappingsPage() {
           size="medium"
         >
           <Save className="h-icon-md w-icon-md" />
-          저장
+          {t('discount.common.save')}
         </Button>
       </div>
 
@@ -189,7 +196,7 @@ export default function MappingsPage() {
           <div className="flex flex-wrap items-center justify-between gap-md">
             <div className="min-w-0 flex-1">
               <p className="text-base font-light text-text-secondary">
-                선택된 숙소와 요금제
+                {t('discount.mappings.selectedContext')}
               </p>
               <div className="mt-xs flex flex-wrap items-center gap-sm">
                 {selectedAccommodation && (
@@ -213,7 +220,7 @@ export default function MappingsPage() {
               size="small"
               onClick={() => setSelectorOpen(true)}
             >
-              수정
+              {t('discount.common.edit')}
             </Button>
           </div>
         </Card>
@@ -252,10 +259,10 @@ export default function MappingsPage() {
         >
           <Link2 className="h-3xl w-3xl mb-md text-text-tertiary" />
           <h3 className="text-xl mb-sm font-bold text-text-primary">
-            숙소를 먼저 선택해주세요
+            {t('discount.mappings.selectAccommodationFirst')}
           </h3>
           <p className="font-light text-text-secondary">
-            위에서 숙소를 선택하면 해당 숙소의 요금제를 볼 수 있습니다
+            {t('discount.mappings.selectAccommodationHelp')}
           </p>
         </div>
       ) : selectedRatePlanIds.length === 0 ? (
@@ -268,10 +275,10 @@ export default function MappingsPage() {
         >
           <Link2 className="h-3xl w-3xl mb-md text-text-tertiary" />
           <h3 className="text-xl mb-sm font-bold text-text-primary">
-            요금제를 선택해주세요
+            {t('discount.mappings.selectRatePlanFirst')}
           </h3>
           <p className="font-light text-text-secondary">
-            위에서 매핑할 요금제를 선택하면 할인을 매핑할 수 있습니다
+            {t('discount.mappings.selectRatePlanHelp')}
           </p>
         </div>
       ) : (
@@ -281,14 +288,14 @@ export default function MappingsPage() {
             <div className="mb-md flex items-center justify-between">
               <div>
                 <h2 className="text-xl font-bold text-text-primary">
-                  매핑 전 할인
+                  {t('discount.mappings.beforeTitle')}
                 </h2>
                 <p className="text-base font-light text-text-secondary">
-                  활성 상태이고 현재 기간에 사용 가능한 할인만 표시됩니다
+                  {t('discount.mappings.beforeDescription')}
                 </p>
               </div>
               <span className="text-base px-sm py-xs rounded bg-bg-tertiary text-text-secondary">
-                {unmappedDiscounts.length}개
+                {t('discount.common.count', { count: unmappedDiscounts.length })}
               </span>
             </div>
             <div className="relative mb-md">
@@ -297,7 +304,7 @@ export default function MappingsPage() {
                 type="text"
                 value={availableDiscountQuery}
                 onChange={(event) => handleAvailableDiscountQueryChange(event.target.value)}
-                placeholder="할인 ID, 할인코드, 할인타입으로 검색..."
+                placeholder={t('discount.mappings.availableSearchPlaceholder')}
                 className="h-control-md w-full rounded pr-control-px-md text-base"
                 style={{
                   backgroundColor: 'var(--bg-primary)',
@@ -310,12 +317,14 @@ export default function MappingsPage() {
             <DiscountList
               discounts={visibleUnmappedDiscounts}
               onDiscountClick={handleMapDiscount}
-              emptyMessage={availableDiscountQuery ? '검색된 할인이 없습니다' : '모든 할인이 매핑되었습니다'}
+              emptyMessage={availableDiscountQuery ? t('discount.mappings.emptyAvailableSearch') : t('discount.mappings.emptyAvailable')}
               actionIcon={<ChevronRight className="h-md w-md" />}
               layout="catalog"
               totalCount={unmappedDiscounts.length}
               onShowMore={() => setAvailableDiscountLimit(current => current + AVAILABLE_DISCOUNT_PAGE_SIZE)}
-              showMoreLabel={`${AVAILABLE_DISCOUNT_PAGE_SIZE}개 더 보기`}
+              showMoreLabel={t('discount.common.showMore', {
+                count: AVAILABLE_DISCOUNT_PAGE_SIZE.toLocaleString(locale)
+              })}
             />
           </div>
 
@@ -324,20 +333,20 @@ export default function MappingsPage() {
             <div className="mb-md flex items-center justify-between">
               <div>
                 <h2 className="text-xl font-bold text-text-primary">
-                  매핑 후
+                  {t('discount.mappings.afterTitle')}
                 </h2>
                 <p className="text-base font-light text-text-secondary">
                   {selectedAccommodation?.name}
                 </p>
               </div>
               <span className="text-base px-sm py-xs rounded bg-primary text-text-on-primary">
-                {mappedDiscounts.length}개
+                {t('discount.common.count', { count: mappedDiscounts.length })}
               </span>
             </div>
             <DiscountList
               discounts={mappedDiscounts}
               onDiscountClick={handleUnmapDiscount}
-              emptyMessage="매핑된 할인이 없습니다"
+              emptyMessage={t('discount.mappings.emptyMapped')}
               actionIcon={<ChevronLeft className="h-md w-md" />}
               layout="compact"
             />

@@ -21,7 +21,7 @@ module.exports = {
     // Input 필수 클래스
     'pr-control-search', 'right-md',
     // Layout 필수 클래스
-    'mb-lg', 'mb-md', 'gap-lg', 'gap-md', 'gap-sm',
+    'mb-xl', 'mb-lg', 'mb-md', 'gap-lg', 'gap-md', 'gap-sm',
     'text-primary', 'text-text-primary', 'text-2xl',
   ],
   theme: {

@@ -1,0 +1,295 @@
+{
+  "app": {
+    "title": "Creami Setting",
+    "description": "Settings Dashboard"
+  },
+  "nav": {
+    "dashboard": "Dashboard",
+    "users": "User Management",
+    "suppliers": "Supplier Management",
+    "apiKeys": "API Key Management",
+    "permissions": "Permission Management",
+    "policies": "Policy Management",
+    "subscriptions": "Subscription Management",
+    "profile": "Profile"
+  },
+  "setting": {
+    "status": {
+      "active": "Active",
+      "inactive": "Inactive",
+      "invited": "Invited"
+    },
+    "dashboard": {
+      "title": "Creami Setting",
+      "description": "Manage users, permissions, and subscriptions.",
+      "cards": {
+        "users": {
+          "title": "User Management",
+          "description": "Manage user accounts, status, and teams."
+        },
+        "permissions": {
+          "title": "Permission Management",
+          "description": "Manage role access scopes and user assignments."
+        },
+        "subscriptions": {
+          "title": "Subscription Management",
+          "description": "Manage plans, payment status, and renewal dates."
+        }
+      }
+    },
+    "login": {
+      "title": "Login",
+      "description": "Log in to Creami Setting.",
+      "email": "Email",
+      "emailPlaceholder": "Enter your email",
+      "emailLogin": "Log in with Email",
+      "naver": "Log in with Naver",
+      "kakao": "Log in with Kakao",
+      "google": "Log in with Google",
+      "or": "or"
+    },
+    "users": {
+      "title": "User Management",
+      "description": "Manage Creami admin accounts, teams, and status.",
+      "invite": "Invite User",
+      "columns": {
+        "userId": "User ID",
+        "user": "User",
+        "email": "Email",
+        "role": "Role",
+        "team": "Team",
+        "status": "Status"
+      },
+      "detail": {
+        "title": "{userName} Details",
+        "description": "Edit user information and accessible accommodations.",
+        "backToList": "Back to Users",
+        "notFound": "User not found.",
+        "saved": "User information has been saved.",
+        "accountInfo": "Account Info",
+        "accountDescription": "Edit name, contact, role, and status.",
+        "name": "Name",
+        "phone": "Mobile Number",
+        "createdById": "Creator ID",
+        "createdAt": "Created",
+        "updatedById": "Updater ID",
+        "updatedAt": "Updated",
+        "accessibleAccommodations": "Accessible Accommodations",
+        "accessDescription": "Search by ID or accommodation name and register multiple selections.",
+        "selectedCount": "{count} registered",
+        "searchTitle": "Accommodation Search",
+        "searchPlaceholder": "Search by ID or accommodation name",
+        "register": "Register",
+        "registered": "Registered",
+        "removeAccommodation": "Remove {accommodationName}",
+        "emptyAccess": "No accessible accommodations are registered."
+      }
+    },
+    "suppliers": {
+      "title": "Supplier Management",
+      "description": "Manage supplier details, integration block date-times, and TPS limits.",
+      "createTitle": "Add Supplier",
+      "editTitle": "Edit Supplier",
+      "createDescription": "Set the supplier name, integration block date-time range, and throttling TPS limit.",
+      "supplierCode": "Supplier Code",
+      "supplierCodePlaceholder": "Enter supplier code",
+      "supplierName": "Supplier Name",
+      "supplierNamePlaceholder": "Enter supplier name",
+      "blockStartDate": "Block Start Date",
+      "blockStartTime": "Block Start Time",
+      "blockEndDate": "Block End Date",
+      "blockEndTime": "Block End Time",
+      "status": "Status",
+      "statuses": {
+        "active": "Active",
+        "inactive": "Inactive"
+      },
+      "tpsLimit": "TPS Limit",
+      "tpsValue": "{count} TPS",
+      "addSupplier": "Add Supplier",
+      "activate": "Activate",
+      "deactivate": "Deactivate",
+      "columns": {
+        "id": "Supplier ID",
+        "supplierCode": "Supplier Code",
+        "supplierName": "Supplier Name",
+        "status": "Status",
+        "blockTime": "Integration Block Date-Time",
+        "tpsLimit": "TPS Limit",
+        "createdById": "Creator ID",
+        "createdAt": "Created",
+        "updatedById": "Updater ID",
+        "updatedAt": "Updated",
+        "actions": "Actions"
+      },
+      "detail": {
+        "title": "{supplierName} Details",
+        "description": "Edit supplier details, integration block date-times, and TPS limits.",
+        "backToList": "Back to Suppliers",
+        "notFound": "Supplier not found.",
+        "saved": "Supplier information has been saved.",
+        "basicInfo": "Basic Info",
+        "basicDescription": "Edit supplier code, supplier name, status, and TPS limit.",
+        "integrationSettings": "Integration Settings",
+        "integrationDescription": "Set the supplier integration block start and end date-times."
+      }
+    },
+    "apiKeys": {
+      "title": "API Key Management",
+      "description": "Manage supplier Authorization keys for REST API integration.",
+      "createTitle": "Add API Key",
+      "createDescription": "Enter a supplier name and generate a REST API Authorization key.",
+      "supplierName": "Supplier Name",
+      "supplierNamePlaceholder": "Enter supplier name",
+      "apiKey": "API Key",
+      "generateKey": "Generate Key",
+      "addApiKey": "Add API Key",
+      "copy": "Copy",
+      "copied": "Copied",
+      "regenerate": "Regenerate",
+      "columns": {
+        "id": "Supplier ID",
+        "supplierName": "Supplier Name",
+        "apiKey": "API Key",
+        "createdAt": "Created",
+        "actions": "Actions"
+      }
+    },
+    "profile": {
+      "title": "Profile Settings",
+      "description": "Manage your profile photo, contact information, and display mode.",
+      "avatarAction": "Upload profile photo",
+      "avatarAlt": "Profile photo",
+      "avatarHelp": "Click the avatar image to upload a profile photo.",
+      "organizationInfo": "Organization Info",
+      "organization": "Organization",
+      "department": "Department",
+      "userId": "User ID",
+      "accountInfo": "Account Info",
+      "accountDescription": "You can update your email, mobile number, and password.",
+      "email": "Email",
+      "phone": "Mobile Number",
+      "password": "Change Password",
+      "currentPassword": "Current Password",
+      "newPassword": "New Password",
+      "confirmPassword": "Confirm New Password",
+      "passwordRequired": "Enter all password fields to change your password.",
+      "passwordPolicy": "New password must be at least 8 characters and include uppercase and lowercase letters.",
+      "passwordSameAsCurrent": "New password must be different from the current password.",
+      "passwordMismatch": "New password and confirmation do not match.",
+      "passwordUpdated": "Password has been changed.",
+      "displayMode": "Display Mode",
+      "darkMode": "Dark Mode",
+      "lightMode": "Light Mode",
+      "lastUpdated": "Last updated: {date}"
+    },
+    "permissions": {
+      "title": "Permission Management",
+      "description": "Manage access scopes and user assignments by role.",
+      "addRole": "Add Role",
+      "userCount": "{count} users",
+      "roles": {
+        "owner": {
+          "description": "Full permissions for all apps and settings"
+        },
+        "admin": {
+          "description": "Operational app management and user invitation permissions"
+        },
+        "operator": {
+          "description": "View and edit booking and accommodation operation data"
+        }
+      },
+      "scopes": {
+        "users": "Users",
+        "permissions": "Permissions",
+        "subscriptions": "Subscriptions",
+        "bookings": "Bookings",
+        "settlements": "Settlements",
+        "properties": "Properties",
+        "discounts": "Discounts",
+        "ari": "ARI"
+      }
+    },
+    "policies": {
+      "title": "Policy Management",
+      "description": "Manage read, write, and full permission policies by menu.",
+      "addPolicy": "Add Policy",
+      "createTitle": "Create Policy",
+      "createDescription": "Create a new policy by selecting a menu, permission, and status.",
+      "create": "Create",
+      "menuType": "[Menu]",
+      "columns": {
+        "menu": "Menu",
+        "permission": "Permission",
+        "status": "Status",
+        "created": "Created",
+        "updated": "Updated",
+        "policyId": "Policy ID",
+        "createdById": "Creator ID"
+      },
+      "menus": {
+        "users": "User Management",
+        "permissions": "Permission Management",
+        "policies": "Policy Management",
+        "subscriptions": "Subscription Management"
+      },
+      "permissions": {
+        "read": "Read",
+        "write": "Write",
+        "all": "ALL"
+      }
+    },
+    "subscriptions": {
+      "title": "Subscription Management",
+      "description": "Manage notification subscriptions by operational event.",
+      "requestButton": "Request Subscription Item",
+      "requestTitle": "Request Subscription Item",
+      "requestDescription": "Request a notification subscription item you need.",
+      "requestMailSubject": "[Creami Setting] Subscription item request",
+      "recipient": "Recipient",
+      "requestMemo": "Request Details",
+      "requestPlaceholder": "Enter the notification item you need and the purpose of use.",
+      "send": "Send",
+      "switchLabel": "{name} subscription setting",
+      "columns": {
+        "id": "Notification ID",
+        "name": "Notification",
+        "description": "Description",
+        "category": "Category",
+        "lastModifiedAt": "Last Modified",
+        "subscribe": "Subscribe"
+      },
+      "categories": {
+        "booking": "Booking",
+        "ratePlan": "Rate Plan",
+        "accommodation": "Accommodation"
+      },
+      "items": {
+        "reservationRequest": {
+          "name": "Reservation Request Alert",
+          "description": "Receive a notification when a new reservation request is submitted."
+        },
+        "reservationCancel": {
+          "name": "Reservation Cancellation Alert",
+          "description": "Receive a notification when a reservation is canceled."
+        },
+        "ratePlanCreate": {
+          "name": "New Rate Plan Alert",
+          "description": "Receive a notification when a new rate plan is created."
+        },
+        "ratePlanUpdate": {
+          "name": "Rate Plan Update Alert",
+          "description": "Receive a notification when rate plan information changes."
+        },
+        "accommodationCreate": {
+          "name": "New Accommodation Alert",
+          "description": "Receive a notification when a new accommodation is created."
+        },
+        "roomCreate": {
+          "name": "New Room Alert",
+          "description": "Receive a notification when a new room is created."
+        }
+      }
+    }
+  }
+}

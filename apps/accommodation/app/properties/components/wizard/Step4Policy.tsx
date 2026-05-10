@@ -1,3 +1,6 @@
+'use client'
+
+import { useState } from 'react'
 import { PropertyFormData, CURRENCY_OPTIONS, ChargeType } from '../../../../lib/types/property'
 import { DollarSign, Percent, Plus, Trash2 } from 'lucide-react'
 
@@ -6,8 +9,17 @@ interface Step4PolicyProps {
   onChange: (data: Partial<PropertyFormData>) => void
 }
 
+function parseChargeValue(value: string): number {
+  const parsedValue = Number(value)
+
+  return Number.isFinite(parsedValue) ? parsedValue : 0
+}
+
 export function Step4Policy({ data, onChange }: Step4PolicyProps) {
   const billingPolicy = data.billingPolicy || {}
+  const [commissionValueText, setCommissionValueText] = useState(() =>
+    String(billingPolicy.commission?.value ?? '')
+  )
 
   const handleCurrencyChange = (currency: string) => {
     onChange({
@@ -24,19 +36,21 @@ export function Step4Policy({ data, onChange }: Step4PolicyProps) {
         ...billingPolicy,
         commission: {
           type,
-          value: billingPolicy.commission?.value || 0
+          value: parseChargeValue(commissionValueText)
         }
       }
     })
   }
 
-  const handleCommissionValueChange = (value: number) => {
+  const handleCommissionValueChange = (value: string) => {
+    setCommissionValueText(value)
+
     onChange({
       billingPolicy: {
         ...billingPolicy,
         commission: {
           type: billingPolicy.commission?.type || 'percentage',
-          value
+          value: parseChargeValue(value)
         }
       }
     })
@@ -163,11 +177,10 @@ export function Step4Policy({ data, onChange }: Step4PolicyProps) {
         {/* 값 입력 */}
         <div className="relative">
           <input
-            type="number"
-            min="0"
-            step={billingPolicy.commission?.type === 'percentage' ? '0.01' : '1'}
-            value={billingPolicy.commission?.value || 0}
-            onChange={(e) => handleCommissionValueChange(parseFloat(e.target.value) || 0)}
+            type="text"
+            inputMode="decimal"
+            value={commissionValueText}
+            onChange={(e) => handleCommissionValueChange(e.target.value)}
             placeholder="0"
             className="w-full px-3 py-2 text-sm pr-12 rounded-lg max-w-md"
             style={{

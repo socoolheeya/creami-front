@@ -1,17 +1,21 @@
+ 'use client'
+
 import { BarChart3, Calendar, DollarSign, Package } from "lucide-react";
+import { useTranslations } from 'next-intl'
 
 export default function Dashboard() {
+  const t = useTranslations()
   const stats = [
-    { icon: Package, label: '재고 현황', value: '95%', color: 'var(--primary)' },
-    { icon: DollarSign, label: '평균 가격', value: '₩150,000', color: '#4ade80' },
-    { icon: Calendar, label: '예약 가능일', value: '28일', color: '#60a5fa' },
-    { icon: BarChart3, label: '점유율', value: '78%', color: '#f59e0b' },
+    { icon: Package, label: t('ari.dashboard.stats.inventory'), value: '95%', color: 'var(--primary)' },
+    { icon: DollarSign, label: t('ari.dashboard.stats.averagePrice'), value: '₩150,000', color: '#4ade80' },
+    { icon: Calendar, label: t('ari.dashboard.stats.availableDays'), value: t('ari.common.days', { count: 28 }), color: '#60a5fa' },
+    { icon: BarChart3, label: t('ari.dashboard.stats.occupancy'), value: '78%', color: '#f59e0b' },
   ];
 
   return (
     <div className="flex flex-col gap-xl">
       <h1 className="text-2xl" style={{ fontWeight: 'var(--font-bold)', color: 'var(--text-primary)' }}>
-        ARI 대시보드
+        {t('ari.dashboard.title')}
       </h1>
 
       <div className="grid grid-cols-1 gap-lg md:grid-cols-2 lg:grid-cols-4">
@@ -59,11 +63,11 @@ export default function Dashboard() {
           }}
         >
           <h2 className="mb-md text-xl" style={{ fontWeight: 'var(--font-bold)', color: 'var(--text-primary)' }}>
-            공지사항
+            {t('ari.dashboard.notice')}
           </h2>
           <div className="space-y-sm">
             <p style={{ color: 'var(--text-secondary)', fontWeight: 'var(--font-light)' }}>
-              Creami ARI에 오신 것을 환영합니다.
+              {t('ari.dashboard.welcome')}
             </p>
           </div>
         </div>

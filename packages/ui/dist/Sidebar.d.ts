@@ -15,8 +15,9 @@ export interface SidebarMenuItemProps {
     onClick?: () => void;
     isActive?: boolean;
     isCollapsed?: boolean;
+    depth?: 0 | 1;
 }
 export declare function Sidebar({ children, isCollapsed, className }: SidebarProps): import("react/jsx-runtime").JSX.Element;
 export declare function SidebarMenu({ children }: SidebarMenuProps): import("react/jsx-runtime").JSX.Element;
-export declare function SidebarMenuItem({ icon: Icon, label, href, onClick, isActive, isCollapsed }: SidebarMenuItemProps): import("react/jsx-runtime").JSX.Element;
+export declare function SidebarMenuItem({ icon: Icon, label, href, onClick, isActive, isCollapsed, depth }: SidebarMenuItemProps): import("react/jsx-runtime").JSX.Element;
 //# sourceMappingURL=Sidebar.d.ts.map

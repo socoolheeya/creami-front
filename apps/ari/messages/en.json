@@ -1,0 +1,205 @@
+{
+  "nav": {
+    "dashboard": "Dashboard",
+    "rates": "Rate Management",
+    "inventories": "Inventory Management"
+  },
+  "ari": {
+    "dashboard": {
+      "title": "ARI Dashboard",
+      "notice": "Notices",
+      "welcome": "Welcome to Creami ARI.",
+      "stats": {
+        "inventory": "Inventory Status",
+        "averagePrice": "Average Price",
+        "availableDays": "Available Days",
+        "occupancy": "Occupancy"
+      }
+    },
+    "common": {
+      "searchConditions": "Search Conditions",
+      "selectConditions": "Select search conditions",
+      "search": "Search",
+      "reset": "Reset",
+      "cancel": "Cancel",
+      "apply": "Apply",
+      "save": "Save",
+      "copy": "Copy",
+      "edit": "Edit",
+      "selectAll": "Select All",
+      "deselectAll": "Clear Selection",
+      "noSearchResults": "No search results",
+      "startDate": "Start Date",
+      "endDate": "End Date",
+      "selectStartDate": "Select start date",
+      "selectEndDate": "Select end date",
+      "selectPeriod": "Select Period",
+      "quickPeriod": "Quick Period",
+      "selectedCount": "{count} selected",
+      "selectedOfTotal": "{selected}/{total} selected",
+      "applyCount": "Apply ({count})",
+      "days": "{count} days",
+      "dateDay": "{day}",
+      "fullPeriod": "Full period: {startDate} ~ {endDate}",
+      "bulkEdit": "Bulk Edit",
+      "bulkRegister": "Bulk Register",
+      "usage": "Usage:",
+      "gridHelp": "Drag to select a range • Double-click to edit one cell • Use bulk register for fast input",
+      "view": {
+        "week": "Week",
+        "month": "Month",
+        "all": "All"
+      },
+      "weekdays": {
+        "sun": "Sun",
+        "mon": "Mon",
+        "tue": "Tue",
+        "wed": "Wed",
+        "thu": "Thu",
+        "fri": "Fri",
+        "sat": "Sat"
+      }
+    },
+    "rates": {
+      "title": "Rate Management",
+      "criteriaType": "Criteria",
+      "packageCriteria": "By Package",
+      "roomCriteria": "By Room",
+      "propertySelect": "Select Property",
+      "propertyPlaceholder": "Select a property",
+      "propertySearchPlaceholder": "Search by property ID, code, or name",
+      "packageSelect": "Select Package",
+      "packagePlaceholder": "Select a package",
+      "packageSearchPlaceholder": "Search by package ID, code, or name",
+      "roomSelect": "Select Room Type",
+      "roomPlaceholder": "Select a room type",
+      "roomSearchPlaceholder": "Search by room ID, code, or name",
+      "selectedRooms": "{count} rooms selected",
+      "selectedPackages": "{count} packages selected",
+      "noSelectedRooms": "No rooms selected",
+      "noSelectedPackages": "No packages selected",
+      "emptyDescription": "Select a property, package/room, and conditions, then press Search.",
+      "rowHeaderRoomType": "Room Type",
+      "rowHeaderPackage": "Package",
+      "bulkTargetRoom": "Room",
+      "bulkTargetPackage": "Package",
+      "table": {
+        "status": "Status",
+        "code": "Rate Code",
+        "name": "Rate Name",
+        "type": "Type",
+        "roomType": "Room Type",
+        "baseRate": "Base Rate",
+        "period": "Period",
+        "manage": "Manage"
+      },
+      "status": {
+        "active": "Active",
+        "scheduled": "Scheduled",
+        "inactive": "Inactive",
+        "expired": "Expired"
+      },
+      "types": {
+        "standard": "Standard Rate",
+        "corporate": "Corporate Rate",
+        "government": "Government Rate",
+        "promotional": "Promotional Rate",
+        "package": "Package Rate",
+        "group": "Group Rate"
+      },
+      "grid": {
+        "rateTypes": {
+          "net_rate": "Net Rate",
+          "sell_rate_no_commission": "Sell Rate",
+          "commission_included": "Commission Included",
+          "net_and_sell": "Net/Sell Rate"
+        },
+        "commissionPercent": "Commission {value}%",
+        "commissionFixed": "Commission {value} KRW",
+        "invalidDateRange": "Start date cannot be later than end date.",
+        "dateRangeExceeded": "The search date range is too long.",
+        "weekdayBulkEdit": "Edit by Weekday",
+        "bulkEditDescription": "Bulk change rates for {count} selected cells.",
+        "rateKrw": "Rate (KRW)",
+        "numberPlaceholder": "Enter a number",
+        "weekdayBulkTitle": "Bulk Edit Weekday Rates",
+        "occupancyRateSteps": "{count} occupancy rate tiers",
+        "breakfastIncluded": "Breakfast Included",
+        "taxIncluded": "Tax Included"
+      }
+    },
+    "inventories": {
+      "title": "Inventory Management",
+      "propertySearch": "Property Search",
+      "propertySearchPlaceholder": "Search by property ID, code, or name...",
+      "roomSelect": "Select Room Type",
+      "roomPlaceholder": "Select a room type",
+      "roomSearchPlaceholder": "Search by room ID, code, or name",
+      "noSelectedRooms": "No rooms selected",
+      "emptyDescription": "Select a property, room, and period, then press Search.",
+      "grid": {
+        "roomType": "Room Type",
+        "bulkEditDescription": "Bulk change available rooms for {count} selected cells.",
+        "availableRooms": "Available Rooms",
+        "inventoryBulkRegister": "Bulk Register Inventory",
+        "register": "Register",
+        "weekdaySelect": "Select Weekdays",
+        "weekdaysOnly": "Weekdays Only",
+        "weekendsOnly": "Weekends Only",
+        "appliedRooms": "Applied Rooms ({count})",
+        "preview": "Preview",
+        "room": "Room",
+        "weekday": "Weekday",
+        "inputInventory": "Input Inventory",
+        "totalInventory": "Total Inventory",
+        "booked": "Booked",
+        "emptyPreview": "Enter weekday inventory to preview the result."
+      },
+      "calendar": {
+        "total": "Total: {count} rooms",
+        "booked": "Booked: {count} rooms",
+        "available": "Available: {count} rooms",
+        "blocks": "{count} blocks",
+        "monthTitle": "{year}-{month}",
+        "legend": {
+          "low": "Low",
+          "normal": "Normal",
+          "warning": "Warning",
+          "busy": "Busy",
+          "full": "Full"
+        }
+      },
+      "table": {
+        "status": "Status",
+        "code": "Inventory Code",
+        "name": "Inventory Name",
+        "type": "Type",
+        "organization": "Group",
+        "roomStatus": "Room Status",
+        "utilization": "Utilization",
+        "period": "Period",
+        "manage": "Manage"
+      },
+      "block": {
+        "roomUsage": "Room Usage",
+        "booked": "Booked: {count} rooms",
+        "total": "Total: {count} rooms",
+        "releaseDate": "Release date: {date}",
+        "types": {
+          "allotment": "Allotment Block",
+          "group": "Group Block",
+          "event": "Event Block",
+          "maintenance": "Maintenance Block",
+          "owner": "Owner Block",
+          "corporate": "Corporate Block"
+        },
+        "status": {
+          "active": "Active",
+          "released": "Released",
+          "cancelled": "Cancelled",
+          "expired": "Expired"
+        }
+      }
+    }
+  }
+}

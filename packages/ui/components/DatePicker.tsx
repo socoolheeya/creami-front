@@ -1,6 +1,6 @@
 'use client'
 
-import { Calendar, ChevronLeft, ChevronRight } from 'lucide-react'
+import { Calendar, ChevronLeft, ChevronRight, X } from 'lucide-react'
 import { useEffect, useRef, useState } from 'react'
 import { Button } from './Button'
 
@@ -11,6 +11,7 @@ export interface DatePickerProps {
   placeholder?: string
   align?: 'left' | 'right'
   size?: 'large' | 'medium' | 'small' | 'mini'
+  clearable?: boolean
 }
 
 export function DatePicker({
@@ -19,7 +20,8 @@ export function DatePicker({
   label,
   placeholder = '날짜 선택',
   align = 'left',
-  size = 'medium'
+  size = 'medium',
+  clearable = false
 }: DatePickerProps) {
   const [isOpen, setIsOpen] = useState(false)
   const [currentMonth, setCurrentMonth] = useState(new Date())
@@ -119,16 +121,33 @@ export function DatePicker({
         </label>
       )}
 
-      <button
-        type="button"
-        onClick={() => setIsOpen((prev) => !prev)}
-        className={`flex w-full items-center justify-between rounded border border-border bg-bg-secondary text-base font-medium leading-none text-text-primary ${sizeStyles[size]}`}
-      >
-        <span className={value ? 'text-text-primary' : 'text-text-tertiary'}>
-          {value ? formatDisplayDate(value) : placeholder}
-        </span>
-        <Calendar className="h-md w-md text-text-tertiary" />
-      </button>
+      <div className="relative">
+        <button
+          type="button"
+          onClick={() => setIsOpen((prev) => !prev)}
+          className={`flex w-full items-center justify-between rounded border border-border bg-bg-secondary text-base font-medium leading-none text-text-primary ${sizeStyles[size]} ${clearable && value ? 'pr-control-search' : ''}`}
+        >
+          <span className={value ? 'text-text-primary' : 'text-text-tertiary'}>
+            {value ? formatDisplayDate(value) : placeholder}
+          </span>
+          <Calendar className="h-md w-md text-text-tertiary" />
+        </button>
+
+        {clearable && value && (
+          <button
+            type="button"
+            aria-label="날짜 초기화"
+            className="absolute right-md top-1/2 flex h-md w-md -translate-y-1/2 items-center justify-center rounded text-text-tertiary transition-colors hover:bg-bg-tertiary hover:text-text-primary"
+            onClick={(event) => {
+              event.stopPropagation()
+              onChange('')
+              setIsOpen(false)
+            }}
+          >
+            <X className="h-md w-md" />
+          </button>
+        )}
+      </div>
 
       {isOpen && (
         <div className={`absolute z-50 mt-sm w-datepicker overflow-hidden rounded border border-border bg-bg-primary shadow-md ${align === 'right' ? 'right-none' : 'left-none'}`}>

@@ -2,6 +2,7 @@
 
 import { ChevronLeft, ChevronRight } from 'lucide-react'
 import { useState } from 'react'
+import { useTranslations } from 'next-intl'
 import { Block } from '@/lib/types/block'
 
 interface InventoryCalendarProps {
@@ -20,6 +21,7 @@ interface DayInventory {
 }
 
 export function InventoryCalendar({ blocks, startDate, endDate, propertyName }: InventoryCalendarProps) {
+  const t = useTranslations()
   const [currentMonth, setCurrentMonth] = useState(new Date(startDate))
 
   const getDaysInMonth = (date: Date) => {
@@ -152,15 +154,15 @@ export function InventoryCalendar({ blocks, startDate, endDate, propertyName }: 
                   fontWeight: 'var(--font-light)'
                 }}
               >
-                <div>전체: {inventory.totalRooms}실</div>
-                <div>예약: {inventory.bookedRooms}실</div>
+                <div>{t('ari.inventories.calendar.total', { count: inventory.totalRooms })}</div>
+                <div>{t('ari.inventories.calendar.booked', { count: inventory.bookedRooms })}</div>
                 <div
                   style={{
                     color: getUtilizationColor(utilizationPercentage),
                     fontWeight: 'var(--font-bold)'
                   }}
                 >
-                  가용: {inventory.availableRooms}실
+                  {t('ari.inventories.calendar.available', { count: inventory.availableRooms })}
                 </div>
               </div>
 
@@ -174,7 +176,7 @@ export function InventoryCalendar({ blocks, startDate, endDate, propertyName }: 
                     fontWeight: 'var(--font-medium)'
                   }}
                 >
-                  {inventory.blocks.length}개 블럭
+                  {t('ari.inventories.calendar.blocks', { count: inventory.blocks.length })}
                 </div>
               )}
             </div>
@@ -217,7 +219,10 @@ export function InventoryCalendar({ blocks, startDate, endDate, propertyName }: 
             color: 'var(--text-primary)'
           }}
         >
-          {currentMonth.getFullYear()}년 {currentMonth.getMonth() + 1}월
+          {t('ari.inventories.calendar.monthTitle', {
+            year: currentMonth.getFullYear(),
+            month: currentMonth.getMonth() + 1
+          })}
         </div>
 
         <button
@@ -247,11 +252,11 @@ export function InventoryCalendar({ blocks, startDate, endDate, propertyName }: 
       {/* Legend */}
       <div className="mb-4 flex flex-wrap gap-3">
         {[
-          { label: '여유', color: '#10b981' },
-          { label: '보통', color: '#22c55e' },
-          { label: '주의', color: '#eab308' },
-          { label: '혼잡', color: '#f59e0b' },
-          { label: '만실', color: '#ef4444' }
+          { label: t('ari.inventories.calendar.legend.low'), color: '#10b981' },
+          { label: t('ari.inventories.calendar.legend.normal'), color: '#22c55e' },
+          { label: t('ari.inventories.calendar.legend.warning'), color: '#eab308' },
+          { label: t('ari.inventories.calendar.legend.busy'), color: '#f59e0b' },
+          { label: t('ari.inventories.calendar.legend.full'), color: '#ef4444' }
         ].map(({ label, color }) => (
           <div key={label} className="flex items-center gap-2">
             <div
@@ -273,7 +278,15 @@ export function InventoryCalendar({ blocks, startDate, endDate, propertyName }: 
 
       {/* Day Headers */}
       <div className="grid grid-cols-7 gap-2 mb-2">
-        {['일', '월', '화', '수', '목', '금', '토'].map((day, index) => (
+        {[
+          t('ari.common.weekdays.sun'),
+          t('ari.common.weekdays.mon'),
+          t('ari.common.weekdays.tue'),
+          t('ari.common.weekdays.wed'),
+          t('ari.common.weekdays.thu'),
+          t('ari.common.weekdays.fri'),
+          t('ari.common.weekdays.sat')
+        ].map((day, index) => (
           <div
             key={day}
             className="text-center text-sm p-2"

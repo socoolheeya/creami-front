@@ -2,6 +2,7 @@
 
 import { Package, Search, ChevronDown, ChevronUp, X, Calendar, Building2, DoorOpen } from 'lucide-react'
 import { useState } from 'react'
+import { useTranslations } from 'next-intl'
 import { mockProperties } from '@/lib/data/mock-properties'
 import { mockRoomTypes } from '@/lib/data/mock-rooms'
 import { mockBlocks } from '@/lib/data/mock-blocks'
@@ -12,6 +13,7 @@ import { Button, DatePicker, Input, SearchableSelect, ViewToggle } from '@creami
 type ViewType = 'calendar' | 'grid'
 
 export default function InventoriesPage() {
+  const t = useTranslations()
   const [selectedPropertyId, setSelectedPropertyId] = useState<string>('')
   const [searchQuery, setSearchQuery] = useState<string>('')
   const [selectedRoomIds, setSelectedRoomIds] = useState<string[]>([])
@@ -117,7 +119,7 @@ export default function InventoriesPage() {
         <div className="flex items-center gap-md">
           <Package className="h-lg w-lg" style={{ color: 'var(--primary)' }} />
           <h1 className="text-2xl" style={{ fontWeight: 'var(--font-bold)', color: 'var(--text-primary)' }}>
-            재고 관리
+            {t('ari.inventories.title')}
           </h1>
         </div>
       </div>
@@ -142,7 +144,7 @@ export default function InventoriesPage() {
         >
           <div className="flex-1">
             <h2 className="mb-xs text-xl" style={{ fontWeight: 'var(--font-bold)', color: 'var(--text-primary)' }}>
-              조회 조건
+              {t('ari.common.searchConditions')}
             </h2>
             {showResults && selectedProperty && isCollapsed && (
               <div className="flex flex-wrap items-center gap-md text-base">
@@ -183,7 +185,7 @@ export default function InventoriesPage() {
                 className="mb-sm block text-base"
                 style={{ color: 'var(--text-secondary)', fontWeight: 'var(--font-medium)' }}
               >
-                숙소 검색
+                {t('ari.inventories.propertySearch')}
               </label>
 
               {/* Search Input */}
@@ -192,14 +194,14 @@ export default function InventoriesPage() {
                   type="text"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  placeholder="숙소 ID, 코드 또는 이름으로 검색..."
+                  placeholder={t('ari.inventories.propertySearchPlaceholder')}
                   showSearchIcon
                 />
               </div>
 
               {searchQuery && filteredProperties.length === 0 && (
                 <div className="mt-sm text-base" style={{ color: 'var(--text-tertiary)' }}>
-                  검색 결과가 없습니다
+                  {t('ari.common.noSearchResults')}
                 </div>
               )}
 
@@ -250,7 +252,7 @@ export default function InventoriesPage() {
                   className="block text-base"
                   style={{ color: 'var(--text-secondary)', fontWeight: 'var(--font-medium)' }}
                 >
-                  객실 타입 선택
+                  {t('ari.inventories.roomSelect')}
                 </label>
 
                 {/* Room Selector */}
@@ -258,8 +260,8 @@ export default function InventoriesPage() {
                   value=""
                   onChange={handleRoomSelect}
                   options={roomOptions}
-                  placeholder="객실 타입을 선택하세요"
-                  searchPlaceholder="객실 ID, 코드 또는 이름으로 검색"
+                  placeholder={t('ari.inventories.roomPlaceholder')}
+                  searchPlaceholder={t('ari.inventories.roomSearchPlaceholder')}
                 />
 
                 {/* Selected Room Tags */}
@@ -299,7 +301,7 @@ export default function InventoriesPage() {
                       borderRadius: 'var(--radius)'
                     }}
                   >
-                    선택된 객실이 없습니다
+                    {t('ari.inventories.noSelectedRooms')}
                   </div>
                 )}
               </div>
@@ -311,20 +313,20 @@ export default function InventoriesPage() {
                 className="mb-sm block text-base"
                 style={{ color: 'var(--text-secondary)', fontWeight: 'var(--font-medium)' }}
               >
-                기간 선택
+                {t('ari.common.selectPeriod')}
               </label>
               <div className="grid grid-cols-1 gap-md md:grid-cols-2">
                 <DatePicker
-                  label="시작일"
+                  label={t('ari.common.startDate')}
                   value={startDate}
                   onChange={setStartDate}
-                  placeholder="시작일 선택"
+                  placeholder={t('ari.common.selectStartDate')}
                 />
                 <DatePicker
-                  label="종료일"
+                  label={t('ari.common.endDate')}
                   value={endDate}
                   onChange={setEndDate}
-                  placeholder="종료일 선택"
+                  placeholder={t('ari.common.selectEndDate')}
                   align="right"
                 />
               </div>
@@ -336,14 +338,14 @@ export default function InventoriesPage() {
                 className="mb-sm block text-base"
                 style={{ color: 'var(--text-secondary)', fontWeight: 'var(--font-medium)' }}
               >
-                빠른 기간 선택
+                {t('ari.common.quickPeriod')}
               </label>
               <div className="flex flex-wrap gap-sm">
                 {[
-                  { label: '30일', days: 30 },
-                  { label: '90일', days: 90 },
-                  { label: '180일', days: 180 },
-                  { label: '365일', days: 365 }
+                  { label: t('ari.common.days', { count: 30 }), days: 30 },
+                  { label: t('ari.common.days', { count: 90 }), days: 90 },
+                  { label: t('ari.common.days', { count: 180 }), days: 180 },
+                  { label: t('ari.common.days', { count: 365 }), days: 365 }
                 ].map(({ label, days }) => (
                   <Button
                     key={days}
@@ -364,7 +366,7 @@ export default function InventoriesPage() {
                 variant="primary"
               >
                 <Search className="w-lg h-lg" />
-                조회
+                {t('ari.common.search')}
               </Button>
 
               {showResults && (
@@ -372,7 +374,7 @@ export default function InventoriesPage() {
                   onClick={handleReset}
                   variant="secondary"
                 >
-                  초기화
+                  {t('ari.common.reset')}
                 </Button>
               )}
             </div>
@@ -422,10 +424,10 @@ export default function InventoriesPage() {
         >
           <Package className="h-3xl w-3xl" style={{ color: 'var(--text-tertiary)' }} />
           <h3 className="text-xl" style={{ fontWeight: 'var(--font-bold)', color: 'var(--text-primary)' }}>
-            조회 조건을 선택하세요
+            {t('ari.common.selectConditions')}
           </h3>
           <p style={{ color: 'var(--text-secondary)', fontWeight: 'var(--font-light)' }}>
-            숙소, 객실, 기간을 선택한 후 조회 버튼을 눌러주세요
+            {t('ari.inventories.emptyDescription')}
           </p>
         </div>
       )}

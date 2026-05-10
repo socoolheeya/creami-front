@@ -91,6 +91,8 @@ export interface Property {
   // Property Info
   roomCount?: number
   floorCount?: number
+  parentPropertyId?: string
+  parentPropertyName?: string
 
   // Step 2: Description
   description: string

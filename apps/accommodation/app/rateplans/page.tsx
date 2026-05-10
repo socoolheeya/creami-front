@@ -1,7 +1,7 @@
 'use client'
 
 import Link from 'next/link'
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 import { useRatePlans } from '@/hooks/useRatePlans'
 import { Receipt, Plus, Search } from 'lucide-react'
 import { RatePlanTableView } from './components/RatePlanTableView'
@@ -16,9 +16,23 @@ export default function RatePlansPage() {
   const [searchParams, setSearchParams] = useState<Record<string, unknown> | undefined>(undefined)
 
   const { data: ratePlans = [], isLoading, error } = useRatePlans(searchParams)
+  const searchedRatePlans = useMemo(() => {
+    const query = searchParams?.search
+
+    if (typeof query !== 'string' || query.trim().length === 0) {
+      return ratePlans
+    }
+
+    const normalizedQuery = query.trim().toLowerCase()
+
+    return ratePlans.filter((ratePlan) =>
+      ratePlan.id.toLowerCase() === normalizedQuery ||
+      ratePlan.name.toLowerCase().includes(normalizedQuery)
+    )
+  }, [ratePlans, searchParams])
 
   const handleSearch = () => {
-    setSearchParams(searchQuery ? { search: searchQuery } : {})
+    setSearchParams(searchQuery.trim() ? { search: searchQuery.trim() } : {})
   }
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
@@ -51,7 +65,7 @@ export default function RatePlansPage() {
         <div className="flex-1 relative flex items-center gap-sm">
           <Input
             type="text"
-            placeholder="요금제명 또는 혜택명으로 검색..."
+            placeholder="요금제 ID 또는 요금제명으로 검색..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             onKeyDown={handleKeyDown}
@@ -74,7 +88,7 @@ export default function RatePlansPage() {
             검색어를 입력하세요
           </h3>
           <p className="text-base font-light text-text-secondary">
-            요금제명 또는 혜택명으로 검색할 수 있습니다
+            요금제 ID 또는 요금제명으로 검색할 수 있습니다
           </p>
         </Card>
       ) : isLoading ? (
@@ -86,7 +100,7 @@ export default function RatePlansPage() {
           <p className="text-error">데이터를 불러오는데 실패했습니다.</p>
           <p className="text-base text-text-secondary">{error.message}</p>
         </Card>
-      ) : ratePlans.length === 0 ? (
+      ) : searchedRatePlans.length === 0 ? (
         <Card className="flex flex-col items-center justify-center border-dashed py-2xl text-center" hover={false}>
           <Receipt className="h-2xl w-2xl mb-md text-text-tertiary" />
           <h3 className="text-lg mb-xs font-bold text-text-primary">
@@ -98,12 +112,12 @@ export default function RatePlansPage() {
         </Card>
       ) : viewMode === 'grid' ? (
         <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
-          {ratePlans.map((ratePlan) => (
+          {searchedRatePlans.map((ratePlan) => (
             <RatePlanCardView key={ratePlan.id} ratePlan={ratePlan} />
           ))}
         </div>
       ) : (
-        <RatePlanTableView ratePlans={ratePlans} />
+        <RatePlanTableView ratePlans={searchedRatePlans} />
       )}
     </div>
   )

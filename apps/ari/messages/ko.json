@@ -1,0 +1,205 @@
+{
+  "nav": {
+    "dashboard": "대시보드",
+    "rates": "요금 관리",
+    "inventories": "재고 관리"
+  },
+  "ari": {
+    "dashboard": {
+      "title": "ARI 대시보드",
+      "notice": "공지사항",
+      "welcome": "Creami ARI에 오신 것을 환영합니다.",
+      "stats": {
+        "inventory": "재고 현황",
+        "averagePrice": "평균 가격",
+        "availableDays": "예약 가능일",
+        "occupancy": "점유율"
+      }
+    },
+    "common": {
+      "searchConditions": "조회 조건",
+      "selectConditions": "조회 조건을 선택하세요",
+      "search": "조회",
+      "reset": "초기화",
+      "cancel": "취소",
+      "apply": "적용",
+      "save": "저장",
+      "copy": "복사",
+      "edit": "편집",
+      "selectAll": "전체선택",
+      "deselectAll": "선택해제",
+      "noSearchResults": "검색 결과가 없습니다",
+      "startDate": "시작일",
+      "endDate": "종료일",
+      "selectStartDate": "시작일 선택",
+      "selectEndDate": "종료일 선택",
+      "selectPeriod": "기간 선택",
+      "quickPeriod": "빠른 기간 선택",
+      "selectedCount": "{count}개 선택됨",
+      "selectedOfTotal": "{selected}/{total} 선택됨",
+      "applyCount": "적용 ({count}개)",
+      "days": "{count}일",
+      "dateDay": "{day}일",
+      "fullPeriod": "전체 기간: {startDate} ~ {endDate}",
+      "bulkEdit": "일괄 수정",
+      "bulkRegister": "대량 등록",
+      "usage": "사용법:",
+      "gridHelp": "드래그로 범위 선택 • 더블클릭으로 개별 수정 • 대량 등록으로 빠른 입력",
+      "view": {
+        "week": "주간",
+        "month": "월간",
+        "all": "전체"
+      },
+      "weekdays": {
+        "sun": "일",
+        "mon": "월",
+        "tue": "화",
+        "wed": "수",
+        "thu": "목",
+        "fri": "금",
+        "sat": "토"
+      }
+    },
+    "rates": {
+      "title": "요금 관리",
+      "criteriaType": "조회 기준",
+      "packageCriteria": "패키지 기준",
+      "roomCriteria": "객실 기준",
+      "propertySelect": "숙소 선택",
+      "propertyPlaceholder": "숙소를 선택하세요",
+      "propertySearchPlaceholder": "숙소 ID, 코드 또는 이름으로 검색",
+      "packageSelect": "패키지 선택",
+      "packagePlaceholder": "패키지를 선택하세요",
+      "packageSearchPlaceholder": "패키지 ID, 코드 또는 이름으로 검색",
+      "roomSelect": "객실 타입 선택",
+      "roomPlaceholder": "객실 타입을 선택하세요",
+      "roomSearchPlaceholder": "객실 ID, 코드 또는 이름으로 검색",
+      "selectedRooms": "{count}개 객실 선택됨",
+      "selectedPackages": "{count}개 패키지 선택됨",
+      "noSelectedRooms": "선택된 객실이 없습니다",
+      "noSelectedPackages": "선택된 패키지가 없습니다",
+      "emptyDescription": "숙소, 패키지/객실, 조건을 선택한 후 조회 버튼을 눌러주세요",
+      "rowHeaderRoomType": "객실 타입",
+      "rowHeaderPackage": "패키지",
+      "bulkTargetRoom": "객실",
+      "bulkTargetPackage": "패키지",
+      "table": {
+        "status": "상태",
+        "code": "요금 코드",
+        "name": "요금명",
+        "type": "타입",
+        "roomType": "객실 타입",
+        "baseRate": "기본 요금",
+        "period": "기간",
+        "manage": "관리"
+      },
+      "status": {
+        "active": "활성",
+        "scheduled": "예정",
+        "inactive": "비활성",
+        "expired": "만료"
+      },
+      "types": {
+        "standard": "기본 요금",
+        "corporate": "기업 요금",
+        "government": "관공서 요금",
+        "promotional": "프로모션 요금",
+        "package": "패키지 요금",
+        "group": "단체 요금"
+      },
+      "grid": {
+        "rateTypes": {
+          "net_rate": "입금가",
+          "sell_rate_no_commission": "판매가",
+          "commission_included": "커미션 포함가",
+          "net_and_sell": "입금가/판매가"
+        },
+        "commissionPercent": "커미션 {value}%",
+        "commissionFixed": "커미션 {value}원",
+        "invalidDateRange": "시작일은 종료일보다 늦을 수 없습니다.",
+        "dateRangeExceeded": "조회날짜 범위 초과하였습니다.",
+        "weekdayBulkEdit": "요일별 수정",
+        "bulkEditDescription": "선택된 {count}개 셀의 요금을 일괄 변경합니다.",
+        "rateKrw": "요금 (KRW)",
+        "numberPlaceholder": "숫자 입력",
+        "weekdayBulkTitle": "요일별 요금 일괄 수정",
+        "occupancyRateSteps": "{count}단계 인원별 요금",
+        "breakfastIncluded": "조식 포함",
+        "taxIncluded": "세금 포함"
+      }
+    },
+    "inventories": {
+      "title": "재고 관리",
+      "propertySearch": "숙소 검색",
+      "propertySearchPlaceholder": "숙소 ID, 코드 또는 이름으로 검색...",
+      "roomSelect": "객실 타입 선택",
+      "roomPlaceholder": "객실 타입을 선택하세요",
+      "roomSearchPlaceholder": "객실 ID, 코드 또는 이름으로 검색",
+      "noSelectedRooms": "선택된 객실이 없습니다",
+      "emptyDescription": "숙소, 객실, 기간을 선택한 후 조회 버튼을 눌러주세요",
+      "grid": {
+        "roomType": "객실 타입",
+        "bulkEditDescription": "선택된 {count}개 셀의 가용 객실 수를 일괄 변경합니다.",
+        "availableRooms": "가용 객실 수",
+        "inventoryBulkRegister": "재고 대량 등록",
+        "register": "등록",
+        "weekdaySelect": "요일 선택",
+        "weekdaysOnly": "평일만",
+        "weekendsOnly": "주말만",
+        "appliedRooms": "적용 객실 ({count}개)",
+        "preview": "적용 미리보기",
+        "room": "객실",
+        "weekday": "요일",
+        "inputInventory": "입력재고",
+        "totalInventory": "총재고",
+        "booked": "예약",
+        "emptyPreview": "요일별 재고를 입력하면 적용 결과가 표시됩니다."
+      },
+      "calendar": {
+        "total": "전체: {count}실",
+        "booked": "예약: {count}실",
+        "available": "가용: {count}실",
+        "blocks": "{count}개 블럭",
+        "monthTitle": "{year}년 {month}월",
+        "legend": {
+          "low": "여유",
+          "normal": "보통",
+          "warning": "주의",
+          "busy": "혼잡",
+          "full": "만실"
+        }
+      },
+      "table": {
+        "status": "상태",
+        "code": "재고 코드",
+        "name": "재고명",
+        "type": "타입",
+        "organization": "단체명",
+        "roomStatus": "객실 현황",
+        "utilization": "사용률",
+        "period": "기간",
+        "manage": "관리"
+      },
+      "block": {
+        "roomUsage": "객실 사용률",
+        "booked": "예약: {count}실",
+        "total": "전체: {count}실",
+        "releaseDate": "릴리즈일: {date}",
+        "types": {
+          "allotment": "할당 블록",
+          "group": "단체 블록",
+          "event": "이벤트 블록",
+          "maintenance": "정비 블록",
+          "owner": "오너 블록",
+          "corporate": "기업 블록"
+        },
+        "status": {
+          "active": "활성",
+          "released": "릴리즈됨",
+          "cancelled": "취소됨",
+          "expired": "만료됨"
+        }
+      }
+    }
+  }
+}

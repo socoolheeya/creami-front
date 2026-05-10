@@ -40,6 +40,17 @@
   --modal-width-lg: 48rem;
   --modal-max-height: 90vh;
   --modal-action-width: 8rem;
+  --profile-avatar-size: 7rem;
+  --profile-info-label-width: 8rem;
+  --social-naver-bg: #03c75a;
+  --social-naver-text: #ffffff;
+  --social-naver-border: #03c75a;
+  --social-kakao-bg: #fee500;
+  --social-kakao-text: #191919;
+  --social-kakao-border: #fee500;
+  --social-google-bg: #ffffff;
+  --social-google-text: #212529;
+  --social-google-border: #dee2e6;
 
   --font-size-xs: 0.75rem;
   --font-size-sm: 0.875rem;

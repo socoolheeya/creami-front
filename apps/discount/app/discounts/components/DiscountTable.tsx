@@ -4,7 +4,8 @@ import { ArrowUpDown } from 'lucide-react'
 import Link from 'next/link'
 import type { ReactNode } from 'react'
 import { useState, useMemo } from 'react'
-import { Discount, DISCOUNT_TYPE_LABELS, DISCOUNT_STATUS_LABELS, DiscountStatus } from '@/lib/types/discount'
+import { useLocale, useTranslations } from 'next-intl'
+import { Discount, DiscountStatus } from '@/lib/types/discount'
 
 interface DiscountTableProps {
   discounts: Discount[]
@@ -42,6 +43,8 @@ function SortableHeader({ field, activeField, children, onSort }: SortableHeader
 }
 
 export function DiscountTable({ discounts }: DiscountTableProps) {
+  const t = useTranslations()
+  const locale = useLocale()
   const [sortField, setSortField] = useState<SortField>(null)
   const [sortOrder, setSortOrder] = useState<SortOrder>('asc')
   const [statusFilter, setStatusFilter] = useState<DiscountStatus | 'all'>('all')
@@ -111,17 +114,17 @@ export function DiscountTable({ discounts }: DiscountTableProps) {
       <table className="w-full">
         <thead>
           <tr style={{ backgroundColor: 'var(--bg-tertiary)', borderBottom: '1px solid var(--border-color)' }}>
-            <SortableHeader field="name" activeField={sortField} onSort={handleSort}>할인명</SortableHeader>
-            <SortableHeader field="code" activeField={sortField} onSort={handleSort}>코드</SortableHeader>
+            <SortableHeader field="name" activeField={sortField} onSort={handleSort}>{t('discount.discounts.table.name')}</SortableHeader>
+            <SortableHeader field="code" activeField={sortField} onSort={handleSort}>{t('discount.discounts.table.code')}</SortableHeader>
             <th className="px-lg py-md text-left" style={{ color: 'var(--text-primary)', fontWeight: 'var(--font-bold)' }}>
-              타입
+              {t('discount.discounts.table.type')}
             </th>
-            <SortableHeader field="value" activeField={sortField} onSort={handleSort}>할인 금액/율</SortableHeader>
+            <SortableHeader field="value" activeField={sortField} onSort={handleSort}>{t('discount.discounts.table.value')}</SortableHeader>
             <th className="px-lg py-md text-left" style={{ color: 'var(--text-primary)', fontWeight: 'var(--font-bold)' }}>
-              기간
+              {t('discount.discounts.table.period')}
             </th>
-            <SortableHeader field="usedCount" activeField={sortField} onSort={handleSort}>사용 현황</SortableHeader>
-            <SortableHeader field="status" activeField={sortField} onSort={handleSort}>상태</SortableHeader>
+            <SortableHeader field="usedCount" activeField={sortField} onSort={handleSort}>{t('discount.discounts.table.usage')}</SortableHeader>
+            <SortableHeader field="status" activeField={sortField} onSort={handleSort}>{t('discount.discounts.table.status')}</SortableHeader>
           </tr>
           {/* Filter Row */}
           <tr style={{ backgroundColor: 'var(--bg-primary)', borderBottom: '1px solid var(--border-color)' }}>
@@ -129,7 +132,7 @@ export function DiscountTable({ discounts }: DiscountTableProps) {
             <th className="px-lg py-sm">
               <input
                 type="text"
-                placeholder="검색..."
+                placeholder={t('discount.common.search')}
                 value={nameSearch}
                 onChange={(e) => setNameSearch(e.target.value)}
                 className="h-control-sm w-full rounded px-control-px-sm text-base"
@@ -144,7 +147,7 @@ export function DiscountTable({ discounts }: DiscountTableProps) {
             <th className="px-lg py-sm">
               <input
                 type="text"
-                placeholder="검색..."
+                placeholder={t('discount.common.search')}
                 value={codeSearch}
                 onChange={(e) => setCodeSearch(e.target.value)}
                 className="h-control-sm w-full rounded px-control-px-sm text-base"
@@ -175,9 +178,9 @@ export function DiscountTable({ discounts }: DiscountTableProps) {
                   color: 'var(--text-primary)'
                 }}
               >
-                <option value="all">전체</option>
-                {Object.entries(DISCOUNT_STATUS_LABELS).map(([key, label]) => (
-                  <option key={key} value={key}>{label}</option>
+                <option value="all">{t('discount.discounts.table.all')}</option>
+                {(['active', 'scheduled', 'expired', 'disabled'] as DiscountStatus[]).map((key) => (
+                  <option key={key} value={key}>{t(`discount.labels.status.${key}`)}</option>
                 ))}
               </select>
             </th>
@@ -239,31 +242,33 @@ export function DiscountTable({ discounts }: DiscountTableProps) {
                 {/* 타입 */}
                 <td className="px-lg py-md">
                   <span className="text-base" style={{ color: 'var(--text-secondary)' }}>
-                    {DISCOUNT_TYPE_LABELS[discount.type]}
+                    {t(`discount.labels.types.${discount.type}`)}
                   </span>
                 </td>
 
                 {/* 할인 금액/율 */}
                 <td className="px-lg py-md">
                   <span className="text-base" style={{ color: 'var(--text-primary)', fontWeight: 'var(--font-medium)' }}>
-                    {discount.type === 'percentage' ? `${discount.value}%` : `${discount.value.toLocaleString()}원`}
+                    {discount.type === 'percentage'
+                      ? `${discount.value}%`
+                      : t('discount.labels.amountWon', { value: discount.value.toLocaleString(locale) })}
                   </span>
                 </td>
 
                 {/* 기간 */}
                 <td className="px-lg py-md">
                   <div className="flex flex-col text-xs" style={{ color: 'var(--text-secondary)' }}>
-                    <span>{discount.startDate.toLocaleDateString('ko-KR')}</span>
-                    <span>~ {discount.endDate.toLocaleDateString('ko-KR')}</span>
+                    <span>{discount.startDate.toLocaleDateString(locale)}</span>
+                    <span>~ {discount.endDate.toLocaleDateString(locale)}</span>
                   </div>
                 </td>
 
                 {/* 사용 현황 */}
                 <td className="px-lg py-md">
                   <div className="flex flex-col text-base" style={{ color: 'var(--text-secondary)' }}>
-                    <span>{discount.usedCount}회 사용</span>
+                    <span>{t('discount.labels.used', { count: discount.usedCount })}</span>
                     {discount.usageLimit && (
-                      <span className="text-xs">/ {discount.usageLimit}회 한도</span>
+                      <span className="text-xs">{t('discount.labels.usageLimit', { count: discount.usageLimit })}</span>
                     )}
                   </div>
                 </td>
@@ -277,7 +282,7 @@ export function DiscountTable({ discounts }: DiscountTableProps) {
                       fontWeight: 'var(--font-medium)'
                     }}
                   >
-                    {DISCOUNT_STATUS_LABELS[discount.status]}
+                    {t(`discount.labels.status.${discount.status}`)}
                   </span>
                 </td>
               </tr>

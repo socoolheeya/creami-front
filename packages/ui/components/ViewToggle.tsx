@@ -20,18 +20,9 @@ export function ViewToggle({ view, onViewChange }: ViewToggleProps) {
       {/* Sliding Background */}
       <div
         className={`absolute top-0 h-full w-1/2 transition-all duration-200 pointer-events-none bg-primary z-0 ${
-          view === 'grid' ? 'left-0' : 'left-1/2'
+          view === 'table' ? 'left-0' : 'left-1/2'
         }`}
       />
-
-      {/* Grid Icon */}
-      <div
-        className={`relative flex-1 flex items-center justify-center transition-colors pointer-events-none z-10 ${
-          view === 'grid' ? 'text-white' : 'text-text-secondary'
-        }`}
-      >
-        <LayoutGrid className="w-md h-md" />
-      </div>
 
       {/* Table Icon */}
       <div
@@ -40,6 +31,15 @@ export function ViewToggle({ view, onViewChange }: ViewToggleProps) {
         }`}
       >
         <List className="w-md h-md" />
+      </div>
+
+      {/* Grid Icon */}
+      <div
+        className={`relative flex-1 flex items-center justify-center transition-colors pointer-events-none z-10 ${
+          view === 'grid' ? 'text-white' : 'text-text-secondary'
+        }`}
+      >
+        <LayoutGrid className="w-md h-md" />
       </div>
     </button>
   )

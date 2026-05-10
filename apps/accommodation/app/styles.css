@@ -46,6 +46,9 @@
   --icon-size-md: 1.25rem;
   --icon-size-lg: 1.5rem;
   --datepicker-width: 20rem;
+  --timepicker-width: 18rem;
+  --timepicker-options-max-height: 12rem;
+  --layer-popover: 1000;
   --view-toggle-width: 4rem;
   --app-switcher-width: 24rem;
   --app-switcher-dropdown-height: calc(100vh - var(--header-height) - var(--spacing-lg));

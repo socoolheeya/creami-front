@@ -18,6 +18,7 @@ export interface SidebarMenuItemProps {
   onClick?: () => void
   isActive?: boolean
   isCollapsed?: boolean
+  depth?: 0 | 1
 }
 
 export function Sidebar({
@@ -52,7 +53,8 @@ export function SidebarMenuItem({
   href,
   onClick,
   isActive = false,
-  isCollapsed = false
+  isCollapsed = false,
+  depth = 0
 }: SidebarMenuItemProps) {
   const handleClick = (e: React.MouseEvent) => {
     if (onClick) {
@@ -72,12 +74,18 @@ export function SidebarMenuItem({
         }`}
       />
       <div
-        className="absolute left-md top-1/2 z-10 -translate-y-1/2 w-lg h-lg flex items-center justify-center"
+        className={`absolute top-1/2 z-10 flex h-lg w-lg -translate-y-1/2 items-center justify-center ${
+          depth === 1 && !isCollapsed ? 'left-lg' : 'left-md'
+        }`}
       >
         <Icon className="w-lg h-lg shrink-0" />
       </div>
       <span
-        className="pointer-events-none absolute left-[calc(var(--sidebar-collapsed)-var(--spacing-md))] top-1/2 z-10 -translate-y-1/2 whitespace-nowrap"
+        className={`pointer-events-none absolute right-md top-1/2 z-10 min-w-0 -translate-y-1/2 truncate whitespace-nowrap ${
+          depth === 1 && !isCollapsed
+            ? 'left-[calc(var(--sidebar-collapsed)+var(--spacing-sm))]'
+            : 'left-[calc(var(--sidebar-collapsed)-var(--spacing-md))]'
+        }`}
       >
         {label}
       </span>
@@ -98,7 +106,7 @@ export function SidebarMenuItem({
         <a
           href={href}
           className={itemClasses}
-          title={isCollapsed ? label : undefined}
+          title={label}
           aria-current={isActive ? 'page' : undefined}
           onClick={handleClick}
         >
@@ -108,7 +116,7 @@ export function SidebarMenuItem({
         <button
           type="button"
           className={`${itemClasses} border-0 text-left cursor-pointer w-full`}
-          title={isCollapsed ? label : undefined}
+          title={label}
           aria-pressed={isActive}
           onClick={onClick}
         >

@@ -3,6 +3,7 @@
 import { Tag, Plus } from 'lucide-react'
 import Link from 'next/link'
 import { useState } from 'react'
+import { useTranslations } from 'next-intl'
 import { Button, Input } from '@creami/ui'
 import { mockDiscounts } from '@/lib/data/mock-discounts'
 import { DiscountCard } from './components/DiscountCard'
@@ -12,6 +13,7 @@ import { ViewToggle } from './components/ViewToggle'
 type ViewMode = 'grid' | 'table'
 
 export default function DiscountsPage() {
+  const t = useTranslations()
   const discounts = mockDiscounts
   const [viewMode, setViewMode] = useState<ViewMode>('grid')
   const [searchQuery, setSearchQuery] = useState('')
@@ -31,14 +33,14 @@ export default function DiscountsPage() {
         <div className="flex items-center gap-md">
           <Tag className="h-icon-lg w-icon-lg text-primary" />
           <h1 className="text-2xl font-bold text-text-primary">
-            할인 관리
+            {t('discount.discounts.title')}
           </h1>
         </div>
 
         <Link href="/discounts/new">
           <Button type="button" variant="primary" size="medium">
             <Plus className="h-icon-md w-icon-md" />
-            신규 등록
+            {t('discount.common.new')}
           </Button>
         </Link>
       </div>
@@ -47,7 +49,7 @@ export default function DiscountsPage() {
       <div className="mb-lg flex gap-md">
         <Input
           type="text"
-          placeholder="할인명 또는 코드로 검색..."
+          placeholder={t('discount.discounts.searchPlaceholder')}
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
           className="flex-1"
@@ -68,17 +70,17 @@ export default function DiscountsPage() {
         >
           <Tag className="h-3xl w-3xl mb-md text-text-tertiary" />
           <h3 className="text-xl mb-sm font-bold text-text-primary">
-            {searchQuery ? '검색 결과가 없습니다' : '등록된 할인이 없습니다'}
+            {searchQuery ? t('discount.discounts.emptySearch') : t('discount.discounts.empty')}
           </h3>
           {!searchQuery && (
             <>
               <p className="mb-lg font-light text-text-secondary">
-                첫 번째 할인을 등록해보세요
+                {t('discount.discounts.emptyHelp')}
               </p>
               <Link href="/discounts/new">
                 <Button type="button" variant="primary" size="medium">
                   <Plus className="h-icon-md w-icon-md" />
-                  할인 등록하기
+                  {t('discount.discounts.create')}
                 </Button>
               </Link>
             </>

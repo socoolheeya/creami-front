@@ -1,7 +1,8 @@
 'use client'
 
 import Link from 'next/link'
-import { Block, BLOCK_TYPE_LABELS, BLOCK_STATUS_LABELS } from '@/lib/types/block'
+import { useLocale, useTranslations } from 'next-intl'
+import { Block } from '@/lib/types/block'
 import { Edit } from 'lucide-react'
 
 interface BlockTableProps {
@@ -9,8 +10,10 @@ interface BlockTableProps {
 }
 
 export function BlockTable({ blocks }: BlockTableProps) {
+  const t = useTranslations()
+  const locale = useLocale()
   const formatDate = (date: Date) => {
-    return new Date(date).toLocaleDateString('ko-KR', {
+    return new Date(date).toLocaleDateString(locale, {
       year: 'numeric',
       month: '2-digit',
       day: '2-digit'
@@ -59,7 +62,7 @@ export function BlockTable({ blocks }: BlockTableProps) {
                   borderBottom: '1px solid var(--border-color)'
                 }}
               >
-                상태
+                {t('ari.inventories.table.status')}
               </th>
               <th
                 className="px-4 py-3 text-left text-sm"
@@ -69,7 +72,7 @@ export function BlockTable({ blocks }: BlockTableProps) {
                   borderBottom: '1px solid var(--border-color)'
                 }}
               >
-                재고 코드
+                {t('ari.inventories.table.code')}
               </th>
               <th
                 className="px-4 py-3 text-left text-sm"
@@ -79,7 +82,7 @@ export function BlockTable({ blocks }: BlockTableProps) {
                   borderBottom: '1px solid var(--border-color)'
                 }}
               >
-                재고명
+                {t('ari.inventories.table.name')}
               </th>
               <th
                 className="px-4 py-3 text-left text-sm"
@@ -89,7 +92,7 @@ export function BlockTable({ blocks }: BlockTableProps) {
                   borderBottom: '1px solid var(--border-color)'
                 }}
               >
-                타입
+                {t('ari.inventories.table.type')}
               </th>
               <th
                 className="px-4 py-3 text-left text-sm"
@@ -99,7 +102,7 @@ export function BlockTable({ blocks }: BlockTableProps) {
                   borderBottom: '1px solid var(--border-color)'
                 }}
               >
-                단체명
+                {t('ari.inventories.table.organization')}
               </th>
               <th
                 className="px-4 py-3 text-center text-sm"
@@ -109,7 +112,7 @@ export function BlockTable({ blocks }: BlockTableProps) {
                   borderBottom: '1px solid var(--border-color)'
                 }}
               >
-                객실 현황
+                {t('ari.inventories.table.roomStatus')}
               </th>
               <th
                 className="px-4 py-3 text-center text-sm"
@@ -119,7 +122,7 @@ export function BlockTable({ blocks }: BlockTableProps) {
                   borderBottom: '1px solid var(--border-color)'
                 }}
               >
-                사용률
+                {t('ari.inventories.table.utilization')}
               </th>
               <th
                 className="px-4 py-3 text-left text-sm"
@@ -129,7 +132,7 @@ export function BlockTable({ blocks }: BlockTableProps) {
                   borderBottom: '1px solid var(--border-color)'
                 }}
               >
-                기간
+                {t('ari.inventories.table.period')}
               </th>
               <th
                 className="px-4 py-3 text-center text-sm"
@@ -139,7 +142,7 @@ export function BlockTable({ blocks }: BlockTableProps) {
                   borderBottom: '1px solid var(--border-color)'
                 }}
               >
-                관리
+                {t('ari.inventories.table.manage')}
               </th>
             </tr>
           </thead>
@@ -164,7 +167,7 @@ export function BlockTable({ blocks }: BlockTableProps) {
                         fontWeight: 'var(--font-medium)'
                       }}
                     >
-                      {BLOCK_STATUS_LABELS[block.status]}
+                      {t(`ari.inventories.block.status.${block.status}`)}
                     </span>
                   </td>
                   <td
@@ -192,7 +195,7 @@ export function BlockTable({ blocks }: BlockTableProps) {
                       fontWeight: 'var(--font-light)'
                     }}
                   >
-                    {BLOCK_TYPE_LABELS[block.type]}
+                    {t(`ari.inventories.block.types.${block.type}`)}
                   </td>
                   <td
                     className="px-4 py-3 text-sm"
@@ -257,7 +260,7 @@ export function BlockTable({ blocks }: BlockTableProps) {
                           backgroundColor: 'var(--bg-tertiary)',
                           color: 'var(--text-primary)'
                         }}
-                        title="편집"
+                        title={t('ari.common.edit')}
                       >
                         <Edit className="w-4 h-4" />
                       </button>

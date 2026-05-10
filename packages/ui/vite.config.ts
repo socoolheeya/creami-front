@@ -20,13 +20,15 @@ export default defineConfig({
       fileName: (format) => `index.${format === 'es' ? 'mjs' : 'cjs'}`,
     },
     rollupOptions: {
-      external: ['react', 'react/jsx-runtime', 'lucide-react', 'next-themes'],
+      external: ['react', 'react/jsx-runtime', 'react-dom', 'lucide-react', 'next-themes', 'next-intl'],
       output: {
         globals: {
           react: 'React',
           'react/jsx-runtime': 'jsxRuntime',
+          'react-dom': 'ReactDOM',
           'lucide-react': 'LucideReact',
           'next-themes': 'NextThemes',
+          'next-intl': 'NextIntl',
         },
       },
     },

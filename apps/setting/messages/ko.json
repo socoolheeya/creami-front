@@ -1,0 +1,295 @@
+{
+  "app": {
+    "title": "Creami Setting",
+    "description": "설정 대시보드"
+  },
+  "nav": {
+    "dashboard": "대시보드",
+    "users": "사용자 관리",
+    "suppliers": "공급사 관리",
+    "apiKeys": "API Key 관리",
+    "permissions": "권한 관리",
+    "policies": "정책 관리",
+    "subscriptions": "구독 관리",
+    "profile": "프로필"
+  },
+  "setting": {
+    "status": {
+      "active": "활성",
+      "inactive": "비활성",
+      "invited": "초대중"
+    },
+    "dashboard": {
+      "title": "Creami Setting",
+      "description": "사용자, 권한, 구독을 관리합니다.",
+      "cards": {
+        "users": {
+          "title": "사용자 관리",
+          "description": "사용자 계정, 상태, 소속을 관리합니다."
+        },
+        "permissions": {
+          "title": "권한 관리",
+          "description": "역할과 권한 범위를 관리합니다."
+        },
+        "subscriptions": {
+          "title": "구독 관리",
+          "description": "요금제, 결제 상태, 갱신일을 관리합니다."
+        }
+      }
+    },
+    "login": {
+      "title": "로그인",
+      "description": "Creami Setting에 로그인합니다.",
+      "email": "이메일",
+      "emailPlaceholder": "이메일을 입력하세요",
+      "emailLogin": "이메일로 로그인",
+      "naver": "네이버로 로그인",
+      "kakao": "카카오로 로그인",
+      "google": "구글로 로그인",
+      "or": "또는"
+    },
+    "users": {
+      "title": "사용자 관리",
+      "description": "Creami 관리자 계정, 소속, 상태를 관리합니다.",
+      "invite": "사용자 초대",
+      "columns": {
+        "userId": "사용자 ID",
+        "user": "사용자",
+        "email": "이메일",
+        "role": "역할",
+        "team": "팀",
+        "status": "상태"
+      },
+      "detail": {
+        "title": "{userName} 상세",
+        "description": "사용자 정보와 접근 가능한 숙소를 수정합니다.",
+        "backToList": "사용자 목록으로",
+        "notFound": "사용자를 찾을 수 없습니다.",
+        "saved": "사용자 정보가 저장되었습니다.",
+        "accountInfo": "계정 정보",
+        "accountDescription": "이름, 연락처, 역할, 상태를 수정할 수 있습니다.",
+        "name": "이름",
+        "phone": "핸드폰 번호",
+        "createdById": "등록자 ID",
+        "createdAt": "등록일",
+        "updatedById": "수정자 ID",
+        "updatedAt": "수정일",
+        "accessibleAccommodations": "접근 가능 숙소",
+        "accessDescription": "ID 또는 숙소명으로 검색하고 멀티 선택해 등록합니다.",
+        "selectedCount": "{count}개 등록됨",
+        "searchTitle": "숙소 검색",
+        "searchPlaceholder": "ID 또는 숙소명으로 검색",
+        "register": "등록",
+        "registered": "등록됨",
+        "removeAccommodation": "{accommodationName} 제거",
+        "emptyAccess": "등록된 접근 가능 숙소가 없습니다."
+      }
+    },
+    "suppliers": {
+      "title": "공급사 관리",
+      "description": "공급사 정보, 연동 금지 일시, TPS 제한을 관리합니다.",
+      "createTitle": "공급사 추가",
+      "editTitle": "공급사 수정",
+      "createDescription": "공급사명, 연동 금지 일시, 쓰로틀링 TPS 제한을 설정합니다.",
+      "supplierCode": "공급사 코드",
+      "supplierCodePlaceholder": "공급사 코드를 입력하세요",
+      "supplierName": "공급사명",
+      "supplierNamePlaceholder": "공급사명을 입력하세요",
+      "blockStartDate": "연동금지 시작 날짜",
+      "blockStartTime": "연동금지 시작 시간",
+      "blockEndDate": "연동금지 종료 날짜",
+      "blockEndTime": "연동금지 종료 시간",
+      "status": "상태",
+      "statuses": {
+        "active": "활성",
+        "inactive": "비활성"
+      },
+      "tpsLimit": "TPS 제한",
+      "tpsValue": "{count} TPS",
+      "addSupplier": "공급사 추가",
+      "activate": "활성화",
+      "deactivate": "비활성화",
+      "columns": {
+        "id": "공급사 ID",
+        "supplierCode": "공급사 코드",
+        "supplierName": "공급사명",
+        "status": "상태",
+        "blockTime": "연동 금지 일시",
+        "tpsLimit": "TPS 제한",
+        "createdById": "등록자 ID",
+        "createdAt": "등록일",
+        "updatedById": "수정자 ID",
+        "updatedAt": "수정일",
+        "actions": "관리"
+      },
+      "detail": {
+        "title": "{supplierName} 상세",
+        "description": "공급사 정보, 연동 금지 일시, TPS 제한을 수정합니다.",
+        "backToList": "공급사 목록으로",
+        "notFound": "공급사를 찾을 수 없습니다.",
+        "saved": "공급사 정보가 저장되었습니다.",
+        "basicInfo": "기본 정보",
+        "basicDescription": "공급사 코드, 공급사명, 상태, TPS 제한을 수정할 수 있습니다.",
+        "integrationSettings": "연동 설정",
+        "integrationDescription": "공급사 연동 금지 시작/종료 일시를 설정합니다."
+      }
+    },
+    "apiKeys": {
+      "title": "API Key 관리",
+      "description": "REST API 연동을 위한 공급사 Authorization 키를 관리합니다.",
+      "createTitle": "API Key 추가",
+      "createDescription": "공급사명을 입력하고 REST API Authorization 키를 생성합니다.",
+      "supplierName": "공급사명",
+      "supplierNamePlaceholder": "공급사명을 입력하세요",
+      "apiKey": "API Key",
+      "generateKey": "키 생성",
+      "addApiKey": "API Key 추가",
+      "copy": "복사",
+      "copied": "복사됨",
+      "regenerate": "재생성",
+      "columns": {
+        "id": "공급사 ID",
+        "supplierName": "공급사명",
+        "apiKey": "API Key",
+        "createdAt": "생성일",
+        "actions": "관리"
+      }
+    },
+    "profile": {
+      "title": "개인 설정",
+      "description": "프로필 사진, 연락처, 화면 모드를 관리합니다.",
+      "avatarAction": "프로필 사진 등록",
+      "avatarAlt": "프로필 사진",
+      "avatarHelp": "아바타 이미지를 클릭해 프로필 사진을 등록합니다.",
+      "organizationInfo": "소속정보",
+      "organization": "조직",
+      "department": "부서",
+      "userId": "사용자 ID",
+      "accountInfo": "계정 정보",
+      "accountDescription": "이메일, 핸드폰 번호, 비밀번호를 수정할 수 있습니다.",
+      "email": "이메일",
+      "phone": "핸드폰 번호",
+      "password": "비밀번호 변경",
+      "currentPassword": "현재 비밀번호",
+      "newPassword": "새 비밀번호",
+      "confirmPassword": "새 비밀번호 확인",
+      "passwordRequired": "비밀번호를 변경하려면 모든 비밀번호 항목을 입력하세요.",
+      "passwordPolicy": "새 비밀번호는 대문자와 소문자를 포함해 8자 이상이어야 합니다.",
+      "passwordSameAsCurrent": "새 비밀번호는 현재 비밀번호와 달라야 합니다.",
+      "passwordMismatch": "새 비밀번호와 확인 비밀번호가 일치하지 않습니다.",
+      "passwordUpdated": "비밀번호가 변경되었습니다.",
+      "displayMode": "화면 모드",
+      "darkMode": "다크 모드",
+      "lightMode": "라이트 모드",
+      "lastUpdated": "최종 수정일: {date}"
+    },
+    "permissions": {
+      "title": "권한 관리",
+      "description": "역할별 접근 범위와 사용자 배정을 관리합니다.",
+      "addRole": "역할 추가",
+      "userCount": "{count}명",
+      "roles": {
+        "owner": {
+          "description": "전체 앱과 설정에 대한 모든 권한"
+        },
+        "admin": {
+          "description": "운영 앱 관리와 사용자 초대 권한"
+        },
+        "operator": {
+          "description": "예약과 숙소 운영 데이터 조회 및 수정"
+        }
+      },
+      "scopes": {
+        "users": "사용자",
+        "permissions": "권한",
+        "subscriptions": "구독",
+        "bookings": "예약",
+        "settlements": "정산",
+        "properties": "숙소",
+        "discounts": "할인",
+        "ari": "ARI"
+      }
+    },
+    "policies": {
+      "title": "정책 관리",
+      "description": "메뉴별 읽기, 쓰기, 전체 권한 정책을 관리합니다.",
+      "addPolicy": "정책 추가",
+      "createTitle": "정책 생성",
+      "createDescription": "메뉴별 권한과 상태를 선택해 새 정책을 생성합니다.",
+      "create": "생성",
+      "menuType": "[메뉴]",
+      "columns": {
+        "menu": "메뉴",
+        "permission": "권한",
+        "status": "상태",
+        "created": "생성",
+        "updated": "수정",
+        "policyId": "정책 ID",
+        "createdById": "생성자ID"
+      },
+      "menus": {
+        "users": "사용자 관리",
+        "permissions": "권한 관리",
+        "policies": "정책 관리",
+        "subscriptions": "구독 관리"
+      },
+      "permissions": {
+        "read": "읽기",
+        "write": "쓰기",
+        "all": "ALL"
+      }
+    },
+    "subscriptions": {
+      "title": "구독 관리",
+      "description": "운영 이벤트별 알림 구독 여부를 관리합니다.",
+      "requestButton": "구독항목 요청",
+      "requestTitle": "구독항목 요청",
+      "requestDescription": "필요한 알림 구독 항목을 요청합니다.",
+      "requestMailSubject": "[Creami Setting] 구독항목 요청",
+      "recipient": "받는 사람",
+      "requestMemo": "요청 사항",
+      "requestPlaceholder": "추가가 필요한 구독 알림 항목과 사용 목적을 입력하세요.",
+      "send": "보내기",
+      "switchLabel": "{name} 구독 설정",
+      "columns": {
+        "id": "알림 ID",
+        "name": "알람",
+        "description": "알람 설명",
+        "category": "분류",
+        "lastModifiedAt": "마지막 구독 수정일",
+        "subscribe": "구독버튼"
+      },
+      "categories": {
+        "booking": "예약",
+        "ratePlan": "요금제",
+        "accommodation": "숙소"
+      },
+      "items": {
+        "reservationRequest": {
+          "name": "예약요청알람",
+          "description": "신규 예약 요청이 접수되면 알림을 받습니다."
+        },
+        "reservationCancel": {
+          "name": "예약취소알람",
+          "description": "예약 취소가 발생하면 알림을 받습니다."
+        },
+        "ratePlanCreate": {
+          "name": "신규요금제등록알람",
+          "description": "새 요금제가 등록되면 알림을 받습니다."
+        },
+        "ratePlanUpdate": {
+          "name": "요금제수정알람",
+          "description": "요금제 정보가 수정되면 알림을 받습니다."
+        },
+        "accommodationCreate": {
+          "name": "신규숙소등록알람",
+          "description": "새 숙소가 등록되면 알림을 받습니다."
+        },
+        "roomCreate": {
+          "name": "신규객실등록알람",
+          "description": "새 객실이 등록되면 알림을 받습니다."
+        }
+      }
+    }
+  }
+}

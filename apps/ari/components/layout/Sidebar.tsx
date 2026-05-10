@@ -1,18 +1,20 @@
 'use client'
 
 import { LayoutDashboard, DollarSign, Package } from 'lucide-react'
+import { useTranslations } from 'next-intl'
 import { usePathname } from 'next/navigation'
 import { Sidebar as SidebarComponent, SidebarMenu, SidebarMenuItem, useSidebar } from '@creami/ui'
 
 const menuItems = [
-  { icon: LayoutDashboard, label: '대시보드', href: '/' },
-  { icon: DollarSign, label: '요금 관리', href: '/rates' },
-  { icon: Package, label: '재고 관리', href: '/inventories' }
+  { icon: LayoutDashboard, labelKey: 'nav.dashboard', href: '/' },
+  { icon: DollarSign, labelKey: 'nav.rates', href: '/rates' },
+  { icon: Package, labelKey: 'nav.inventories', href: '/inventories' }
 ]
 
 export function Sidebar() {
   const { isCollapsed } = useSidebar()
   const pathname = usePathname()
+  const t = useTranslations()
 
   const getIsActive = (href: string) => {
     if (href === '/') {
@@ -28,7 +30,7 @@ export function Sidebar() {
           <SidebarMenuItem
             key={item.href}
             icon={item.icon}
-            label={item.label}
+            label={t(item.labelKey)}
             href={item.href}
             isActive={getIsActive(item.href)}
             isCollapsed={isCollapsed}

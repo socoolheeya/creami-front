@@ -3,6 +3,7 @@
 import { Discount } from '@/lib/types/discount'
 import { Tag } from 'lucide-react'
 import { ReactNode } from 'react'
+import { useLocale, useTranslations } from 'next-intl'
 
 interface DiscountListProps {
   discounts: Discount[]
@@ -15,14 +16,14 @@ interface DiscountListProps {
   showMoreLabel?: string
 }
 
-const getDiscountValueLabel = (discount: Discount) => (
+const getDiscountValueLabel = (discount: Discount, t: ReturnType<typeof useTranslations>, locale: string) => (
   discount.type === 'percentage'
     ? `${discount.value}%`
-    : `${discount.value.toLocaleString()}원`
+    : t('discount.labels.amountWon', { value: discount.value.toLocaleString(locale) })
 )
 
-const getPeriodLabel = (discount: Discount) => (
-  `${discount.startDate.toLocaleDateString('ko-KR', { month: 'short', day: 'numeric' })} ~ ${discount.endDate.toLocaleDateString('ko-KR', { month: 'short', day: 'numeric' })}`
+const getPeriodLabel = (discount: Discount, locale: string) => (
+  `${discount.startDate.toLocaleDateString(locale, { month: 'short', day: 'numeric' })} ~ ${discount.endDate.toLocaleDateString(locale, { month: 'short', day: 'numeric' })}`
 )
 
 export function DiscountList({
@@ -33,8 +34,12 @@ export function DiscountList({
   layout = 'compact',
   totalCount,
   onShowMore,
-  showMoreLabel = '더 보기'
+  showMoreLabel
 }: DiscountListProps) {
+  const t = useTranslations()
+  const locale = useLocale()
+  const resolvedShowMoreLabel = showMoreLabel ?? t('discount.common.showMore', { count: 50 })
+
   if (discounts.length === 0) {
     return (
       <div
@@ -60,7 +65,10 @@ export function DiscountList({
       <div className="rounded bg-bg-primary" style={{ border: '1px solid var(--border-color)' }}>
         <div className="flex items-center justify-between gap-md border-b border-border px-md py-sm">
           <p className="text-base font-light text-text-secondary">
-            {catalogTotalCount.toLocaleString()}개 중 {discounts.length.toLocaleString()}개 표시
+            {t('discount.common.shownOfTotal', {
+              total: catalogTotalCount.toLocaleString(locale),
+              shown: discounts.length.toLocaleString(locale)
+            })}
           </p>
           {hasMore && (
             <button
@@ -68,15 +76,15 @@ export function DiscountList({
               onClick={onShowMore}
               className="rounded px-sm py-xs text-base font-bold text-primary transition-colors hover:bg-bg-secondary"
             >
-              {showMoreLabel}
+              {resolvedShowMoreLabel}
             </button>
           )}
         </div>
 
         <div className="max-h-[calc(var(--spacing-3xl)*9)] overflow-y-auto">
           {discounts.map((discount) => {
-            const discountValueLabel = getDiscountValueLabel(discount)
-            const periodLabel = getPeriodLabel(discount)
+            const discountValueLabel = getDiscountValueLabel(discount, t, locale)
+            const periodLabel = getPeriodLabel(discount, locale)
 
             return (
               <button
@@ -122,7 +130,7 @@ export function DiscountList({
               onClick={onShowMore}
               className="w-full rounded bg-bg-secondary px-md py-sm text-base font-bold text-text-primary transition-colors hover:bg-bg-tertiary"
             >
-              {showMoreLabel}
+              {resolvedShowMoreLabel}
             </button>
           </div>
         )}
@@ -133,8 +141,8 @@ export function DiscountList({
   return (
     <div className="flex flex-col gap-md">
       {discounts.map((discount) => {
-        const discountValueLabel = getDiscountValueLabel(discount)
-        const periodLabel = getPeriodLabel(discount)
+        const discountValueLabel = getDiscountValueLabel(discount, t, locale)
+        const periodLabel = getPeriodLabel(discount, locale)
 
         return (
           <button

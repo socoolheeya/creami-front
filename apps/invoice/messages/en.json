@@ -1,0 +1,12 @@
+{
+  "app": {
+    "title": "Creami Invoice",
+    "description": "Invoice Dashboard"
+  },
+  "nav": {
+    "dashboard": "Dashboard",
+    "invoices": "Invoice Management",
+    "payments": "Payment Management",
+    "reports": "Reports"
+  }
+}

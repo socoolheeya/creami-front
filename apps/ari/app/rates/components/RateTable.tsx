@@ -1,7 +1,8 @@
 'use client'
 
 import Link from 'next/link'
-import { Rate, RATE_TYPE_LABELS } from '@/lib/types/rate'
+import { useLocale, useTranslations } from 'next-intl'
+import { Rate } from '@/lib/types/rate'
 import { Edit } from 'lucide-react'
 
 interface RateTableProps {
@@ -9,8 +10,10 @@ interface RateTableProps {
 }
 
 export function RateTable({ rates }: RateTableProps) {
+  const t = useTranslations()
+  const locale = useLocale()
   const formatDate = (date: Date) => {
-    return new Date(date).toLocaleDateString('ko-KR', {
+    return new Date(date).toLocaleDateString(locale, {
       year: 'numeric',
       month: '2-digit',
       day: '2-digit'
@@ -18,7 +21,7 @@ export function RateTable({ rates }: RateTableProps) {
   }
 
   const formatCurrency = (amount: number, currency: string) => {
-    return new Intl.NumberFormat('ko-KR', {
+    return new Intl.NumberFormat(locale, {
       style: 'currency',
       currency: currency || 'KRW'
     }).format(amount)
@@ -36,21 +39,6 @@ export function RateTable({ rates }: RateTableProps) {
         return '#ef4444'
       default:
         return 'var(--text-tertiary)'
-    }
-  }
-
-  const getStatusLabel = (status: string) => {
-    switch (status) {
-      case 'active':
-        return '활성'
-      case 'scheduled':
-        return '예정'
-      case 'inactive':
-        return '비활성'
-      case 'expired':
-        return '만료'
-      default:
-        return status
     }
   }
 
@@ -76,7 +64,7 @@ export function RateTable({ rates }: RateTableProps) {
                   borderBottom: '1px solid var(--border-color)'
                 }}
               >
-                상태
+                {t('ari.rates.table.status')}
               </th>
               <th
                 className="px-4 py-3 text-left text-sm"
@@ -86,7 +74,7 @@ export function RateTable({ rates }: RateTableProps) {
                   borderBottom: '1px solid var(--border-color)'
                 }}
               >
-                요금 코드
+                {t('ari.rates.table.code')}
               </th>
               <th
                 className="px-4 py-3 text-left text-sm"
@@ -96,7 +84,7 @@ export function RateTable({ rates }: RateTableProps) {
                   borderBottom: '1px solid var(--border-color)'
                 }}
               >
-                요금명
+                {t('ari.rates.table.name')}
               </th>
               <th
                 className="px-4 py-3 text-left text-sm"
@@ -106,7 +94,7 @@ export function RateTable({ rates }: RateTableProps) {
                   borderBottom: '1px solid var(--border-color)'
                 }}
               >
-                타입
+                {t('ari.rates.table.type')}
               </th>
               <th
                 className="px-4 py-3 text-left text-sm"
@@ -116,7 +104,7 @@ export function RateTable({ rates }: RateTableProps) {
                   borderBottom: '1px solid var(--border-color)'
                 }}
               >
-                객실 타입
+                {t('ari.rates.table.roomType')}
               </th>
               <th
                 className="px-4 py-3 text-right text-sm"
@@ -126,7 +114,7 @@ export function RateTable({ rates }: RateTableProps) {
                   borderBottom: '1px solid var(--border-color)'
                 }}
               >
-                기본 요금
+                {t('ari.rates.table.baseRate')}
               </th>
               <th
                 className="px-4 py-3 text-left text-sm"
@@ -136,7 +124,7 @@ export function RateTable({ rates }: RateTableProps) {
                   borderBottom: '1px solid var(--border-color)'
                 }}
               >
-                기간
+                {t('ari.rates.table.period')}
               </th>
               <th
                 className="px-4 py-3 text-center text-sm"
@@ -146,7 +134,7 @@ export function RateTable({ rates }: RateTableProps) {
                   borderBottom: '1px solid var(--border-color)'
                 }}
               >
-                관리
+                {t('ari.rates.table.manage')}
               </th>
             </tr>
           </thead>
@@ -168,7 +156,7 @@ export function RateTable({ rates }: RateTableProps) {
                       fontWeight: 'var(--font-medium)'
                     }}
                   >
-                    {getStatusLabel(rate.status)}
+                    {t(`ari.rates.status.${rate.status}`)}
                   </span>
                 </td>
                 <td
@@ -196,7 +184,7 @@ export function RateTable({ rates }: RateTableProps) {
                     fontWeight: 'var(--font-light)'
                   }}
                 >
-                  {RATE_TYPE_LABELS[rate.type]}
+                  {t(`ari.rates.types.${rate.type}`)}
                 </td>
                 <td
                   className="px-4 py-3 text-sm"
@@ -233,7 +221,7 @@ export function RateTable({ rates }: RateTableProps) {
                         backgroundColor: 'var(--bg-tertiary)',
                         color: 'var(--text-primary)'
                       }}
-                      title="편집"
+                      title={t('ari.common.edit')}
                     >
                       <Edit className="w-4 h-4" />
                     </button>

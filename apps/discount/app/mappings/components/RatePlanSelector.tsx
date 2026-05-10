@@ -4,6 +4,7 @@ import { RatePlan } from '@/lib/types/rateplan'
 import { Search } from 'lucide-react'
 import { ChangeEvent, useState } from 'react'
 import { Button, Card } from '@creami/ui'
+import { useTranslations } from 'next-intl'
 
 interface RatePlanSelectorProps {
   ratePlans: RatePlan[]
@@ -22,6 +23,7 @@ export function RatePlanSelector({
   disabled = false,
   onApply
 }: RatePlanSelectorProps) {
+  const t = useTranslations()
   const [searchQuery, setSearchQuery] = useState('')
 
   const filteredRatePlans = ratePlans.filter(ratePlan => {
@@ -65,7 +67,10 @@ export function RatePlanSelector({
     <Card className={compact ? 'p-md' : 'p-lg'} hover={false}>
       <div className={`flex items-center justify-between ${compact ? 'mb-sm' : 'mb-md'}`}>
         <h2 className="text-xl font-bold text-text-primary">
-          요금제 선택 ({selectedIds.length}/{ratePlans.length})
+          {t('discount.mappings.ratePlan.title', {
+            selected: selectedIds.length,
+            total: ratePlans.length
+          })}
         </h2>
         <div className="flex gap-sm">
           <Button
@@ -75,7 +80,7 @@ export function RatePlanSelector({
             variant="secondary"
             size="small"
           >
-            전체 선택
+            {t('discount.common.selectAll')}
           </Button>
           <Button
             type="button"
@@ -84,7 +89,7 @@ export function RatePlanSelector({
             variant="secondary"
             size="small"
           >
-            선택 해제
+            {t('discount.common.clearSelection')}
           </Button>
           {onApply && (
             <Button
@@ -94,7 +99,7 @@ export function RatePlanSelector({
               variant="primary"
               size="small"
             >
-              적용
+              {t('discount.common.apply')}
             </Button>
           )}
         </div>
@@ -107,7 +112,7 @@ export function RatePlanSelector({
           value={searchQuery}
           onChange={handleSearchChange}
           disabled={disabled}
-          placeholder={disabled ? '숙소를 먼저 선택하세요' : 'ID 또는 요금제명으로 검색...'}
+          placeholder={disabled ? t('discount.mappings.ratePlan.disabledPlaceholder') : t('discount.mappings.ratePlan.placeholder')}
           className="h-control-md w-full rounded pr-control-px-md text-base"
           style={{
             backgroundColor: disabled ? 'var(--bg-tertiary)' : 'var(--bg-secondary)',
@@ -135,7 +140,7 @@ export function RatePlanSelector({
                 color: isSelected ? 'var(--text-on-primary)' : 'var(--text-primary)'
               }}
               aria-pressed={isSelected}
-              title={isSelected ? '선택 해제' : '선택'}
+              title={isSelected ? t('discount.mappings.ratePlan.deselect') : t('discount.mappings.ratePlan.select')}
             >
               <span
                 className="mr-sm text-xs font-light"
@@ -153,7 +158,7 @@ export function RatePlanSelector({
 
       {!disabled && searchQuery && filteredRatePlans.length === 0 && (
         <div className="py-md text-center text-base font-light text-text-secondary">
-          검색 결과가 없습니다
+          {t('discount.common.noSearchResults')}
         </div>
       )}
     </Card>

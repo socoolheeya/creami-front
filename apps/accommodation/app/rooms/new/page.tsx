@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, Suspense } from 'react'
+import { useState, Suspense } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { RoomFormData } from '@/lib/types/room'
 import { useCreateRoom } from '@/hooks/useRooms'
@@ -12,6 +12,7 @@ import { Step3Occupancy } from '../components/wizard/Step3Occupancy'
 import { Step4Description } from '../components/wizard/Step4Description'
 import { Step5Features } from '../components/wizard/Step5Features'
 import { Step6Images } from '../components/wizard/Step6Images'
+import { notification } from '@creami/ui'
 
 const STEPS = ['기본정보', '객실정보', '인원정보', '상세설명', '특징', '이미지']
 
@@ -89,11 +90,21 @@ function NewRoomPageContent() {
       // API 호출하여 객실 생성
       await createRoom.mutateAsync(formData)
 
+      notification.success({
+        message: '저장이 완료되었습니다.',
+        placement: 'top-right',
+        direction: 'right'
+      })
+
       // 목록 페이지로 이동
       router.push('/rooms')
     } catch (error) {
       console.error('Failed to create room:', error)
-      alert('객실 등록에 실패했습니다. 다시 시도해주세요.')
+      notification.error({
+        message: '저장에 실패했습니다.',
+        placement: 'top-right',
+        direction: 'right'
+      })
     } finally {
       setIsSubmitting(false)
     }

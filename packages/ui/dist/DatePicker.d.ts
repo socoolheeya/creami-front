@@ -5,6 +5,7 @@ export interface DatePickerProps {
     placeholder?: string;
     align?: 'left' | 'right';
     size?: 'large' | 'medium' | 'small' | 'mini';
+    clearable?: boolean;
 }
-export declare function DatePicker({ value, onChange, label, placeholder, align, size }: DatePickerProps): import("react/jsx-runtime").JSX.Element;
+export declare function DatePicker({ value, onChange, label, placeholder, align, size, clearable }: DatePickerProps): import("react/jsx-runtime").JSX.Element;
 //# sourceMappingURL=DatePicker.d.ts.map

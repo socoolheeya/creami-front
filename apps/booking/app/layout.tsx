@@ -1,4 +1,6 @@
 import type { Metadata } from "next";
+import { NextIntlClientProvider } from "next-intl";
+import { getLocale, getMessages } from "next-intl/server";
 import "./globals.css";
 import { ThemeProvider } from '@/components/providers/ThemeProvider'
 import { MainLayout } from '@/components/layout/MainLayout'
@@ -12,17 +14,22 @@ export const metadata: Metadata = {
   },
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const locale = await getLocale();
+  const messages = await getMessages();
+
   return (
-    <html lang="ko" suppressHydrationWarning>
+    <html lang={locale} suppressHydrationWarning>
       <body>
-        <ThemeProvider>
-          <MainLayout>{children}</MainLayout>
-        </ThemeProvider>
+        <NextIntlClientProvider messages={messages}>
+          <ThemeProvider>
+            <MainLayout>{children}</MainLayout>
+          </ThemeProvider>
+        </NextIntlClientProvider>
       </body>
     </html>
   );

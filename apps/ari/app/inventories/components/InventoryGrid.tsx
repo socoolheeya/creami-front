@@ -2,7 +2,8 @@
 
 import { useState, useRef, useEffect, useMemo } from 'react'
 import { ChevronLeft, ChevronRight, Edit2, Copy, Save, X, CalendarRange, Calendar as CalendarIcon } from 'lucide-react'
-import { DatePicker } from '@creami/ui'
+import { DatePicker, notification } from '@creami/ui'
+import { useLocale, useTranslations } from 'next-intl'
 
 interface RoomInventory {
   roomId: string
@@ -30,17 +31,11 @@ interface SelectedCell {
 
 type ViewMode = 'week' | 'month' | 'all'
 
-const WEEKDAY_LABELS: Record<number, string> = {
-  0: '일',
-  1: '월',
-  2: '화',
-  3: '수',
-  4: '목',
-  5: '금',
-  6: '토'
-}
+const WEEKDAY_KEYS = ['sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat'] as const
 
 export function InventoryGrid({ startDate, endDate, selectedRooms }: InventoryGridProps) {
+  const t = useTranslations()
+  const locale = useLocale()
   const [viewMode, setViewMode] = useState<ViewMode>('week')
   const [currentWeekStart, setCurrentWeekStart] = useState(new Date(startDate))
   const [inventoryData, setInventoryData] = useState<Record<string, RoomInventory>>({})
@@ -283,6 +278,11 @@ export function InventoryGrid({ startDate, endDate, selectedRooms }: InventoryGr
       setShowBulkEdit(false)
       setBulkEditValue('')
       setSelectedCells([])
+      notification.success({
+        message: '저장이 완료되었습니다.',
+        placement: 'top-right',
+        direction: 'right'
+      })
     }
   }
 
@@ -370,7 +370,7 @@ export function InventoryGrid({ startDate, endDate, selectedRooms }: InventoryGr
         day: Number(day),
         value: parseInt(value)
       }))
-      .filter(({ day, value }) => bulkRegisterWeekdays.includes(day) && WEEKDAY_LABELS[day] && !isNaN(value))
+      .filter(({ day, value }) => bulkRegisterWeekdays.includes(day) && WEEKDAY_KEYS[day] && !isNaN(value))
       .sort((a, b) => {
         const order = [1, 2, 3, 4, 5, 6, 0]
         return order.indexOf(a.day) - order.indexOf(b.day)
@@ -383,7 +383,7 @@ export function InventoryGrid({ startDate, endDate, selectedRooms }: InventoryGr
       name: room.name,
       cells: validCells.map(({ day, value }) => ({
         day,
-        label: WEEKDAY_LABELS[day],
+        label: t(`ari.common.weekdays.${WEEKDAY_KEYS[day]}`),
         available: value,
         total: 10,
         booked: Math.max(10 - value, 0)
@@ -427,6 +427,11 @@ export function InventoryGrid({ startDate, endDate, selectedRooms }: InventoryGr
     setBulkRegisterEnd('')
     setBulkRegisterWeekdays([0, 1, 2, 3, 4, 5, 6])
     setBulkRegisterValues({})
+    notification.success({
+      message: '저장이 완료되었습니다.',
+      placement: 'top-right',
+      direction: 'right'
+    })
   }
 
   const viewDates = getDatesForView()
@@ -493,7 +498,7 @@ export function InventoryGrid({ startDate, endDate, selectedRooms }: InventoryGr
                 fontWeight: 'var(--font-medium)'
               }}
             >
-              주간
+              {t('ari.common.view.week')}
             </button>
             <button
               onClick={() => setViewMode('month')}
@@ -505,7 +510,7 @@ export function InventoryGrid({ startDate, endDate, selectedRooms }: InventoryGr
                 fontWeight: 'var(--font-medium)'
               }}
             >
-              월간
+              {t('ari.common.view.month')}
             </button>
             <button
               onClick={() => setViewMode('all')}
@@ -517,7 +522,7 @@ export function InventoryGrid({ startDate, endDate, selectedRooms }: InventoryGr
                 fontWeight: 'var(--font-medium)'
               }}
             >
-              전체
+              {t('ari.common.view.all')}
             </button>
           </div>
 
@@ -533,7 +538,7 @@ export function InventoryGrid({ startDate, endDate, selectedRooms }: InventoryGr
             }}
           >
             <CalendarRange className="w-icon-md h-icon-md" />
-            대량 등록
+            {t('ari.common.bulkRegister')}
           </button>
         </div>
 
@@ -563,13 +568,13 @@ export function InventoryGrid({ startDate, endDate, selectedRooms }: InventoryGr
                 >
                   {viewMode === 'week' ? (
                     <>
-                      {currentWeekStart.toLocaleDateString('ko-KR', { year: 'numeric', month: 'long', day: 'numeric' })}
+                      {currentWeekStart.toLocaleDateString(locale, { year: 'numeric', month: 'long', day: 'numeric' })}
                       {' - '}
-                      {new Date(currentWeekStart.getTime() + 6 * 24 * 60 * 60 * 1000).toLocaleDateString('ko-KR', { month: 'long', day: 'numeric' })}
+                      {new Date(currentWeekStart.getTime() + 6 * 24 * 60 * 60 * 1000).toLocaleDateString(locale, { month: 'long', day: 'numeric' })}
                     </>
                   ) : (
                     <>
-                      {currentWeekStart.toLocaleDateString('ko-KR', { year: 'numeric', month: 'long' })}
+                      {currentWeekStart.toLocaleDateString(locale, { year: 'numeric', month: 'long' })}
                     </>
                   )}
                 </div>
@@ -595,7 +600,7 @@ export function InventoryGrid({ startDate, endDate, selectedRooms }: InventoryGr
                   color: 'var(--text-primary)'
                 }}
               >
-                전체 기간: {startDate} ~ {endDate}
+                {t('ari.common.fullPeriod', { startDate, endDate })}
               </div>
             )}
           </div>
@@ -611,7 +616,7 @@ export function InventoryGrid({ startDate, endDate, selectedRooms }: InventoryGr
                 fontWeight: 'var(--font-medium)'
               }}
             >
-              {selectedCells.length}개 선택됨
+              {t('ari.common.selectedCount', { count: selectedCells.length })}
             </span>
 
             <button
@@ -625,7 +630,7 @@ export function InventoryGrid({ startDate, endDate, selectedRooms }: InventoryGr
               }}
             >
               <Edit2 className="w-md h-md" />
-              일괄 수정
+              {t('ari.common.bulkEdit')}
             </button>
 
             <button
@@ -640,7 +645,7 @@ export function InventoryGrid({ startDate, endDate, selectedRooms }: InventoryGr
               }}
             >
               <Copy className="w-md h-md" />
-              복사
+              {t('ari.common.copy')}
             </button>
 
             <button
@@ -675,7 +680,7 @@ export function InventoryGrid({ startDate, endDate, selectedRooms }: InventoryGr
                   minWidth: 'var(--rate-row-header-width)'
                 }}
               >
-                객실 타입
+                {t('ari.inventories.grid.roomType')}
               </th>
               {viewDates.map((date) => {
                 const dayOfWeek = date.getDay()
@@ -693,9 +698,9 @@ export function InventoryGrid({ startDate, endDate, selectedRooms }: InventoryGr
                       backgroundColor: isWeekend ? 'var(--bg-tertiary)' : 'var(--bg-secondary)'
                     }}
                   >
-                    <div>{date.getDate()}일</div>
+                    <div>{t('ari.common.dateDay', { day: date.getDate() })}</div>
                     <div className="text-base" style={{ fontWeight: 'var(--font-light)' }}>
-                      {['일', '월', '화', '수', '목', '금', '토'][dayOfWeek]}
+                      {t(`ari.common.weekdays.${WEEKDAY_KEYS[dayOfWeek]}`)}
                     </div>
                   </th>
                 )
@@ -839,7 +844,7 @@ export function InventoryGrid({ startDate, endDate, selectedRooms }: InventoryGr
                 color: 'var(--text-primary)'
               }}
             >
-              일괄 수정
+              {t('ari.common.bulkEdit')}
             </h3>
 
             <p
@@ -849,7 +854,7 @@ export function InventoryGrid({ startDate, endDate, selectedRooms }: InventoryGr
                 fontWeight: 'var(--font-light)'
               }}
             >
-              선택된 {selectedCells.length}개 셀의 가용 객실 수를 일괄 변경합니다.
+              {t('ari.inventories.grid.bulkEditDescription', { count: selectedCells.length })}
             </p>
 
             <label
@@ -859,13 +864,13 @@ export function InventoryGrid({ startDate, endDate, selectedRooms }: InventoryGr
                 fontWeight: 'var(--font-medium)'
               }}
             >
-              가용 객실 수
+              {t('ari.inventories.grid.availableRooms')}
             </label>
             <input
               type="number"
               value={bulkEditValue}
               onChange={(e) => setBulkEditValue(e.target.value)}
-              placeholder="숫자 입력"
+              placeholder={t('ari.rates.grid.numberPlaceholder')}
               className="w-full h-control-md px-control-px-lg py-none rounded mb-md text-base leading-none"
               style={{
                 backgroundColor: 'var(--bg-secondary)',
@@ -888,7 +893,7 @@ export function InventoryGrid({ startDate, endDate, selectedRooms }: InventoryGr
                 }}
               >
                 <Save className="w-icon-md h-icon-md" />
-                저장
+                {t('ari.common.save')}
               </button>
               <button
                 onClick={() => {
@@ -904,7 +909,7 @@ export function InventoryGrid({ startDate, endDate, selectedRooms }: InventoryGr
                   border: '1px solid var(--border-color)'
                 }}
               >
-                취소
+                {t('ari.common.cancel')}
               </button>
             </div>
           </div>
@@ -939,7 +944,7 @@ export function InventoryGrid({ startDate, endDate, selectedRooms }: InventoryGr
                   color: 'var(--text-primary)'
                 }}
               >
-                재고 대량 등록
+                {t('ari.inventories.grid.inventoryBulkRegister')}
               </h3>
               <div className="flex shrink-0 gap-md">
                 <button
@@ -955,7 +960,7 @@ export function InventoryGrid({ startDate, endDate, selectedRooms }: InventoryGr
                   }}
                 >
                   <Save className="w-icon-md h-icon-md" />
-                  등록
+                  {t('ari.inventories.grid.register')}
                 </button>
                 <button
                   onClick={() => {
@@ -974,7 +979,7 @@ export function InventoryGrid({ startDate, endDate, selectedRooms }: InventoryGr
                     border: '1px solid var(--border-color)'
                   }}
                 >
-                  취소
+                  {t('ari.common.cancel')}
                 </button>
               </div>
             </div>
@@ -985,20 +990,20 @@ export function InventoryGrid({ startDate, endDate, selectedRooms }: InventoryGr
                 className="block text-base mb-sm"
                 style={{ color: 'var(--text-secondary)', fontWeight: 'var(--font-medium)' }}
               >
-                기간 선택
+                {t('ari.common.selectPeriod')}
               </label>
               <div className="grid grid-cols-2 gap-md">
                 <DatePicker
-                  label="시작일"
+                  label={t('ari.common.startDate')}
                   value={bulkRegisterStart}
                   onChange={setBulkRegisterStart}
-                  placeholder="시작일 선택"
+                  placeholder={t('ari.common.selectStartDate')}
                 />
                 <DatePicker
-                  label="종료일"
+                  label={t('ari.common.endDate')}
                   value={bulkRegisterEnd}
                   onChange={setBulkRegisterEnd}
-                  placeholder="종료일 선택"
+                  placeholder={t('ari.common.selectEndDate')}
                   align="right"
                 />
               </div>
@@ -1010,7 +1015,7 @@ export function InventoryGrid({ startDate, endDate, selectedRooms }: InventoryGr
                 className="block text-base mb-md"
                 style={{ color: 'var(--text-secondary)', fontWeight: 'var(--font-medium)' }}
               >
-                요일 선택
+                {t('ari.inventories.grid.weekdaySelect')}
               </label>
 
               <div className="flex gap-sm mb-md">
@@ -1025,7 +1030,7 @@ export function InventoryGrid({ startDate, endDate, selectedRooms }: InventoryGr
                     border: '1px solid var(--border-color)'
                   }}
                 >
-                  전체
+                  {t('ari.common.view.all')}
                 </button>
                 <button
                   onClick={selectWeekdaysOnly}
@@ -1038,7 +1043,7 @@ export function InventoryGrid({ startDate, endDate, selectedRooms }: InventoryGr
                     border: '1px solid var(--border-color)'
                   }}
                 >
-                  평일만
+                  {t('ari.inventories.grid.weekdaysOnly')}
                 </button>
                 <button
                   onClick={selectWeekendsOnly}
@@ -1051,19 +1056,19 @@ export function InventoryGrid({ startDate, endDate, selectedRooms }: InventoryGr
                     border: '1px solid var(--border-color)'
                   }}
                 >
-                  주말만
+                  {t('ari.inventories.grid.weekendsOnly')}
                 </button>
               </div>
 
               <div className="grid grid-cols-7 gap-sm">
                 {[
-                  { day: 0, label: '일', color: 'var(--error)' },
-                  { day: 1, label: '월', color: 'var(--text-primary)' },
-                  { day: 2, label: '화', color: 'var(--text-primary)' },
-                  { day: 3, label: '수', color: 'var(--text-primary)' },
-                  { day: 4, label: '목', color: 'var(--text-primary)' },
-                  { day: 5, label: '금', color: 'var(--text-primary)' },
-                  { day: 6, label: '토', color: 'var(--primary)' }
+                  { day: 0, label: t('ari.common.weekdays.sun'), color: 'var(--error)' },
+                  { day: 1, label: t('ari.common.weekdays.mon'), color: 'var(--text-primary)' },
+                  { day: 2, label: t('ari.common.weekdays.tue'), color: 'var(--text-primary)' },
+                  { day: 3, label: t('ari.common.weekdays.wed'), color: 'var(--text-primary)' },
+                  { day: 4, label: t('ari.common.weekdays.thu'), color: 'var(--text-primary)' },
+                  { day: 5, label: t('ari.common.weekdays.fri'), color: 'var(--text-primary)' },
+                  { day: 6, label: t('ari.common.weekdays.sat'), color: 'var(--primary)' }
                 ].map(({ day, label, color }) => {
                   const active = bulkRegisterWeekdays.includes(day)
 
@@ -1111,7 +1116,7 @@ export function InventoryGrid({ startDate, endDate, selectedRooms }: InventoryGr
                 className="block text-base mb-sm"
                 style={{ color: 'var(--text-secondary)', fontWeight: 'var(--font-medium)' }}
               >
-                적용 객실 ({selectedRooms.length}개)
+                {t('ari.inventories.grid.appliedRooms', { count: selectedRooms.length })}
               </label>
               <div
                 className="p-sm rounded text-base"
@@ -1129,7 +1134,7 @@ export function InventoryGrid({ startDate, endDate, selectedRooms }: InventoryGr
             {/* Preview */}
             <div className="mb-none">
               <div className="mb-sm text-base" style={{ color: 'var(--text-secondary)', fontWeight: 'var(--font-medium)' }}>
-                적용 미리보기
+                {t('ari.inventories.grid.preview')}
               </div>
               <div
                 className="overflow-x-auto rounded"
@@ -1142,19 +1147,19 @@ export function InventoryGrid({ startDate, endDate, selectedRooms }: InventoryGr
                   <thead>
                     <tr style={{ backgroundColor: 'var(--bg-secondary)' }}>
                       <th className="px-md py-sm text-left text-base" style={{ color: 'var(--text-primary)', fontWeight: 'var(--font-bold)', borderBottom: '1px solid var(--border-color)' }}>
-                        객실
+                        {t('ari.inventories.grid.room')}
                       </th>
                       <th className="px-md py-sm text-left text-base" style={{ color: 'var(--text-primary)', fontWeight: 'var(--font-bold)', borderBottom: '1px solid var(--border-color)' }}>
-                        요일
+                        {t('ari.inventories.grid.weekday')}
                       </th>
                       <th className="px-md py-sm text-right text-base" style={{ color: 'var(--text-primary)', fontWeight: 'var(--font-bold)', borderBottom: '1px solid var(--border-color)' }}>
-                        입력재고
+                        {t('ari.inventories.grid.inputInventory')}
                       </th>
                       <th className="px-md py-sm text-right text-base" style={{ color: 'var(--text-primary)', fontWeight: 'var(--font-bold)', borderBottom: '1px solid var(--border-color)' }}>
-                        총재고
+                        {t('ari.inventories.grid.totalInventory')}
                       </th>
                       <th className="px-md py-sm text-right text-base" style={{ color: 'var(--text-primary)', fontWeight: 'var(--font-bold)', borderBottom: '1px solid var(--border-color)' }}>
-                        예약
+                        {t('ari.inventories.grid.booked')}
                       </th>
                     </tr>
                   </thead>
@@ -1162,7 +1167,7 @@ export function InventoryGrid({ startDate, endDate, selectedRooms }: InventoryGr
                     {bulkRegisterPreviewRows.length === 0 ? (
                       <tr>
                         <td colSpan={5} className="px-md py-lg text-center text-base" style={{ color: 'var(--text-tertiary)', fontWeight: 'var(--font-light)' }}>
-                          요일별 재고를 입력하면 적용 결과가 표시됩니다.
+                          {t('ari.inventories.grid.emptyPreview')}
                         </td>
                       </tr>
                     ) : (
@@ -1205,8 +1210,8 @@ export function InventoryGrid({ startDate, endDate, selectedRooms }: InventoryGr
         }}
       >
         <div className="text-base" style={{ color: 'var(--text-secondary)' }}>
-          <span style={{ fontWeight: 'var(--font-medium)' }}>사용법:</span>
-          {' '}드래그로 범위 선택 • 더블클릭으로 개별 수정 • 대량 등록으로 빠른 입력
+          <span style={{ fontWeight: 'var(--font-medium)' }}>{t('ari.common.usage')}</span>
+          {' '}{t('ari.common.gridHelp')}
         </div>
       </div>
     </div>

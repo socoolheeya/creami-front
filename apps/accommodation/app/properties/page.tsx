@@ -1,82 +1,92 @@
 'use client'
 
-import { Building2, Plus, Search } from 'lucide-react'
+import { Building2, Plus } from 'lucide-react'
 import Link from 'next/link'
-import { useState } from 'react'
-import { useProperties } from '@/hooks/useProperties'
+import { useEffect, useMemo, useRef, useState } from 'react'
+import { type PropertySearchCondition, useInfiniteProperties } from '@/hooks/useProperties'
 import { PropertyCard } from './components/PropertyCard'
 import { PropertyTable } from './components/PropertyTable'
-import { ViewToggle, Button, Input, Card } from '@creami/ui'
+import { ViewToggle, Button, Card } from '@creami/ui'
 
 type ViewMode = 'grid' | 'table'
 
 export default function PropertiesPage() {
-  const [viewMode, setViewMode] = useState<ViewMode>('grid')
-  const [searchQuery, setSearchQuery] = useState('')
-  const [searchParams, setSearchParams] = useState<Record<string, unknown> | undefined>(undefined)
+  const [viewMode, setViewMode] = useState<ViewMode>('table')
+  const searchParams = useMemo<PropertySearchCondition>(() => ({
+    size: 10
+  }), [])
 
-  const { data: properties = [], isLoading, error } = useProperties(searchParams)
+  const {
+    data,
+    isLoading,
+    error,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage
+  } = useInfiniteProperties(
+    searchParams,
+    true
+  )
+  const loadMoreRef = useRef<HTMLDivElement>(null)
+  const properties = useMemo(
+    () => data?.pages.flatMap((page) => page.properties) ?? [],
+    [data]
+  )
 
-  const handleSearch = () => {
-    setSearchParams(searchQuery ? { search: searchQuery } : {})
-  }
-
-  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === 'Enter') {
-      handleSearch()
+  useEffect(() => {
+    if (!hasNextPage || isFetchingNextPage) {
+      return
     }
-  }
+
+    const target = loadMoreRef.current
+
+    if (!target) {
+      return
+    }
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const entry = entries[0]
+
+        if (entry.isIntersecting) {
+          fetchNextPage()
+        }
+      },
+      { rootMargin: '320px' }
+    )
+
+    observer.observe(target)
+
+    return () => {
+      observer.disconnect()
+    }
+  }, [fetchNextPage, hasNextPage, isFetchingNextPage])
 
   return (
     <div>
       {/* Header */}
-      <div className="flex items-center justify-between mb-lg">
+      <div className="mb-lg flex items-center justify-between">
         <div className="flex items-center gap-md">
-          <Building2 className="w-lg h-lg text-primary" />
-          <h1 className="text-2xl text-text-primary">
+          <Building2 className="h-icon-lg w-icon-lg text-primary" />
+          <h1 className="text-2xl font-bold text-text-primary">
             숙소 관리
           </h1>
         </div>
 
         <Link href="/properties/new">
           <Button>
-            <Plus className="w-lg h-lg" />
+            <Plus className="h-icon-md w-icon-md" />
             신규 등록
           </Button>
         </Link>
       </div>
 
-      {/* Search and View Toggle */}
-      <div className="mb-md flex items-center gap-md">
-        <div className="flex-1 relative flex items-center gap-sm">
-          <Input
-            type="text"
-            placeholder="숙소명 또는 주소로 검색..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            onKeyDown={handleKeyDown}
-            className="flex-1"
-          />
-          <Button onClick={handleSearch}>
-            <Search className="w-lg h-lg" />
-            검색
-          </Button>
-        </div>
+      <div className="mb-md flex justify-end">
         <ViewToggle view={viewMode} onViewChange={setViewMode} />
       </div>
 
       {/* Content */}
-      {!searchParams ? (
-        <Card className="flex flex-col items-center justify-center border-dashed py-2xl text-center" hover={false}>
-          <Search className="h-2xl w-2xl mb-md text-text-tertiary" />
-          <h3 className="text-lg mb-xs font-bold text-text-primary">
-            검색어를 입력하세요
-          </h3>
-          <p className="text-base font-light text-text-secondary">
-            숙소명 또는 주소로 검색할 수 있습니다
-          </p>
-        </Card>
-      ) : isLoading ? (
+      {isLoading ? (
         <div className="flex items-center justify-center py-2xl">
           <div className="text-text-secondary">로딩 중...</div>
         </div>
@@ -96,13 +106,23 @@ export default function PropertiesPage() {
           </p>
         </Card>
       ) : viewMode === 'grid' ? (
-        <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
-          {properties.map((accommodation) => (
-            <PropertyCard key={accommodation.id} accommodation={accommodation} />
-          ))}
-        </div>
+        <>
+          <div className="grid grid-cols-1 gap-lg md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
+            {properties.map((accommodation) => (
+              <PropertyCard key={accommodation.id} accommodation={accommodation} />
+            ))}
+          </div>
+          <div ref={loadMoreRef} className="flex justify-center py-lg text-base font-light text-text-tertiary">
+            {isFetchingNextPage ? '추가 숙소를 불러오는 중입니다.' : hasNextPage ? ' ' : '마지막 숙소입니다.'}
+          </div>
+        </>
       ) : (
-        <PropertyTable properties={properties} />
+        <>
+          <PropertyTable properties={properties} />
+          <div ref={loadMoreRef} className="flex justify-center py-lg text-base font-light text-text-tertiary">
+            {isFetchingNextPage ? '추가 숙소를 불러오는 중입니다.' : hasNextPage ? ' ' : '마지막 숙소입니다.'}
+          </div>
+        </>
       )}
     </div>
   )

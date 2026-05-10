@@ -14,6 +14,7 @@ import { Step3Occupancy } from '../../components/wizard/Step3Occupancy'
 import { Step4Description } from '../../components/wizard/Step4Description'
 import { Step5Features } from '../../components/wizard/Step5Features'
 import { Step6Images } from '../../components/wizard/Step6Images'
+import { notification } from '@creami/ui'
 
 const STEPS = ['기본정보', '객실정보', '인원정보', '객실설명', '특징', '이미지']
 
@@ -159,8 +160,11 @@ export default function RoomEditPage({ params }: { params: Promise<{ id: string 
     // TODO: API 호출로 데이터 수정
     console.log('객실 수정 데이터:', formData)
 
-    // 임시로 콘솔 출력 후 상세 화면으로 이동
-    alert('객실이 수정되었습니다!')
+    notification.success({
+      message: '수정이 완료되었습니다.',
+      placement: 'top-right',
+      direction: 'right'
+    })
     router.push(`/rooms/${id}`)
   }
 

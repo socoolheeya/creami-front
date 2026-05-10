@@ -1,0 +1,295 @@
+{
+  "app": {
+    "title": "Creami Setting",
+    "description": "設定ダッシュボード"
+  },
+  "nav": {
+    "dashboard": "ダッシュボード",
+    "users": "ユーザー管理",
+    "suppliers": "供給会社管理",
+    "apiKeys": "API Key管理",
+    "permissions": "権限管理",
+    "policies": "ポリシー管理",
+    "subscriptions": "サブスクリプション管理",
+    "profile": "プロフィール"
+  },
+  "setting": {
+    "status": {
+      "active": "有効",
+      "inactive": "無効",
+      "invited": "招待中"
+    },
+    "dashboard": {
+      "title": "Creami Setting",
+      "description": "ユーザー、権限、サブスクリプションを管理します。",
+      "cards": {
+        "users": {
+          "title": "ユーザー管理",
+          "description": "ユーザーアカウント、状態、所属を管理します。"
+        },
+        "permissions": {
+          "title": "権限管理",
+          "description": "ロール別のアクセス範囲とユーザー割り当てを管理します。"
+        },
+        "subscriptions": {
+          "title": "サブスクリプション管理",
+          "description": "プラン、決済状態、更新日を管理します。"
+        }
+      }
+    },
+    "login": {
+      "title": "ログイン",
+      "description": "Creami Settingにログインします。",
+      "email": "メール",
+      "emailPlaceholder": "メールアドレスを入力してください",
+      "emailLogin": "メールでログイン",
+      "naver": "Naverでログイン",
+      "kakao": "Kakaoでログイン",
+      "google": "Googleでログイン",
+      "or": "または"
+    },
+    "users": {
+      "title": "ユーザー管理",
+      "description": "Creami管理者アカウント、所属、状態を管理します。",
+      "invite": "ユーザー招待",
+      "columns": {
+        "userId": "ユーザーID",
+        "user": "ユーザー",
+        "email": "メール",
+        "role": "ロール",
+        "team": "チーム",
+        "status": "状態"
+      },
+      "detail": {
+        "title": "{userName} 詳細",
+        "description": "ユーザー情報とアクセス可能な宿泊施設を修正します。",
+        "backToList": "ユーザー一覧へ",
+        "notFound": "ユーザーが見つかりません。",
+        "saved": "ユーザー情報が保存されました。",
+        "accountInfo": "アカウント情報",
+        "accountDescription": "名前、連絡先、ロール、状態を修正できます。",
+        "name": "名前",
+        "phone": "携帯番号",
+        "createdById": "登録者ID",
+        "createdAt": "登録日",
+        "updatedById": "修正者ID",
+        "updatedAt": "修正日",
+        "accessibleAccommodations": "アクセス可能な宿泊施設",
+        "accessDescription": "IDまたは宿泊施設名で検索し、複数選択して登録します。",
+        "selectedCount": "{count}件登録済み",
+        "searchTitle": "宿泊施設検索",
+        "searchPlaceholder": "IDまたは宿泊施設名で検索",
+        "register": "登録",
+        "registered": "登録済み",
+        "removeAccommodation": "{accommodationName}を削除",
+        "emptyAccess": "登録されたアクセス可能な宿泊施設がありません。"
+      }
+    },
+    "suppliers": {
+      "title": "供給会社管理",
+      "description": "供給会社情報、連携禁止日時、TPS制限を管理します。",
+      "createTitle": "供給会社追加",
+      "editTitle": "供給会社修正",
+      "createDescription": "供給会社名、連携禁止日時、スロットリングTPS制限を設定します。",
+      "supplierCode": "供給会社コード",
+      "supplierCodePlaceholder": "供給会社コードを入力してください",
+      "supplierName": "供給会社名",
+      "supplierNamePlaceholder": "供給会社名を入力してください",
+      "blockStartDate": "連携禁止開始日",
+      "blockStartTime": "連携禁止開始時間",
+      "blockEndDate": "連携禁止終了日",
+      "blockEndTime": "連携禁止終了時間",
+      "status": "状態",
+      "statuses": {
+        "active": "有効",
+        "inactive": "無効"
+      },
+      "tpsLimit": "TPS制限",
+      "tpsValue": "{count} TPS",
+      "addSupplier": "供給会社追加",
+      "activate": "有効化",
+      "deactivate": "無効化",
+      "columns": {
+        "id": "供給会社ID",
+        "supplierCode": "供給会社コード",
+        "supplierName": "供給会社名",
+        "status": "状態",
+        "blockTime": "連携禁止日時",
+        "tpsLimit": "TPS制限",
+        "createdById": "登録者ID",
+        "createdAt": "登録日",
+        "updatedById": "修正者ID",
+        "updatedAt": "修正日",
+        "actions": "管理"
+      },
+      "detail": {
+        "title": "{supplierName} 詳細",
+        "description": "供給会社情報、連携禁止日時、TPS制限を修正します。",
+        "backToList": "供給会社一覧へ",
+        "notFound": "供給会社が見つかりません。",
+        "saved": "供給会社情報が保存されました。",
+        "basicInfo": "基本情報",
+        "basicDescription": "供給会社コード、供給会社名、状態、TPS制限を修正できます。",
+        "integrationSettings": "連携設定",
+        "integrationDescription": "供給会社の連携禁止開始/終了日時を設定します。"
+      }
+    },
+    "apiKeys": {
+      "title": "API Key管理",
+      "description": "REST API連携用の供給会社Authorizationキーを管理します。",
+      "createTitle": "API Key追加",
+      "createDescription": "供給会社名を入力し、REST API Authorizationキーを生成します。",
+      "supplierName": "供給会社名",
+      "supplierNamePlaceholder": "供給会社名を入力してください",
+      "apiKey": "API Key",
+      "generateKey": "キー生成",
+      "addApiKey": "API Key追加",
+      "copy": "コピー",
+      "copied": "コピー済み",
+      "regenerate": "再生成",
+      "columns": {
+        "id": "供給会社ID",
+        "supplierName": "供給会社名",
+        "apiKey": "API Key",
+        "createdAt": "作成日",
+        "actions": "管理"
+      }
+    },
+    "profile": {
+      "title": "個人設定",
+      "description": "プロフィール写真、連絡先、表示モードを管理します。",
+      "avatarAction": "プロフィール写真を登録",
+      "avatarAlt": "プロフィール写真",
+      "avatarHelp": "アバター画像をクリックしてプロフィール写真を登録します。",
+      "organizationInfo": "所属情報",
+      "organization": "組織",
+      "department": "部署",
+      "userId": "ユーザーID",
+      "accountInfo": "アカウント情報",
+      "accountDescription": "メールアドレス、携帯番号、パスワードを修正できます。",
+      "email": "メール",
+      "phone": "携帯番号",
+      "password": "パスワード変更",
+      "currentPassword": "現在のパスワード",
+      "newPassword": "新しいパスワード",
+      "confirmPassword": "新しいパスワード確認",
+      "passwordRequired": "パスワードを変更するには、すべてのパスワード項目を入力してください。",
+      "passwordPolicy": "新しいパスワードは大文字と小文字を含む8文字以上で入力してください。",
+      "passwordSameAsCurrent": "新しいパスワードは現在のパスワードと異なる必要があります。",
+      "passwordMismatch": "新しいパスワードと確認用パスワードが一致しません。",
+      "passwordUpdated": "パスワードが変更されました。",
+      "displayMode": "表示モード",
+      "darkMode": "ダークモード",
+      "lightMode": "ライトモード",
+      "lastUpdated": "最終更新日: {date}"
+    },
+    "permissions": {
+      "title": "権限管理",
+      "description": "ロール別のアクセス範囲とユーザー割り当てを管理します。",
+      "addRole": "ロール追加",
+      "userCount": "{count}名",
+      "roles": {
+        "owner": {
+          "description": "すべてのアプリと設定に対する全権限"
+        },
+        "admin": {
+          "description": "運用アプリ管理とユーザー招待権限"
+        },
+        "operator": {
+          "description": "予約と宿泊運用データの閲覧および修正"
+        }
+      },
+      "scopes": {
+        "users": "ユーザー",
+        "permissions": "権限",
+        "subscriptions": "サブスクリプション",
+        "bookings": "予約",
+        "settlements": "精算",
+        "properties": "宿泊施設",
+        "discounts": "割引",
+        "ari": "ARI"
+      }
+    },
+    "policies": {
+      "title": "ポリシー管理",
+      "description": "メニュー別の読み取り、書き込み、全体権限ポリシーを管理します。",
+      "addPolicy": "ポリシー追加",
+      "createTitle": "ポリシー作成",
+      "createDescription": "メニュー別の権限と状態を選択して新しいポリシーを作成します。",
+      "create": "作成",
+      "menuType": "[メニュー]",
+      "columns": {
+        "menu": "メニュー",
+        "permission": "権限",
+        "status": "状態",
+        "created": "作成",
+        "updated": "修正",
+        "policyId": "ポリシーID",
+        "createdById": "作成者ID"
+      },
+      "menus": {
+        "users": "ユーザー管理",
+        "permissions": "権限管理",
+        "policies": "ポリシー管理",
+        "subscriptions": "サブスクリプション管理"
+      },
+      "permissions": {
+        "read": "読み取り",
+        "write": "書き込み",
+        "all": "ALL"
+      }
+    },
+    "subscriptions": {
+      "title": "サブスクリプション管理",
+      "description": "運用イベント別の通知サブスクリプションを管理します。",
+      "requestButton": "購読項目リクエスト",
+      "requestTitle": "購読項目リクエスト",
+      "requestDescription": "必要な通知購読項目をリクエストします。",
+      "requestMailSubject": "[Creami Setting] 購読項目リクエスト",
+      "recipient": "宛先",
+      "requestMemo": "リクエスト内容",
+      "requestPlaceholder": "追加が必要な通知項目と利用目的を入力してください。",
+      "send": "送信",
+      "switchLabel": "{name} 購読設定",
+      "columns": {
+        "id": "通知ID",
+        "name": "通知",
+        "description": "通知説明",
+        "category": "分類",
+        "lastModifiedAt": "最終購読更新日",
+        "subscribe": "購読ボタン"
+      },
+      "categories": {
+        "booking": "予約",
+        "ratePlan": "料金プラン",
+        "accommodation": "宿泊施設"
+      },
+      "items": {
+        "reservationRequest": {
+          "name": "予約リクエスト通知",
+          "description": "新しい予約リクエストが受け付けられると通知を受け取ります。"
+        },
+        "reservationCancel": {
+          "name": "予約キャンセル通知",
+          "description": "予約キャンセルが発生すると通知を受け取ります。"
+        },
+        "ratePlanCreate": {
+          "name": "新規料金プラン登録通知",
+          "description": "新しい料金プランが登録されると通知を受け取ります。"
+        },
+        "ratePlanUpdate": {
+          "name": "料金プラン修正通知",
+          "description": "料金プラン情報が修正されると通知を受け取ります。"
+        },
+        "accommodationCreate": {
+          "name": "新規宿泊施設登録通知",
+          "description": "新しい宿泊施設が登録されると通知を受け取ります。"
+        },
+        "roomCreate": {
+          "name": "新規客室登録通知",
+          "description": "新しい客室が登録されると通知を受け取ります。"
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,12 @@
+{
+  "app": {
+    "title": "Creami Invoice",
+    "description": "송장 대시보드"
+  },
+  "nav": {
+    "dashboard": "대시보드",
+    "invoices": "송장 관리",
+    "payments": "결제 관리",
+    "reports": "리포트"
+  }
+}

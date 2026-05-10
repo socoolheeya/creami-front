@@ -1,353 +1,239 @@
 'use client'
 
-import {ArrowUpDown, Calendar, Mail, MapPin, Phone} from 'lucide-react'
-import Link from 'next/link'
-import {useMemo, useState} from 'react'
-import {Property, PROPERTY_TYPE_LABELS, PropertyType} from '@/lib/types/property'
+import { useMemo, useState } from 'react'
+import { useRouter } from 'next/navigation'
+import { ArrowUpDown } from 'lucide-react'
+import {
+  Card,
+  Input,
+  Select,
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow
+} from '@creami/ui'
+import {
+  Property,
+  PROPERTY_TYPE_LABELS,
+  type PropertyStatus,
+  type PropertyType
+} from '@/lib/types/property'
 
 interface PropertyTableProps {
   properties: Property[]
 }
 
-type SortField = 'name' | 'type' | 'status' | null
+type SortField = 'name' | 'type' | 'status' | 'countryCode' | 'city' | 'createdAt'
 type SortOrder = 'asc' | 'desc'
 
+const PROPERTY_STATUS_LABELS: Record<PropertyStatus, string> = {
+  draft: 'DRAFT',
+  active: 'ACTIVE',
+  inactive: 'INACTIVE',
+  archived: 'ARCHIVED'
+}
+
+const createdDateFormatter = new Intl.DateTimeFormat('ko-KR', {
+  year: 'numeric',
+  month: '2-digit',
+  day: '2-digit'
+})
+
 export function PropertyTable({ properties }: PropertyTableProps) {
-  const [sortField, setSortField] = useState<SortField>(null)
+  const router = useRouter()
+  const [sortField, setSortField] = useState<SortField>('name')
   const [sortOrder, setSortOrder] = useState<SortOrder>('asc')
-  const [typeFilter, setTypeFilter] = useState<PropertyType | 'all'>('all')
-  const [statusFilter, setStatusFilter] = useState<'all' | 'active' | 'inactive'>('all')
   const [idSearch, setIdSearch] = useState('')
   const [nameSearch, setNameSearch] = useState('')
-  const [addressSearch, setAddressSearch] = useState('')
-  const [contactSearch, setContactSearch] = useState('')
+  const [typeFilter, setTypeFilter] = useState<PropertyType | 'all'>('all')
+  const [statusFilter, setStatusFilter] = useState<PropertyStatus | 'all'>('all')
+  const [countrySearch, setCountrySearch] = useState('')
+  const [citySearch, setCitySearch] = useState('')
+
+  const filteredAndSortedData = useMemo(() => {
+    const normalizedId = idSearch.trim().toLowerCase()
+    const normalizedName = nameSearch.trim().toLowerCase()
+    const normalizedCountry = countrySearch.trim().toLowerCase()
+    const normalizedCity = citySearch.trim().toLowerCase()
+
+    const result = properties.filter((property) => {
+      const matchesId = !normalizedId || property.id.toLowerCase().includes(normalizedId)
+      const matchesName = !normalizedName || property.name.toLowerCase().includes(normalizedName)
+      const matchesType = typeFilter === 'all' || property.type === typeFilter
+      const matchesStatus = statusFilter === 'all' || property.status === statusFilter
+      const matchesCountry =
+        !normalizedCountry || property.countryCode?.toLowerCase().includes(normalizedCountry)
+      const matchesCity = !normalizedCity || property.city?.toLowerCase().includes(normalizedCity)
+
+      return matchesId && matchesName && matchesType && matchesStatus && matchesCountry && matchesCity
+    })
+
+    result.sort((firstProperty, secondProperty) => {
+      const compareValue =
+        sortField === 'createdAt'
+          ? firstProperty.createdAt.getTime() - secondProperty.createdAt.getTime()
+          : String(firstProperty[sortField] ?? '').localeCompare(
+              String(secondProperty[sortField] ?? '')
+            )
+      return sortOrder === 'asc' ? compareValue : -compareValue
+    })
+
+    return result
+  }, [
+    citySearch,
+    countrySearch,
+    idSearch,
+    nameSearch,
+    properties,
+    sortField,
+    sortOrder,
+    statusFilter,
+    typeFilter
+  ])
 
   const handleSort = (field: SortField) => {
     if (sortField === field) {
-      setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc')
-    } else {
-      setSortField(field)
-      setSortOrder('asc')
+      setSortOrder((currentOrder) => (currentOrder === 'asc' ? 'desc' : 'asc'))
+      return
     }
+
+    setSortField(field)
+    setSortOrder('asc')
   }
 
-  const filteredAndSortedData = useMemo(() => {
-    let result = [...properties]
-
-    // 검색 필터 적용
-    if (idSearch) {
-      result = result.filter(acc =>
-        acc.id.toLowerCase().includes(idSearch.toLowerCase())
-      )
-    }
-    if (nameSearch) {
-      result = result.filter(acc =>
-        acc.name.toLowerCase().includes(nameSearch.toLowerCase())
-      )
-    }
-    if (addressSearch) {
-      result = result.filter(acc =>
-        acc.address.toLowerCase().includes(addressSearch.toLowerCase())
-      )
-    }
-    if (contactSearch) {
-      result = result.filter(acc =>
-        acc.phone.includes(contactSearch) ||
-        (acc.email && acc.email.toLowerCase().includes(contactSearch.toLowerCase()))
-      )
-    }
-
-    // 드롭다운 필터 적용
-    if (typeFilter !== 'all') {
-      result = result.filter(acc => acc.type === typeFilter)
-    }
-    if (statusFilter !== 'all') {
-      result = result.filter(acc => acc.status === statusFilter)
-    }
-
-    // 정렬 적용
-    if (sortField) {
-      result.sort((a, b) => {
-        let compareValue = 0
-        if (sortField === 'name') {
-          compareValue = a.name.localeCompare(b.name)
-        } else if (sortField === 'type') {
-          compareValue = a.type.localeCompare(b.type)
-        } else if (sortField === 'status') {
-          compareValue = a.status.localeCompare(b.status)
-        }
-        return sortOrder === 'asc' ? compareValue : -compareValue
-      })
-    }
-
-    return result
-  }, [properties, sortField, sortOrder, typeFilter, statusFilter, idSearch, nameSearch, addressSearch, contactSearch])
-
-  const SortableHeader = ({ field, children }: { field: SortField; children: React.ReactNode }) => (
-    <th className="px-3 py-2 text-left text-sm">
+  const renderSortableHead = (field: SortField, label: string) => (
+    <TableHead>
       <button
+        type="button"
         onClick={() => handleSort(field)}
-        className="flex items-center gap-2 transition-colors"
-        style={{ color: 'var(--text-primary)', fontWeight: 'var(--font-bold)' }}
+        className="flex cursor-pointer items-center gap-xs border-none bg-transparent p-none text-base font-bold text-text-primary"
       >
-        {children}
+        {label}
         <ArrowUpDown
-          className="w-4 h-4"
-          style={{
-            opacity: sortField === field ? 1 : 0.3,
-            color: sortField === field ? 'var(--primary)' : 'currentColor'
-          }}
+          className={`h-icon-md w-icon-md ${
+            sortField === field ? 'text-primary' : 'text-text-tertiary'
+          }`}
         />
       </button>
-    </th>
+    </TableHead>
   )
 
   return (
-    <div
-      className="rounded-lg overflow-hidden"
-      style={{
-        backgroundColor: 'var(--bg-primary)',
-        borderRadius: 'var(--radius)',
-        border: '1px solid var(--border-color)',
-        boxShadow: 'var(--shadow)'
-      }}
-    >
-      <table className="w-full">
-        <thead>
-          <tr style={{ backgroundColor: 'var(--bg-tertiary)', borderBottom: '1px solid var(--border-color)' }}>
-            <th className="px-2 py-2 text-left text-sm" style={{ color: 'var(--text-primary)', fontWeight: 'var(--font-bold)', width: '80px' }}>
-              ID
-            </th>
-            <SortableHeader field="name">숙소명</SortableHeader>
-            <SortableHeader field="type">유형</SortableHeader>
-            <th className="px-3 py-2 text-left text-sm" style={{ color: 'var(--text-primary)', fontWeight: 'var(--font-bold)' }}>
-              주소
-            </th>
-            <th className="px-3 py-2 text-left text-sm" style={{ color: 'var(--text-primary)', fontWeight: 'var(--font-bold)' }}>
-              연락처
-            </th>
-            <th className="px-3 py-2 text-left text-sm" style={{ color: 'var(--text-primary)', fontWeight: 'var(--font-bold)' }}>
-              체크인/아웃
-            </th>
-            <SortableHeader field="status">상태</SortableHeader>
+    <Card hover={false}>
+      <Table>
+        <TableHeader>
+          <tr>
+            <TableHead>ID</TableHead>
+            {renderSortableHead('name', '숙소명')}
+            {renderSortableHead('type', '유형')}
+            {renderSortableHead('status', '상태')}
+            {renderSortableHead('countryCode', '국가')}
+            {renderSortableHead('city', '도시')}
+            {renderSortableHead('createdAt', '생성일')}
           </tr>
-          {/* Filter Row */}
-          <tr style={{ backgroundColor: 'var(--bg-primary)', borderBottom: '1px solid var(--border-color)' }}>
-            {/* ID 검색 */}
-            <th className="px-2 py-2">
-              <input
-                type="text"
-                placeholder="ID"
+          <tr className="bg-bg-primary">
+            <TableHead>
+              <Input
                 value={idSearch}
-                onChange={(e) => setIdSearch(e.target.value)}
-                className="w-full px-2 py-1 text-xs"
-                style={{
-                  backgroundColor: 'var(--bg-secondary)',
-                  border: '1px solid var(--border-color)',
-                  borderRadius: 'var(--radius-sm)',
-                  color: 'var(--text-primary)',
-                  width: '70px'
-                }}
+                onChange={(event) => setIdSearch(event.target.value)}
+                placeholder="ID"
+                size="small"
               />
-            </th>
-            {/* 숙소명 검색 */}
-            <th className="px-3 py-2">
-              <input
-                type="text"
-                placeholder="검색..."
+            </TableHead>
+            <TableHead>
+              <Input
                 value={nameSearch}
-                onChange={(e) => setNameSearch(e.target.value)}
-                className="w-full px-2 py-1 text-xs"
-                style={{
-                  backgroundColor: 'var(--bg-secondary)',
-                  border: '1px solid var(--border-color)',
-                  borderRadius: 'var(--radius-sm)',
-                  color: 'var(--text-primary)'
-                }}
+                onChange={(event) => setNameSearch(event.target.value)}
+                placeholder="숙소명"
+                size="small"
               />
-            </th>
-            {/* 유형 필터 */}
-            <th className="px-3 py-2">
-              <select
+            </TableHead>
+            <TableHead>
+              <Select
                 value={typeFilter}
-                onChange={(e) => setTypeFilter(e.target.value as PropertyType | 'all')}
-                className="w-full px-2 py-1 text-xs"
-                style={{
-                  backgroundColor: 'var(--bg-secondary)',
-                  border: '1px solid var(--border-color)',
-                  borderRadius: 'var(--radius-sm)',
-                  color: 'var(--text-primary)'
-                }}
+                onChange={(event) => setTypeFilter(event.target.value as PropertyType | 'all')}
+                size="small"
               >
                 <option value="all">전체</option>
-                {Object.entries(PROPERTY_TYPE_LABELS).map(([key, label]) => (
-                  <option key={key} value={key}>{label}</option>
+                {Object.entries(PROPERTY_TYPE_LABELS).map(([value, label]) => (
+                  <option key={value} value={value}>
+                    {label}
+                  </option>
                 ))}
-              </select>
-            </th>
-            {/* 주소 검색 */}
-            <th className="px-3 py-2">
-              <input
-                type="text"
-                placeholder="검색..."
-                value={addressSearch}
-                onChange={(e) => setAddressSearch(e.target.value)}
-                className="w-full px-2 py-1 text-xs"
-                style={{
-                  backgroundColor: 'var(--bg-secondary)',
-                  border: '1px solid var(--border-color)',
-                  borderRadius: 'var(--radius-sm)',
-                  color: 'var(--text-primary)'
-                }}
-              />
-            </th>
-            {/* 연락처 검색 */}
-            <th className="px-3 py-2">
-              <input
-                type="text"
-                placeholder="검색..."
-                value={contactSearch}
-                onChange={(e) => setContactSearch(e.target.value)}
-                className="w-full px-2 py-1 text-xs"
-                style={{
-                  backgroundColor: 'var(--bg-secondary)',
-                  border: '1px solid var(--border-color)',
-                  borderRadius: 'var(--radius-sm)',
-                  color: 'var(--text-primary)'
-                }}
-              />
-            </th>
-            {/* 체크인/아웃 - 필터 없음 */}
-            <th className="px-3 py-2"></th>
-            {/* 상태 필터 */}
-            <th className="px-3 py-2">
-              <select
+              </Select>
+            </TableHead>
+            <TableHead>
+              <Select
                 value={statusFilter}
-                onChange={(e) => setStatusFilter(e.target.value as 'all' | 'active' | 'inactive')}
-                className="w-full px-2 py-1 text-xs"
-                style={{
-                  backgroundColor: 'var(--bg-secondary)',
-                  border: '1px solid var(--border-color)',
-                  borderRadius: 'var(--radius-sm)',
-                  color: 'var(--text-primary)'
-                }}
+                onChange={(event) =>
+                  setStatusFilter(event.target.value as PropertyStatus | 'all')
+                }
+                size="small"
               >
                 <option value="all">전체</option>
-                <option value="active">운영중</option>
-                <option value="inactive">중지</option>
-              </select>
-            </th>
+                {Object.entries(PROPERTY_STATUS_LABELS).map(([value, label]) => (
+                  <option key={value} value={value}>
+                    {label}
+                  </option>
+                ))}
+              </Select>
+            </TableHead>
+            <TableHead>
+              <Input
+                value={countrySearch}
+                onChange={(event) => setCountrySearch(event.target.value)}
+                placeholder="국가"
+                size="small"
+              />
+            </TableHead>
+            <TableHead>
+              <Input
+                value={citySearch}
+                onChange={(event) => setCitySearch(event.target.value)}
+                placeholder="도시"
+                size="small"
+              />
+            </TableHead>
+            <TableHead>{''}</TableHead>
           </tr>
-        </thead>
-        <tbody>
-          {filteredAndSortedData.map((accommodation) => (
-            <tr
-              key={accommodation.id}
-              className="transition-colors cursor-pointer"
-              style={{ borderBottom: '1px solid var(--border-color)' }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.backgroundColor = 'var(--bg-secondary)'
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.backgroundColor = 'transparent'
-              }}
+        </TableHeader>
+        <TableBody>
+          {filteredAndSortedData.map((property) => (
+            <TableRow
+              key={property.id}
+              onClick={() => router.push(`/properties/${property.id}`)}
             >
-              {/* ID */}
-              <td className="px-2 py-2">
-                <span className="text-xs font-mono" style={{ color: 'var(--text-tertiary)' }}>
-                  {accommodation.id}
+              <TableCell className="font-light text-text-tertiary">
+                {property.id}
+              </TableCell>
+              <TableCell>
+                <span className="font-bold text-text-primary">
+                  {property.name}
                 </span>
-              </td>
-
-              {/* 숙소명 */}
-              <td className="px-3 py-2">
-                <Link href={`/properties/${accommodation.id}`}>
-                  <div className="flex flex-col cursor-pointer">
-                    <span
-                      className="hover:underline text-sm"
-                      style={{ fontWeight: 'var(--font-bold)', color: 'var(--text-primary)' }}
-                    >
-                      {accommodation.name}
-                    </span>
-                    <span className="text-xs mt-0.5" style={{ color: 'var(--text-tertiary)' }}>
-                      {accommodation.images.length}장 사진 • {accommodation.amenities.length}개 편의시설
-                    </span>
-                  </div>
-                </Link>
-              </td>
-
-              {/* 유형 */}
-              <td className="px-3 py-2">
-                <span
-                  className="px-2 py-0.5 rounded text-xs"
-                  style={{
-                    backgroundColor: 'var(--bg-tertiary)',
-                    color: 'var(--text-secondary)',
-                    fontWeight: 'var(--font-medium)'
-                  }}
-                >
-                  {PROPERTY_TYPE_LABELS[accommodation.type]}
+              </TableCell>
+              <TableCell className="font-medium text-text-secondary">
+                {PROPERTY_TYPE_LABELS[property.type] ?? property.type}
+              </TableCell>
+              <TableCell>
+                <span className="inline-flex h-control-sm items-center rounded bg-primary-bg px-control-px-sm py-none text-base font-bold text-primary">
+                  {PROPERTY_STATUS_LABELS[property.status] ?? property.status}
                 </span>
-              </td>
-
-              {/* 주소 */}
-              <td className="px-3 py-2">
-                <div className="flex items-start gap-2">
-                  <MapPin className="w-4 h-4 flex-shrink-0 mt-0.5" style={{ color: 'var(--text-tertiary)' }} />
-                  <span className="text-xs" style={{ color: 'var(--text-secondary)' }}>
-                    {accommodation.address}
-                  </span>
-                </div>
-              </td>
-
-              {/* 연락처 */}
-              <td className="px-3 py-2">
-                <div className="flex flex-col gap-0.5">
-                  <div className="flex items-center gap-2">
-                    <Phone className="w-3 h-3" style={{ color: 'var(--text-tertiary)' }} />
-                    <span className="text-xs" style={{ color: 'var(--text-secondary)' }}>
-                      {accommodation.phone}
-                    </span>
-                  </div>
-                  {accommodation.email && (
-                    <div className="flex items-center gap-2">
-                      <Mail className="w-3 h-3" style={{ color: 'var(--text-tertiary)' }} />
-                      <span className="text-xs" style={{ color: 'var(--text-secondary)' }}>
-                        {accommodation.email}
-                      </span>
-                    </div>
-                  )}
-                </div>
-              </td>
-
-              {/* 체크인/아웃 */}
-              <td className="px-3 py-2">
-                <div className="flex items-center gap-2">
-                  <Calendar className="w-4 h-4" style={{ color: 'var(--text-tertiary)' }} />
-                  <div className="flex flex-col text-xs" style={{ color: 'var(--text-secondary)' }}>
-                    <span>IN: {accommodation.checkIn}</span>
-                    <span>OUT: {accommodation.checkOut}</span>
-                  </div>
-                </div>
-              </td>
-
-              {/* 상태 */}
-              <td className="px-3 py-2">
-                <span
-                  className="px-2 py-0.5 rounded-full text-xs"
-                  style={{
-                    backgroundColor: accommodation.status === 'active' ? '#d1fae5' : '#fee2e2',
-                    color: accommodation.status === 'active' ? '#065f46' : '#991b1b',
-                    fontWeight: 'var(--font-medium)'
-                  }}
-                >
-                  {accommodation.status === 'active' ? '운영중' : '중지'}
-                </span>
-              </td>
-            </tr>
+              </TableCell>
+              <TableCell className="font-medium text-text-secondary">
+                {property.countryCode || '-'}
+              </TableCell>
+              <TableCell className="font-medium text-text-secondary">
+                {property.city || '-'}
+              </TableCell>
+              <TableCell className="font-light text-text-secondary">
+                {createdDateFormatter.format(property.createdAt)}
+              </TableCell>
+            </TableRow>
           ))}
-        </tbody>
-      </table>
-    </div>
+        </TableBody>
+      </Table>
+    </Card>
   )
 }

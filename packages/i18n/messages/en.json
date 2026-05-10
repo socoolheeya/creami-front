@@ -1,0 +1,68 @@
+{
+  "common": {
+    "language": "Language",
+    "notification": "Notification",
+    "profile": "Profile",
+    "settings": "Settings",
+    "logout": "Logout",
+    "search": "Search",
+    "filter": "Filter",
+    "save": "Save",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "edit": "Edit",
+    "add": "Add",
+    "close": "Close",
+    "confirm": "Confirm"
+  },
+  "sidebar": {
+    "collapse": "Collapse sidebar",
+    "expand": "Expand sidebar"
+  },
+  "notification": {
+    "empty": "No notifications",
+    "title": "Notifications"
+  },
+  "language": {
+    "select": "Select language",
+    "ko": "한국어",
+    "en": "English",
+    "ja": "日本語"
+  },
+  "appSwitcher": {
+    "title": "Switch app",
+    "current": "Current"
+  },
+  "apps": {
+    "home": "Creami Home",
+    "accommodation": "Creami Accommodation",
+    "ari": "Creami ARI",
+    "discount": "Creami Discount",
+    "booking": "Creami Booking",
+    "invoice": "Creami Invoice",
+    "setting": "Creami Setting"
+  },
+  "nav": {
+    "dashboard": "Dashboard",
+    "homeDashboard": "Home Dashboard",
+    "ariDashboard": "ARI Dashboard",
+    "discountDashboard": "Discount Dashboard",
+    "invoiceDashboard": "Invoice Dashboard",
+    "masterProperties": "Master Property Management",
+    "properties": "Property Management",
+    "rooms": "Room Management",
+    "rateplans": "Rate Plan Management",
+    "rates": "Rate Management",
+    "inventories": "Inventory Management",
+    "discounts": "Discount Management",
+    "discountMappings": "Discount-Rate Plan Mapping",
+    "bookings": "Booking List",
+    "newBooking": "New Booking",
+    "invoices": "Invoice List",
+    "profile": "Profile",
+    "users": "User Management",
+    "permissions": "Permission Management",
+    "policies": "Policy Management",
+    "subscriptions": "Subscription Management"
+  }
+}

@@ -4,14 +4,17 @@ import type { ReactNode } from 'react'
 import { Header } from './Header'
 import type { AppSwitcherApp } from './AppSwitcher'
 import { SidebarProvider, useSidebar } from './SidebarContext'
+import type { Locale } from '@creami/i18n'
 
 export interface MainLayoutProps {
   children: ReactNode
   sidebar: ReactNode
   apps: readonly AppSwitcherApp[]
   currentAppId: string
-  themeToggle?: ReactNode
+  currentLocale: Locale
+  onLocaleChange: (locale: Locale) => void
   rightSlot?: ReactNode
+  profileHref?: string
 }
 
 function MainLayoutContent({
@@ -19,8 +22,10 @@ function MainLayoutContent({
   sidebar,
   apps,
   currentAppId,
-  themeToggle,
-  rightSlot
+  currentLocale,
+  rightSlot,
+  profileHref,
+  onLocaleChange
 }: MainLayoutProps) {
   const { isCollapsed } = useSidebar()
 
@@ -29,8 +34,10 @@ function MainLayoutContent({
       <Header
         apps={apps}
         currentAppId={currentAppId}
-        themeToggle={themeToggle}
+        currentLocale={currentLocale}
         rightSlot={rightSlot}
+        profileHref={profileHref}
+        onLocaleChange={onLocaleChange}
       />
       {sidebar}
       <main

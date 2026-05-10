@@ -1,15 +1,18 @@
 'use client'
 
-import { Discount, DISCOUNT_TYPE_LABELS, DISCOUNT_STATUS_LABELS, DISCOUNT_TARGET_LABELS } from '@/lib/types/discount'
+import { Discount } from '@/lib/types/discount'
 import { Tag, Percent, DollarSign, Calendar } from 'lucide-react'
 import Link from 'next/link'
 import { Card } from '@creami/ui'
+import { useLocale, useTranslations } from 'next-intl'
 
 interface DiscountCardProps {
   discount: Discount
 }
 
 export function DiscountCard({ discount }: DiscountCardProps) {
+  const t = useTranslations()
+  const locale = useLocale()
   const statusColor =
     discount.status === 'active' ? 'var(--primary)' :
     discount.status === 'scheduled' ? 'var(--info)' :
@@ -62,7 +65,7 @@ export function DiscountCard({ discount }: DiscountCardProps) {
                 fontWeight: 'var(--font-medium)'
               }}
             >
-              {DISCOUNT_STATUS_LABELS[discount.status]}
+              {t(`discount.labels.status.${discount.status}`)}
             </span>
           </div>
 
@@ -90,11 +93,13 @@ export function DiscountCard({ discount }: DiscountCardProps) {
                 <DollarSign className="h-icon-md w-icon-md" style={{ color: 'var(--primary)' }} />
               )}
               <span className="text-2xl" style={{ fontWeight: 'var(--font-bold)', color: 'var(--text-primary)' }}>
-                {discount.type === 'percentage' ? `${discount.value}%` : `${discount.value.toLocaleString()}원`}
+                {discount.type === 'percentage'
+                  ? `${discount.value}%`
+                  : t('discount.labels.amountWon', { value: discount.value.toLocaleString(locale) })}
               </span>
             </div>
             <span className="text-base" style={{ color: 'var(--text-secondary)' }}>
-              {DISCOUNT_TYPE_LABELS[discount.type]}
+              {t(`discount.labels.types.${discount.type}`)}
             </span>
           </div>
 
@@ -103,15 +108,17 @@ export function DiscountCard({ discount }: DiscountCardProps) {
             <div className="flex items-center gap-sm">
               <Tag className="h-md w-md" style={{ color: 'var(--text-secondary)' }} />
               <span style={{ color: 'var(--text-secondary)' }}>
-                대상: {DISCOUNT_TARGET_LABELS[discount.target]}
+                {t('discount.labels.target', {
+                  target: t(`discount.labels.targets.${discount.target}`)
+                })}
               </span>
             </div>
 
             <div className="flex items-center gap-sm">
               <Calendar className="h-md w-md" style={{ color: 'var(--text-secondary)' }} />
               <span style={{ color: 'var(--text-secondary)' }}>
-                {discount.startDate.toLocaleDateString('ko-KR', { month: 'short', day: 'numeric' })} ~ {' '}
-                {discount.endDate.toLocaleDateString('ko-KR', { month: 'short', day: 'numeric' })}
+                {discount.startDate.toLocaleDateString(locale, { month: 'short', day: 'numeric' })} ~{' '}
+                {discount.endDate.toLocaleDateString(locale, { month: 'short', day: 'numeric' })}
               </span>
             </div>
           </div>

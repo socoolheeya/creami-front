@@ -2,6 +2,7 @@
 
 import { DollarSign, Search, ChevronDown, ChevronUp, X, Building2, Bed, Package2 } from 'lucide-react'
 import { useState } from 'react'
+import { useTranslations } from 'next-intl'
 import { mockProperties } from '@/lib/data/mock-properties'
 import { mockRoomTypes } from '@/lib/data/mock-rooms'
 import { mockPackages } from '@/lib/data/mock-packages'
@@ -63,6 +64,7 @@ const ratePlanPricingSettings: Record<string, {
 }
 
 export default function RatesPage() {
+  const t = useTranslations()
 
   // Search condition state
   const [selectedPropertyId, setSelectedPropertyId] = useState<string>('')
@@ -299,7 +301,7 @@ export default function RatesPage() {
         className="block text-base"
         style={{ color: 'var(--text-secondary)', fontWeight: 'var(--font-medium)' }}
       >
-        객실 타입 선택
+        {t('ari.rates.roomSelect')}
       </label>
 
       <div className="relative">
@@ -311,8 +313,8 @@ export default function RatesPage() {
         >
           <span style={{ color: selectedRoomIds.length > 0 ? 'var(--text-primary)' : 'var(--text-tertiary)' }}>
             {selectedRoomIds.length > 0
-              ? `${selectedRoomIds.length}개 객실 선택됨`
-              : '객실 타입을 선택하세요'}
+              ? t('ari.rates.selectedRooms', { count: selectedRoomIds.length })
+              : t('ari.rates.roomPlaceholder')}
           </span>
           <ChevronDown className="h-lg w-lg" />
         </Button>
@@ -338,7 +340,7 @@ export default function RatesPage() {
               }}
             >
               <span style={{ fontWeight: 'var(--font-medium)', color: 'var(--text-primary)' }}>
-                {tempSelectedRoomIds.length}/{availableRooms.length} 선택됨
+                {t('ari.common.selectedOfTotal', { selected: tempSelectedRoomIds.length, total: availableRooms.length })}
               </span>
               <div className="flex gap-sm">
                 <Button
@@ -347,7 +349,7 @@ export default function RatesPage() {
                   size="sm"
                   style={{ color: 'var(--primary)' }}
                 >
-                  전체선택
+                  {t('ari.common.selectAll')}
                 </Button>
                 <Button
                   onClick={handleDeselectAllRooms}
@@ -355,7 +357,7 @@ export default function RatesPage() {
                   size="sm"
                   style={{ color: 'var(--text-secondary)' }}
                 >
-                  선택해제
+                  {t('ari.common.deselectAll')}
                 </Button>
               </div>
             </div>
@@ -364,7 +366,7 @@ export default function RatesPage() {
               <Input
                 value={roomSearchQuery}
                 onChange={(event) => setRoomSearchQuery(event.target.value)}
-                placeholder="객실 ID, 코드 또는 이름으로 검색"
+                placeholder={t('ari.rates.roomSearchPlaceholder')}
                 showSearchIcon
               />
             </div>
@@ -409,7 +411,7 @@ export default function RatesPage() {
                 ))
               ) : (
                 <div className="rounded py-sm text-center text-base" style={{ color: 'var(--text-tertiary)' }}>
-                  검색 결과가 없습니다
+                  {t('ari.common.noSearchResults')}
                 </div>
               )}
             </div>
@@ -426,14 +428,14 @@ export default function RatesPage() {
                 variant="secondary"
                 className="flex-1"
               >
-                취소
+                {t('ari.common.cancel')}
               </Button>
               <Button
                 onClick={handleApplyRoomSelection}
                 variant="primary"
                 className="flex-1"
               >
-                적용 ({tempSelectedRoomIds.length}개)
+                {t('ari.common.applyCount', { count: tempSelectedRoomIds.length })}
               </Button>
             </div>
           </div>
@@ -476,7 +478,7 @@ export default function RatesPage() {
             borderRadius: 'var(--radius)'
           }}
         >
-          선택된 객실이 없습니다
+          {t('ari.rates.noSelectedRooms')}
         </div>
       )}
     </div>
@@ -488,14 +490,14 @@ export default function RatesPage() {
         className="mb-sm block text-base"
         style={{ color: 'var(--text-secondary)', fontWeight: 'var(--font-medium)' }}
       >
-        패키지 선택
+        {t('ari.rates.packageSelect')}
       </label>
       <SearchableSelect
         value={selectedPackageId}
         onChange={handlePackageSelect}
         options={packageOptions}
-        placeholder="패키지를 선택하세요"
-        searchPlaceholder="패키지 ID, 코드 또는 이름으로 검색"
+        placeholder={t('ari.rates.packagePlaceholder')}
+        searchPlaceholder={t('ari.rates.packageSearchPlaceholder')}
         disabled={!selectedPropertyId}
       />
     </div>
@@ -507,14 +509,14 @@ export default function RatesPage() {
         className="mb-sm block text-base"
         style={{ color: 'var(--text-secondary)', fontWeight: 'var(--font-medium)' }}
       >
-        객실 타입 선택
+        {t('ari.rates.roomSelect')}
       </label>
       <SearchableSelect
         value={selectedRoomIds[0] || ''}
         onChange={handleSingleRoomSelect}
         options={roomOptions}
-        placeholder="객실 타입을 선택하세요"
-        searchPlaceholder="객실 ID, 코드 또는 이름으로 검색"
+        placeholder={t('ari.rates.roomPlaceholder')}
+        searchPlaceholder={t('ari.rates.roomSearchPlaceholder')}
         disabled={!selectedPropertyId}
       />
     </div>
@@ -526,7 +528,7 @@ export default function RatesPage() {
         className="block text-base"
         style={{ color: 'var(--text-secondary)', fontWeight: 'var(--font-medium)' }}
       >
-        패키지 선택
+        {t('ari.rates.packageSelect')}
       </label>
 
       <div className="relative">
@@ -538,8 +540,8 @@ export default function RatesPage() {
         >
           <span style={{ color: selectedPackageIds.length > 0 ? 'var(--text-primary)' : 'var(--text-tertiary)' }}>
             {selectedPackageIds.length > 0
-              ? `${selectedPackageIds.length}개 패키지 선택됨`
-              : '패키지를 선택하세요'}
+              ? t('ari.rates.selectedPackages', { count: selectedPackageIds.length })
+              : t('ari.rates.packagePlaceholder')}
           </span>
           <ChevronDown className="h-lg w-lg" />
         </Button>
@@ -565,7 +567,7 @@ export default function RatesPage() {
               }}
             >
               <span style={{ fontWeight: 'var(--font-medium)', color: 'var(--text-primary)' }}>
-                {tempSelectedPackageIds.length}/{availablePackages.length} 선택됨
+                {t('ari.common.selectedOfTotal', { selected: tempSelectedPackageIds.length, total: availablePackages.length })}
               </span>
               <div className="flex gap-sm">
                 <Button
@@ -574,7 +576,7 @@ export default function RatesPage() {
                   size="sm"
                   style={{ color: 'var(--primary)' }}
                 >
-                  전체선택
+                  {t('ari.common.selectAll')}
                 </Button>
                 <Button
                   onClick={handleDeselectAllPackages}
@@ -582,7 +584,7 @@ export default function RatesPage() {
                   size="sm"
                   style={{ color: 'var(--text-secondary)' }}
                 >
-                  선택해제
+                  {t('ari.common.deselectAll')}
                 </Button>
               </div>
             </div>
@@ -591,7 +593,7 @@ export default function RatesPage() {
               <Input
                 value={packageSearchQuery}
                 onChange={(event) => setPackageSearchQuery(event.target.value)}
-                placeholder="패키지 ID, 코드 또는 이름으로 검색"
+                placeholder={t('ari.rates.packageSearchPlaceholder')}
                 showSearchIcon
               />
             </div>
@@ -636,7 +638,7 @@ export default function RatesPage() {
                 ))
               ) : (
                 <div className="rounded py-sm text-center text-base" style={{ color: 'var(--text-tertiary)' }}>
-                  검색 결과가 없습니다
+                  {t('ari.common.noSearchResults')}
                 </div>
               )}
             </div>
@@ -653,14 +655,14 @@ export default function RatesPage() {
                 variant="secondary"
                 className="flex-1"
               >
-                취소
+                {t('ari.common.cancel')}
               </Button>
               <Button
                 onClick={handleApplyPackageSelection}
                 variant="primary"
                 className="flex-1"
               >
-                적용 ({tempSelectedPackageIds.length}개)
+                {t('ari.common.applyCount', { count: tempSelectedPackageIds.length })}
               </Button>
             </div>
           </div>
@@ -703,7 +705,7 @@ export default function RatesPage() {
             borderRadius: 'var(--radius)'
           }}
         >
-          선택된 패키지가 없습니다
+          {t('ari.rates.noSelectedPackages')}
         </div>
       )}
     </div>
@@ -716,7 +718,7 @@ export default function RatesPage() {
         <div className="flex items-center gap-md">
           <DollarSign className="h-lg w-lg" style={{ color: 'var(--primary)' }} />
           <h1 className="text-2xl" style={{ fontWeight: 'var(--font-bold)', color: 'var(--text-primary)' }}>
-            요금 관리
+            {t('ari.rates.title')}
           </h1>
         </div>
       </div>
@@ -741,7 +743,7 @@ export default function RatesPage() {
         >
           <div className="flex-1">
             <h2 className="mb-xs text-xl" style={{ fontWeight: 'var(--font-bold)', color: 'var(--text-primary)' }}>
-              조회 조건
+              {t('ari.common.searchConditions')}
             </h2>
             {showResults && selectedProperty && isCollapsed && (
               <div
@@ -809,7 +811,7 @@ export default function RatesPage() {
                   className="mb-sm block text-base"
                   style={{ color: 'var(--text-secondary)', fontWeight: 'var(--font-medium)' }}
                 >
-                  조회 기준
+                  {t('ari.rates.criteriaType')}
                 </label>
                 <div className="flex gap-sm">
                   <Button
@@ -817,24 +819,24 @@ export default function RatesPage() {
                     variant={criteriaType === 'package' ? 'primary' : 'tertiary'}
                     size="sm"
                   >
-                    패키지 기준
+                    {t('ari.rates.packageCriteria')}
                   </Button>
                   <Button
                     onClick={() => handleCriteriaTypeChange('room')}
                     variant={criteriaType === 'room' ? 'primary' : 'tertiary'}
                     size="sm"
                   >
-                    객실 기준
+                    {t('ari.rates.roomCriteria')}
                   </Button>
                 </div>
               </div>
 
               <div className="flex flex-wrap gap-sm">
                 {[
-                  { label: '30일', days: 30 },
-                  { label: '60일', days: 60 },
-                  { label: '90일', days: 90 },
-                  { label: '365일', days: 365 }
+                  { label: t('ari.common.days', { count: 30 }), days: 30 },
+                  { label: t('ari.common.days', { count: 60 }), days: 60 },
+                  { label: t('ari.common.days', { count: 90 }), days: 90 },
+                  { label: t('ari.common.days', { count: 365 }), days: 365 }
                 ].map(({ label, days }) => (
                   <Button
                     key={days}
@@ -858,7 +860,7 @@ export default function RatesPage() {
                   size="sm"
                 >
                   <Search className="h-md w-md" />
-                  조회
+                  {t('ari.common.search')}
                 </Button>
               </div>
             </div>
@@ -869,14 +871,14 @@ export default function RatesPage() {
                   className="mb-sm block text-base"
                   style={{ color: 'var(--text-secondary)', fontWeight: 'var(--font-medium)' }}
                 >
-                  숙소 선택
+                  {t('ari.rates.propertySelect')}
                 </label>
                 <SearchableSelect
                   value={selectedPropertyId}
                   onChange={handlePropertyChange}
                   options={propertyOptions}
-                  placeholder="숙소를 선택하세요"
-                  searchPlaceholder="숙소 ID, 코드 또는 이름으로 검색"
+                  placeholder={t('ari.rates.propertyPlaceholder')}
+                  searchPlaceholder={t('ari.rates.propertySearchPlaceholder')}
                 />
               </div>
 
@@ -903,20 +905,20 @@ export default function RatesPage() {
                     className="mb-sm block text-base"
                     style={{ color: 'var(--text-secondary)', fontWeight: 'var(--font-medium)' }}
                   >
-                    기간 선택
+                    {t('ari.common.selectPeriod')}
                   </label>
                   <div className="grid grid-cols-1 gap-md md:grid-cols-2">
                     <DatePicker
-                      label="시작일"
+                      label={t('ari.common.startDate')}
                       value={startDate}
                       onChange={setStartDate}
-                      placeholder="시작일 선택"
+                      placeholder={t('ari.common.selectStartDate')}
                     />
                     <DatePicker
-                      label="종료일"
+                      label={t('ari.common.endDate')}
                       value={endDate}
                       onChange={setEndDate}
-                      placeholder="종료일 선택"
+                      placeholder={t('ari.common.selectEndDate')}
                       align="right"
                     />
                   </div>
@@ -931,7 +933,7 @@ export default function RatesPage() {
                   onClick={handleReset}
                   variant="secondary"
                 >
-                  초기화
+                  {t('ari.common.reset')}
                 </Button>
               )}
             </div>
@@ -951,10 +953,10 @@ export default function RatesPage() {
         >
           <DollarSign className="h-3xl w-3xl" style={{ color: 'var(--text-tertiary)' }} />
           <h3 className="text-xl" style={{ fontWeight: 'var(--font-bold)', color: 'var(--text-primary)' }}>
-            조회 조건을 선택하세요
+            {t('ari.common.selectConditions')}
           </h3>
           <p style={{ color: 'var(--text-secondary)', fontWeight: 'var(--font-light)' }}>
-            숙소, 패키지/객실, 조건을 선택한 후 조회 버튼을 눌러주세요
+            {t('ari.rates.emptyDescription')}
           </p>
         </div>
       ) : (
@@ -963,8 +965,8 @@ export default function RatesPage() {
           endDate={endDate}
           selectedRooms={resultRows}
           packageName={resultContextName}
-          rowHeaderLabel={criteriaType === 'package' ? '객실 타입' : '패키지'}
-          bulkTargetLabel={criteriaType === 'package' ? '객실' : '패키지'}
+          rowHeaderLabel={criteriaType === 'package' ? t('ari.rates.rowHeaderRoomType') : t('ari.rates.rowHeaderPackage')}
+          bulkTargetLabel={criteriaType === 'package' ? t('ari.rates.bulkTargetRoom') : t('ari.rates.bulkTargetPackage')}
           ratePlanPricing={activeRatePlanPricing}
         />
       )}

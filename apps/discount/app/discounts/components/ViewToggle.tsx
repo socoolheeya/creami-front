@@ -1,6 +1,7 @@
 'use client'
 
 import { LayoutGrid, List } from 'lucide-react'
+import { useTranslations } from 'next-intl'
 
 interface ViewToggleProps {
   view: 'grid' | 'table'
@@ -8,6 +9,8 @@ interface ViewToggleProps {
 }
 
 export function ViewToggle({ view, onViewChange }: ViewToggleProps) {
+  const t = useTranslations()
+
   return (
     <div
       className="flex rounded overflow-hidden"
@@ -24,7 +27,7 @@ export function ViewToggle({ view, onViewChange }: ViewToggleProps) {
           color: view === 'grid' ? 'var(--text-on-primary)' : 'var(--text-primary)',
           fontWeight: 'var(--font-medium)'
         }}
-        title="카드 보기"
+        title={t('discount.common.viewCard')}
       >
         <LayoutGrid className="h-icon-md w-icon-md" />
       </button>
@@ -37,7 +40,7 @@ export function ViewToggle({ view, onViewChange }: ViewToggleProps) {
           fontWeight: 'var(--font-medium)',
           borderLeft: '1px solid var(--border-color)'
         }}
-        title="테이블 보기"
+        title={t('discount.common.viewTable')}
       >
         <List className="h-icon-md w-icon-md" />
       </button>

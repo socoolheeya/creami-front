@@ -1,0 +1,104 @@
+{
+  "nav": {
+    "discountDashboard": "割引ダッシュボード",
+    "discounts": "割引管理",
+    "discountMappings": "割引・料金プラン連携"
+  },
+  "discount": {
+    "dashboard": {
+      "title": "割引ダッシュボード",
+      "notice": "お知らせ",
+      "welcome": "Creami Discountへようこそ。",
+      "stats": {
+        "activeDiscounts": "有効な割引",
+        "averageRate": "平均割引率",
+        "discountRevenue": "割引売上",
+        "usedCustomers": "利用顧客"
+      }
+    },
+    "common": {
+      "new": "新規登録",
+      "search": "検索...",
+      "save": "保存",
+      "edit": "修正",
+      "apply": "適用",
+      "selectAll": "すべて選択",
+      "clearSelection": "選択解除",
+      "noSearchResults": "検索結果がありません",
+      "count": "{count}件",
+      "showMore": "{count}件さらに表示",
+      "shownOfTotal": "{total}件中{shown}件表示",
+      "viewCard": "カード表示",
+      "viewTable": "テーブル表示"
+    },
+    "labels": {
+      "types": {
+        "percentage": "パーセント割引",
+        "fixed": "定額割引"
+      },
+      "targets": {
+        "all": "全体",
+        "accommodation": "特定宿泊施設",
+        "room": "特定客室",
+        "rateplan": "特定料金プラン"
+      },
+      "status": {
+        "active": "有効",
+        "scheduled": "予定",
+        "expired": "期限切れ",
+        "disabled": "無効"
+      },
+      "amountWon": "{value}ウォン",
+      "target": "対象: {target}",
+      "used": "{count}回使用",
+      "usageLimit": "/ {count}回上限"
+    },
+    "discounts": {
+      "title": "割引管理",
+      "searchPlaceholder": "割引名またはコードで検索...",
+      "empty": "登録された割引がありません",
+      "emptySearch": "検索結果がありません",
+      "emptyHelp": "最初の割引を登録してみましょう",
+      "create": "割引を登録",
+      "table": {
+        "name": "割引名",
+        "code": "コード",
+        "type": "タイプ",
+        "value": "割引金額/率",
+        "period": "期間",
+        "usage": "使用状況",
+        "status": "状態",
+        "all": "全体"
+      }
+    },
+    "mappings": {
+      "title": "割引・料金プラン連携",
+      "selectedContext": "選択された宿泊施設と料金プラン",
+      "selectAccommodationFirst": "先に宿泊施設を選択してください",
+      "selectAccommodationHelp": "上で宿泊施設を選択すると、その宿泊施設の料金プランを確認できます",
+      "selectRatePlanFirst": "料金プランを選択してください",
+      "selectRatePlanHelp": "上で連携する料金プランを選択すると、割引を連携できます",
+      "selectRatePlanAlert": "先に料金プランを選択してください",
+      "saveSuccess": "連携が保存されました。",
+      "beforeTitle": "連携前の割引",
+      "beforeDescription": "有効状態で現在期間に使用可能な割引のみ表示されます",
+      "afterTitle": "連携後",
+      "availableSearchPlaceholder": "割引ID、割引コード、割引タイプで検索...",
+      "emptyAvailableSearch": "検索された割引がありません",
+      "emptyAvailable": "すべての割引が連携されています",
+      "emptyMapped": "連携された割引がありません",
+      "accommodation": {
+        "title": "宿泊施設選択",
+        "clear": "選択解除",
+        "placeholder": "IDまたは宿泊施設名で検索..."
+      },
+      "ratePlan": {
+        "title": "料金プラン選択 ({selected}/{total})",
+        "placeholder": "IDまたは料金プラン名で検索...",
+        "disabledPlaceholder": "先に宿泊施設を選択してください",
+        "select": "選択",
+        "deselect": "選択解除"
+      }
+    }
+  }
+}

@@ -1,167 +1,240 @@
 'use client'
 
-import { ArrowLeft, MapPin, Phone, Mail, Calendar, Edit, Wifi, Car, Coffee, DollarSign, Star, Building2, Globe, Home, Tag, User } from 'lucide-react'
-import Link from 'next/link'
 import Image from 'next/image'
-import { useState, use } from 'react'
-import { mockAccommodations } from '@/lib/data/mock-accommodations'
-import { PROPERTY_TYPE_LABELS, CURRENCY_OPTIONS } from '../../../lib/types/property'
+import Link from 'next/link'
+import { useParams } from 'next/navigation'
+import { useMemo, useState } from 'react'
+import {
+  ArrowLeft,
+  Building2,
+  Calendar,
+  DollarSign,
+  Edit,
+  Globe,
+  Home,
+  ImageIcon,
+  Mail,
+  MapPin,
+  Phone,
+  Star,
+  Tag,
+  User,
+  Wifi
+} from 'lucide-react'
+import { Button, Card } from '@creami/ui'
+import { useProperty } from '@/hooks/useProperties'
+import { CURRENCY_OPTIONS, PROPERTY_TYPE_LABELS, type Property } from '@/lib/types/property'
 import { mockRatePlans } from '@/lib/data/mock-rateplans'
 import { PRICE_TYPE_LABELS } from '@/lib/types/rateplan'
+import { PropertyEditForm } from '../components/PropertyEditForm'
 
-export default function AccommodationDetailPage({ params }: { params: Promise<{ id: string }> }) {
-  const { id } = use(params)
-  const accommodation = mockAccommodations.find(acc => acc.id === id)
+function InfoItem({
+  icon: Icon,
+  label,
+  value
+}: {
+  icon: typeof Phone
+  label: string
+  value: string
+}) {
+  return (
+    <div className="flex min-w-0 items-center gap-sm">
+      <Icon className="h-icon-md w-icon-md shrink-0 text-text-tertiary" />
+      <div className="min-w-0">
+        <div className="text-base font-light text-text-tertiary">{label}</div>
+        <div className="truncate text-base font-medium text-text-primary">{value || '-'}</div>
+      </div>
+    </div>
+  )
+}
+
+function getPropertyStatusLabel(status: string) {
+  const statusMap: Record<string, string> = {
+    draft: 'DRAFT',
+    active: 'ACTIVE',
+    inactive: 'INACTIVE',
+    archived: 'ARCHIVED'
+  }
+
+  return statusMap[status] ?? status
+}
+
+function formatDateTime(value: Date) {
+  return new Intl.DateTimeFormat('ko-KR', {
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+    hour: '2-digit',
+    minute: '2-digit',
+    second: '2-digit',
+    hour12: false
+  }).format(value)
+}
+
+export default function AccommodationDetailPage() {
+  const params = useParams<{ id: string }>()
+  const propertyId = params.id ?? ''
+  const { data: propertyData, isLoading, isError } = useProperty(propertyId)
   const [selectedImageIndex, setSelectedImageIndex] = useState(0)
+  const [isEditing, setIsEditing] = useState(false)
+  const [propertyOverride, setPropertyOverride] = useState<Property | null>(null)
+  const accommodation = propertyOverride ?? propertyData
 
-  const accommodationRatePlans = mockRatePlans.filter(rp => rp.accommodationId === id)
+  const accommodationRatePlans = useMemo(
+    () => mockRatePlans.filter((ratePlan) => ratePlan.accommodationId === propertyId),
+    [propertyId]
+  )
+  const currencyInfo = CURRENCY_OPTIONS.find(
+    (currency) => currency.code === accommodation?.billingPolicy.currency
+  )
+  const displayImages = useMemo(() => {
+    const images = accommodation?.images ?? []
+    return [...images].sort((leftImage, rightImage) => {
+      if (leftImage.isPrimary) {
+        return -1
+      }
+      if (rightImage.isPrimary) {
+        return 1
+      }
+      return leftImage.sortOrder - rightImage.sortOrder
+    })
+  }, [accommodation?.images])
+  const selectedImage = displayImages[selectedImageIndex] ?? displayImages[0]
+  const faxNumbers = accommodation?.faxNumbers ?? []
 
-  if (!accommodation) {
+  if (isLoading) {
     return (
-      <div className="flex flex-col items-center justify-center py-12">
-        <h2 className="text-xl mb-3 text-sm" style={{ fontWeight: 'var(--font-bold)', color: 'var(--text-primary)' }}>
-          숙소를 찾을 수 없습니다
-        </h2>
-        <Link href="/properties">
-          <button
-            className="px-3 py-1.5 rounded-lg text-sm"
-            style={{
-              backgroundColor: 'var(--primary)',
-              color: '#ffffff',
-              fontWeight: 'var(--font-medium)'
-            }}
-          >
-            목록으로 돌아가기
-          </button>
+      <Card className="p-lg" hover={false}>
+        <p className="text-base font-medium text-text-secondary">숙소를 조회하는 중입니다.</p>
+      </Card>
+    )
+  }
+
+  if (isError || !accommodation) {
+    return (
+      <div>
+        <Link
+          href="/properties"
+          className="mb-lg inline-flex items-center gap-sm text-base font-medium text-text-secondary no-underline hover:text-primary"
+        >
+          <ArrowLeft className="h-icon-md w-icon-md" />
+          숙소 목록으로
         </Link>
+        <Card className="p-lg" hover={false}>
+          <h1 className="text-xl font-bold text-text-primary">숙소를 찾을 수 없습니다</h1>
+        </Card>
       </div>
     )
   }
 
-  const currencyInfo = CURRENCY_OPTIONS.find(c => c.code === accommodation.billingPolicy.currency)
+  if (isEditing) {
+    return (
+      <div>
+        <Link
+          href="/properties"
+          className="mb-md inline-flex items-center gap-sm text-base font-medium text-text-secondary no-underline hover:text-primary"
+        >
+          <ArrowLeft className="h-icon-md w-icon-md" />
+          숙소 목록으로
+        </Link>
+        <PropertyEditForm
+          key={accommodation.id}
+          accommodation={accommodation}
+          propertyId={propertyId}
+          onCancel={() => setIsEditing(false)}
+          onSaved={(property) => {
+            setPropertyOverride(property)
+            setSelectedImageIndex(0)
+            setIsEditing(false)
+          }}
+        />
+      </div>
+    )
+  }
 
   return (
     <div>
-      {/* Header */}
-      <div className="mb-4">
+      <div className="mb-lg">
         <Link
           href="/properties"
-          className="inline-flex items-center gap-2 mb-3 transition-colors text-sm"
-          style={{ color: 'var(--text-secondary)' }}
+          className="mb-md inline-flex items-center gap-sm text-base font-medium text-text-secondary no-underline hover:text-primary"
         >
-          <ArrowLeft className="w-4 h-4" />
-          <span style={{ fontWeight: 'var(--font-medium)' }}>숙소 목록으로</span>
+          <ArrowLeft className="h-icon-md w-icon-md" />
+          숙소 목록으로
         </Link>
 
-        <div className="flex items-start justify-between">
-          <div>
-            <div className="flex items-center gap-3 mb-1.5">
-              <span
-                className="px-2 py-0.5 rounded text-xs"
-                style={{
-                  backgroundColor: 'var(--bg-tertiary)',
-                  color: 'var(--text-secondary)',
-                  fontWeight: 'var(--font-medium)'
-                }}
-              >
-                {PROPERTY_TYPE_LABELS[accommodation.type]}
-              </span>
-              <span
-                className="px-2 py-0.5 rounded-full text-xs"
-                style={{
-                  backgroundColor: accommodation.status === 'active' ? '#d1fae5' : '#fee2e2',
-                  color: accommodation.status === 'active' ? '#065f46' : '#991b1b',
-                  fontWeight: 'var(--font-medium)'
-                }}
-              >
-                {accommodation.status === 'active' ? '운영중' : '중지'}
-              </span>
-            </div>
-            <div className="flex items-center gap-3 mb-1.5">
-              <h1 className="text-2xl" style={{ fontWeight: 'var(--font-bold)', color: 'var(--text-primary)' }}>
-                {accommodation.name}
-              </h1>
-              {accommodation.stars && (
-                <div className="flex items-center gap-1">
-                  {Array.from({ length: accommodation.stars }).map((_, i) => (
-                    <Star key={i} className="w-4 h-4 fill-yellow-400 text-yellow-400" />
+        <div className="flex items-start justify-between gap-lg">
+          <div className="min-w-0">
+            <div className="mb-sm flex flex-wrap items-center gap-md">
+              <h1 className="text-2xl font-bold text-text-primary">{accommodation.name}</h1>
+              {accommodation.stars ? (
+                <div className="flex items-center gap-xs">
+                  {Array.from({ length: accommodation.stars }).map((_, index) => (
+                    <Star
+                      key={`${accommodation.id}-star-${index}`}
+                      className="h-icon-md w-icon-md fill-primary text-primary"
+                    />
                   ))}
                 </div>
-              )}
+              ) : null}
             </div>
+
             {accommodation.enName && (
-              <div className="text-base mb-1.5" style={{ color: 'var(--text-secondary)', fontWeight: 'var(--font-medium)' }}>
+              <p className="mb-sm text-base font-medium text-text-secondary">
                 {accommodation.enName}
-              </div>
+              </p>
             )}
-            <div className="flex items-center gap-2 text-sm" style={{ color: 'var(--text-secondary)' }}>
-              <MapPin className="w-4 h-4" />
-              <span>
+            <div className="flex min-w-0 items-center gap-sm text-base font-light text-text-secondary">
+              <MapPin className="h-icon-md w-icon-md shrink-0 text-text-tertiary" />
+              <span className="truncate">
                 {accommodation.address}
-                {accommodation.addressDetail && ` ${accommodation.addressDetail}`}
-                {accommodation.city && accommodation.zipCode && ` (${accommodation.city}, ${accommodation.zipCode})`}
+                {accommodation.addressDetail ? ` ${accommodation.addressDetail}` : ''}
+                {accommodation.city && accommodation.zipCode
+                  ? ` (${accommodation.city}, ${accommodation.zipCode})`
+                  : ''}
               </span>
             </div>
           </div>
 
-          <Link href={`/properties/${accommodation.id}/edit`}>
-            <button
-              className="flex items-center gap-2 px-3 py-1.5 rounded-lg transition-colors text-sm"
-              style={{
-                backgroundColor: 'var(--primary)',
-                color: '#ffffff',
-                borderRadius: 'var(--radius-sm)',
-                fontWeight: 'var(--font-medium)'
-              }}
-            >
-              <Edit className="w-4 h-4" />
-              수정
-            </button>
-          </Link>
+          <Button type="button" onClick={() => setIsEditing(true)}>
+            <Edit className="h-icon-md w-icon-md" />
+            수정
+          </Button>
         </div>
       </div>
 
-      {/* Main Content Grid */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-        {/* Left Column - Images and Description */}
-        <div className="lg:col-span-2 space-y-4">
-          {/* Image Gallery */}
-          <div
-            className="rounded-lg overflow-hidden"
-            style={{
-              backgroundColor: 'var(--bg-primary)',
-              borderRadius: 'var(--radius)',
-              border: '1px solid var(--border-color)',
-              boxShadow: 'var(--shadow)'
-            }}
-          >
-            {/* Main Image */}
-            <div className="relative w-full h-72 bg-gray-200">
-              {accommodation.images.length > 0 ? (
+      <div className="grid gap-lg lg:grid-cols-3">
+        <div className="grid gap-lg lg:col-span-2">
+          <Card className="w-full p-lg" hover={false}>
+            <h2 className="mb-md text-xl font-bold text-text-primary">이미지</h2>
+            <div className="flex w-full justify-center">
+              <div className="relative h-datepicker w-datepicker max-w-full overflow-hidden rounded bg-bg-tertiary">
+                {selectedImage ? (
                 <Image
-                  src={accommodation.images[selectedImageIndex].url}
+                  src={selectedImage.url}
                   alt={accommodation.name}
                   fill
                   className="object-cover"
                 />
-              ) : (
-                <div className="w-full h-full flex items-center justify-center" style={{ backgroundColor: 'var(--bg-tertiary)' }}>
-                  <span className="text-sm" style={{ color: 'var(--text-tertiary)' }}>이미지 없음</span>
-                </div>
-              )}
+                ) : (
+                  <div className="flex h-full flex-col items-center justify-center gap-sm text-center text-base font-light text-text-tertiary">
+                    <ImageIcon className="h-2xl w-2xl text-text-tertiary" />
+                    <span>이미지 없음</span>
+                  </div>
+                )}
+              </div>
             </div>
 
-            {/* Thumbnail Strip */}
-            {accommodation.images.length > 1 && (
-              <div className="p-3 flex gap-2 overflow-x-auto">
-                {accommodation.images.map((image, index) => (
+            {displayImages.length > 1 && (
+              <div className="mt-sm flex w-full gap-xs overflow-x-auto">
+                {displayImages.map((image, index) => (
                   <button
                     key={image.id}
+                    type="button"
                     onClick={() => setSelectedImageIndex(index)}
-                    className="relative flex-shrink-0 w-16 h-16 rounded overflow-hidden"
-                    style={{
-                      border: selectedImageIndex === index ? '2px solid var(--primary)' : '2px solid transparent'
-                    }}
+                    className={`relative h-control-md w-control-md shrink-0 cursor-pointer overflow-hidden rounded border bg-bg-tertiary ${
+                      selectedImageIndex === index ? 'border-primary' : 'border-border'
+                    }`}
                   >
                     <Image
                       src={image.url}
@@ -173,451 +246,173 @@ export default function AccommodationDetailPage({ params }: { params: Promise<{ 
                 ))}
               </div>
             )}
-          </div>
+          </Card>
 
-          {/* Description */}
-          <div
-            className="rounded-lg p-4"
-            style={{
-              backgroundColor: 'var(--bg-primary)',
-              borderRadius: 'var(--radius)',
-              border: '1px solid var(--border-color)',
-              boxShadow: 'var(--shadow)'
-            }}
-          >
-            <h2 className="text-lg mb-3" style={{ fontWeight: 'var(--font-bold)', color: 'var(--text-primary)' }}>
-              숙소 설명
-            </h2>
-
-            {/* 한글 설명 */}
-            {accommodation.description && (
-              <div className="mb-3">
-                <h3 className="text-sm mb-1.5" style={{ fontWeight: 'var(--font-medium)', color: 'var(--text-primary)' }}>
-                  한글
-                </h3>
-                <p className="whitespace-pre-wrap text-sm" style={{ color: 'var(--text-secondary)', lineHeight: '1.6' }}>
-                  {accommodation.description}
-                </p>
-              </div>
-            )}
-
-            {/* 영문 설명 */}
-            {accommodation.enDescription && (
+          <Card className="p-lg" hover={false}>
+            <h2 className="mb-md text-xl font-bold text-text-primary">숙소 설명</h2>
+            <div className="grid gap-md">
               <div>
-                <h3 className="text-sm mb-1.5" style={{ fontWeight: 'var(--font-medium)', color: 'var(--text-primary)' }}>
-                  English
-                </h3>
-                <p className="whitespace-pre-wrap text-sm" style={{ color: 'var(--text-secondary)', lineHeight: '1.6' }}>
-                  {accommodation.enDescription}
+                <h3 className="mb-xs text-base font-medium text-text-primary">한글</h3>
+                <p className="whitespace-pre-wrap text-base font-light text-text-secondary">
+                  {accommodation.description || '-'}
                 </p>
               </div>
-            )}
-          </div>
-
-          {/* Amenities */}
-          <div
-            className="rounded-lg p-4"
-            style={{
-              backgroundColor: 'var(--bg-primary)',
-              borderRadius: 'var(--radius)',
-              border: '1px solid var(--border-color)',
-              boxShadow: 'var(--shadow)'
-            }}
-          >
-            <h2 className="text-lg mb-3" style={{ fontWeight: 'var(--font-bold)', color: 'var(--text-primary)' }}>
-              편의시설
-            </h2>
-            <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
-              {accommodation.amenities.map((amenity) => (
-                <div
-                  key={amenity}
-                  className="flex items-center gap-2 px-2 py-1.5 rounded"
-                  style={{
-                    backgroundColor: 'var(--bg-tertiary)',
-                    color: 'var(--text-secondary)'
-                  }}
-                >
-                  <Wifi className="w-4 h-4" />
-                  <span className="text-xs">{amenity}</span>
+              {accommodation.enDescription && (
+                <div>
+                  <h3 className="mb-xs text-base font-medium text-text-primary">English</h3>
+                  <p className="whitespace-pre-wrap text-base font-light text-text-secondary">
+                    {accommodation.enDescription}
+                  </p>
                 </div>
-              ))}
+              )}
             </div>
-          </div>
+          </Card>
+
+          <Card className="p-lg" hover={false}>
+            <h2 className="mb-md text-xl font-bold text-text-primary">편의시설</h2>
+            <div className="grid gap-sm md:grid-cols-3">
+              {accommodation.amenities.length > 0 ? (
+                accommodation.amenities.map((amenity) => (
+                  <div
+                    key={amenity}
+                    className="flex h-control-md items-center gap-sm rounded bg-bg-tertiary px-control-px-md text-base font-medium text-text-secondary"
+                  >
+                    <Wifi className="h-icon-md w-icon-md" />
+                    {amenity}
+                  </div>
+                ))
+              ) : (
+                <p className="text-base font-light text-text-tertiary">등록된 편의시설이 없습니다.</p>
+              )}
+            </div>
+          </Card>
         </div>
 
-        {/* Right Column - Info Cards */}
-        <div className="space-y-4">
-          {/* Contact Info */}
-          <div
-            className="rounded-lg p-4"
-            style={{
-              backgroundColor: 'var(--bg-primary)',
-              borderRadius: 'var(--radius)',
-              border: '1px solid var(--border-color)',
-              boxShadow: 'var(--shadow)'
-            }}
-          >
-            <h3 className="text-base mb-3" style={{ fontWeight: 'var(--font-bold)', color: 'var(--text-primary)' }}>
-              연락처
-            </h3>
-            <div className="space-y-2">
-              <div className="flex items-center gap-2">
-                <Phone className="w-4 h-4" style={{ color: 'var(--text-tertiary)' }} />
-                <div>
-                  <div className="text-xs" style={{ color: 'var(--text-tertiary)' }}>전화번호</div>
-                  <div className="text-sm" style={{ color: 'var(--text-primary)', fontWeight: 'var(--font-medium)' }}>
-                    {accommodation.phone}
-                  </div>
-                </div>
+        <div className="grid content-start gap-lg">
+          <Card className="p-lg" hover={false}>
+            <h2 className="mb-md text-xl font-bold text-text-primary">연락처</h2>
+            <div className="grid gap-md md:grid-cols-2">
+              <InfoItem icon={Phone} label="전화번호" value={accommodation.phone} />
+              <InfoItem icon={Mail} label="이메일" value={accommodation.email ?? ''} />
+              <div className="md:col-span-2">
+                <InfoItem icon={Globe} label="홈페이지" value={accommodation.homepage ?? ''} />
               </div>
-              {accommodation.email && (
-                <div className="flex items-center gap-2">
-                  <Mail className="w-4 h-4" style={{ color: 'var(--text-tertiary)' }} />
-                  <div>
-                    <div className="text-xs" style={{ color: 'var(--text-tertiary)' }}>이메일</div>
-                    <div className="text-sm" style={{ color: 'var(--text-primary)', fontWeight: 'var(--font-medium)' }}>
-                      {accommodation.email}
-                    </div>
-                  </div>
-                </div>
-              )}
-              {accommodation.homepage && (
-                <div className="flex items-center gap-2">
-                  <Globe className="w-4 h-4" style={{ color: 'var(--text-tertiary)' }} />
-                  <div>
-                    <div className="text-xs" style={{ color: 'var(--text-tertiary)' }}>홈페이지</div>
-                    <a
-                      href={accommodation.homepage}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="hover:underline text-sm"
-                      style={{ color: 'var(--primary)', fontWeight: 'var(--font-medium)' }}
-                    >
-                      {accommodation.homepage}
-                    </a>
-                  </div>
-                </div>
-              )}
-              {accommodation.faxNumbers && accommodation.faxNumbers.length > 0 && (
-                <div className="flex items-center gap-2">
-                  <Phone className="w-4 h-4" style={{ color: 'var(--text-tertiary)' }} />
-                  <div>
-                    <div className="text-xs" style={{ color: 'var(--text-tertiary)' }}>팩스</div>
-                    <div className="text-sm" style={{ color: 'var(--text-primary)', fontWeight: 'var(--font-medium)' }}>
-                      {accommodation.faxNumbers.join(', ')}
-                    </div>
-                  </div>
+              {faxNumbers.length > 0 ? (
+                faxNumbers.map((faxNumber, index) => (
+                  <InfoItem
+                    key={`${faxNumber}-${index}`}
+                    icon={Phone}
+                    label={`팩스번호 ${index + 1}`}
+                    value={faxNumber}
+                  />
+                ))
+              ) : (
+                <div className="md:col-span-2">
+                  <InfoItem icon={Phone} label="팩스번호" value="" />
                 </div>
               )}
             </div>
-          </div>
+          </Card>
 
-          {/* Property Info */}
-          {(accommodation.roomCount || accommodation.floorCount) && (
-            <div
-              className="rounded-lg p-4"
-              style={{
-                backgroundColor: 'var(--bg-primary)',
-                borderRadius: 'var(--radius)',
-                border: '1px solid var(--border-color)',
-                boxShadow: 'var(--shadow)'
-              }}
-            >
-              <h3 className="text-base mb-3" style={{ fontWeight: 'var(--font-bold)', color: 'var(--text-primary)' }}>
-                시설 정보
-              </h3>
-              <div className="space-y-2">
-                {accommodation.roomCount && (
-                  <div className="flex items-center gap-2">
-                    <Home className="w-4 h-4" style={{ color: 'var(--text-tertiary)' }} />
-                    <div>
-                      <div className="text-xs" style={{ color: 'var(--text-tertiary)' }}>객실 수</div>
-                      <div className="text-sm" style={{ color: 'var(--text-primary)', fontWeight: 'var(--font-medium)' }}>
-                        {accommodation.roomCount}개
-                      </div>
-                    </div>
-                  </div>
-                )}
-                {accommodation.floorCount && (
-                  <div className="flex items-center gap-2">
-                    <Building2 className="w-4 h-4" style={{ color: 'var(--text-tertiary)' }} />
-                    <div>
-                      <div className="text-xs" style={{ color: 'var(--text-tertiary)' }}>층수</div>
-                      <div className="text-sm" style={{ color: 'var(--text-primary)', fontWeight: 'var(--font-medium)' }}>
-                        {accommodation.floorCount}층
-                      </div>
-                    </div>
-                  </div>
-                )}
+          <Card className="p-lg" hover={false}>
+            <h2 className="mb-md text-xl font-bold text-text-primary">운영 정보</h2>
+            <div className="grid gap-md md:grid-cols-2">
+              <InfoItem
+                icon={Tag}
+                label="유형"
+                value={PROPERTY_TYPE_LABELS[accommodation.type] ?? accommodation.type}
+              />
+              <InfoItem icon={Tag} label="상태" value={getPropertyStatusLabel(accommodation.status)} />
+              <div className="md:col-span-2">
+                <InfoItem icon={Globe} label="언어" value={accommodation.language ?? ''} />
               </div>
+              <InfoItem icon={Building2} label="층수" value={`${accommodation.floorCount ?? 0}층`} />
+              <InfoItem icon={Home} label="객실 수" value={`${accommodation.roomCount ?? 0}개`} />
+              <InfoItem icon={Calendar} label="체크인" value={accommodation.checkIn} />
+              <InfoItem icon={Calendar} label="체크아웃" value={accommodation.checkOut} />
             </div>
-          )}
+          </Card>
 
-          {/* Check-in/out Times */}
-          <div
-            className="rounded-lg p-4"
-            style={{
-              backgroundColor: 'var(--bg-primary)',
-              borderRadius: 'var(--radius)',
-              border: '1px solid var(--border-color)',
-              boxShadow: 'var(--shadow)'
-            }}
-          >
-            <h3 className="text-base mb-3" style={{ fontWeight: 'var(--font-bold)', color: 'var(--text-primary)' }}>
-              체크인/아웃
-            </h3>
-            <div className="space-y-2">
-              <div className="flex items-center gap-2">
-                <Calendar className="w-4 h-4" style={{ color: 'var(--text-tertiary)' }} />
-                <div>
-                  <div className="text-xs" style={{ color: 'var(--text-tertiary)' }}>체크인</div>
-                  <div className="text-sm" style={{ color: 'var(--text-primary)', fontWeight: 'var(--font-medium)' }}>
-                    {accommodation.checkIn}
-                  </div>
-                </div>
-              </div>
-              <div className="flex items-center gap-2">
-                <Calendar className="w-4 h-4" style={{ color: 'var(--text-tertiary)' }} />
-                <div>
-                  <div className="text-xs" style={{ color: 'var(--text-tertiary)' }}>체크아웃</div>
-                  <div className="text-sm" style={{ color: 'var(--text-primary)', fontWeight: 'var(--font-medium)' }}>
-                    {accommodation.checkOut}
-                  </div>
-                </div>
-              </div>
+          <Card className="p-lg" hover={false}>
+            <h2 className="mb-md text-xl font-bold text-text-primary">요금 정책</h2>
+            <div className="grid gap-md">
+              <InfoItem
+                icon={DollarSign}
+                label="통화"
+                value={currencyInfo?.name ?? accommodation.billingPolicy.currency}
+              />
+              <InfoItem
+                icon={DollarSign}
+                label="결제 방법"
+                value={accommodation.billingPolicy.paymentMethod ?? ''}
+              />
+              <InfoItem
+                icon={DollarSign}
+                label="수수료"
+                value={
+                  accommodation.billingPolicy.commission.type === 'percentage'
+                    ? `${accommodation.billingPolicy.commission.value}%`
+                    : `${currencyInfo?.symbol ?? ''}${accommodation.billingPolicy.commission.value}`
+                }
+              />
             </div>
-          </div>
-
-          {/* Billing Policy */}
-          <div
-            className="rounded-lg p-4"
-            style={{
-              backgroundColor: 'var(--bg-primary)',
-              borderRadius: 'var(--radius)',
-              border: '1px solid var(--border-color)',
-              boxShadow: 'var(--shadow)'
-            }}
-          >
-            <h3 className="text-base mb-3" style={{ fontWeight: 'var(--font-bold)', color: 'var(--text-primary)' }}>
-              요금 정책
-            </h3>
-            <div className="space-y-2">
-              <div className="flex items-center gap-2">
-                <DollarSign className="w-4 h-4" style={{ color: 'var(--text-tertiary)' }} />
-                <div>
-                  <div className="text-xs" style={{ color: 'var(--text-tertiary)' }}>통화</div>
-                  <div className="text-sm" style={{ color: 'var(--text-primary)', fontWeight: 'var(--font-medium)' }}>
-                    {currencyInfo?.name || accommodation.billingPolicy.currency}
-                  </div>
-                </div>
-              </div>
-              {accommodation.billingPolicy.paymentMethod && (
-                <div className="flex items-center gap-2">
-                  <DollarSign className="w-4 h-4" style={{ color: 'var(--text-tertiary)' }} />
-                  <div>
-                    <div className="text-xs" style={{ color: 'var(--text-tertiary)' }}>결제 방법</div>
-                    <div className="text-sm" style={{ color: 'var(--text-primary)', fontWeight: 'var(--font-medium)' }}>
-                      {accommodation.billingPolicy.paymentMethod}
-                    </div>
-                  </div>
-                </div>
-              )}
-              {accommodation.billingPolicy.bankName && (
-                <div className="flex items-center gap-2">
-                  <DollarSign className="w-4 h-4" style={{ color: 'var(--text-tertiary)' }} />
-                  <div>
-                    <div className="text-xs" style={{ color: 'var(--text-tertiary)' }}>은행</div>
-                    <div className="text-sm" style={{ color: 'var(--text-primary)', fontWeight: 'var(--font-medium)' }}>
-                      {accommodation.billingPolicy.bankName}
-                    </div>
-                  </div>
-                </div>
-              )}
-              {accommodation.billingPolicy.accountNumber && (
-                <div className="flex items-center gap-2">
-                  <DollarSign className="w-4 h-4" style={{ color: 'var(--text-tertiary)' }} />
-                  <div>
-                    <div className="text-xs" style={{ color: 'var(--text-tertiary)' }}>계좌번호</div>
-                    <div className="text-sm" style={{ color: 'var(--text-primary)', fontWeight: 'var(--font-medium)' }}>
-                      {accommodation.billingPolicy.accountNumber}
-                    </div>
-                  </div>
-                </div>
-              )}
-              <div className="flex items-center gap-2">
-                <DollarSign className="w-4 h-4" style={{ color: 'var(--text-tertiary)' }} />
-                <div>
-                  <div className="text-xs" style={{ color: 'var(--text-tertiary)' }}>수수료</div>
-                  <div className="text-sm" style={{ color: 'var(--text-primary)', fontWeight: 'var(--font-medium)' }}>
-                    {accommodation.billingPolicy.commission.type === 'percentage'
-                      ? `${accommodation.billingPolicy.commission.value}%`
-                      : `${currencyInfo?.symbol || ''}${accommodation.billingPolicy.commission.value}`}
-                  </div>
-                </div>
-              </div>
-              {accommodation.billingPolicy.surcharge && (
-                <div className="flex items-center gap-2">
-                  <DollarSign className="w-4 h-4" style={{ color: 'var(--text-tertiary)' }} />
-                  <div>
-                    <div className="text-xs" style={{ color: 'var(--text-tertiary)' }}>할증료</div>
-                    <div className="text-sm" style={{ color: 'var(--text-primary)', fontWeight: 'var(--font-medium)' }}>
-                      {accommodation.billingPolicy.surcharge.type === 'percentage'
-                        ? `${accommodation.billingPolicy.surcharge.value}%`
-                        : `${currencyInfo?.symbol || ''}${accommodation.billingPolicy.surcharge.value}`}
-                    </div>
-                  </div>
-                </div>
-              )}
-              {accommodation.billingPolicy.tax && (
-                <div className="flex items-center gap-2">
-                  <DollarSign className="w-4 h-4" style={{ color: 'var(--text-tertiary)' }} />
-                  <div>
-                    <div className="text-xs" style={{ color: 'var(--text-tertiary)' }}>세금</div>
-                    <div className="text-sm" style={{ color: 'var(--text-primary)', fontWeight: 'var(--font-medium)' }}>
-                      {accommodation.billingPolicy.tax.type === 'percentage'
-                        ? `${accommodation.billingPolicy.tax.value}%`
-                        : `${currencyInfo?.symbol || ''}${accommodation.billingPolicy.tax.value}`}
-                    </div>
-                  </div>
-                </div>
-              )}
-            </div>
-          </div>
+          </Card>
         </div>
       </div>
 
-      {/* Rate Plans Section */}
       {accommodationRatePlans.length > 0 && (
-        <div className="mt-4">
-          <div
-            className="rounded-lg p-4"
-            style={{
-              backgroundColor: 'var(--bg-primary)',
-              borderRadius: 'var(--radius)',
-              border: '1px solid var(--border-color)',
-              boxShadow: 'var(--shadow)'
-            }}
-          >
-            <div className="flex items-center justify-between mb-3">
-              <h2 className="text-lg" style={{ fontWeight: 'var(--font-bold)', color: 'var(--text-primary)' }}>
-                요금정책 ({accommodationRatePlans.length}개)
-              </h2>
-              <Link href="/rateplans">
-                <button
-                  className="flex items-center gap-1 px-3 py-1.5 rounded-lg transition-colors text-xs"
-                  style={{
-                    backgroundColor: 'var(--bg-tertiary)',
-                    color: 'var(--text-primary)',
-                    fontWeight: 'var(--font-medium)',
-                    borderRadius: 'var(--radius-sm)'
-                  }}
-                >
-                  전체 보기
-                </button>
-              </Link>
-            </div>
-
-            <div className="space-y-3">
-              {accommodationRatePlans.map((ratePlan) => (
-                <div
-                  key={ratePlan.id}
-                  className="p-3 rounded-lg transition-colors"
-                  style={{
-                    backgroundColor: 'var(--bg-secondary)',
-                    border: '1px solid var(--border-color)'
-                  }}
-                >
-                  <div className="flex items-start justify-between mb-2">
-                    <div className="flex-1">
-                      <div className="flex items-center gap-2 mb-1">
-                        <h3 className="text-sm" style={{ fontWeight: 'var(--font-bold)', color: 'var(--text-primary)' }}>
-                          {ratePlan.name}
-                        </h3>
-                        <span
-                          className="px-2 py-0.5 rounded-full text-xs"
-                          style={{
-                            backgroundColor: ratePlan.status === 'active' ? 'var(--primary)' + '20' : 'var(--text-tertiary)' + '20',
-                            color: ratePlan.status === 'active' ? 'var(--primary)' : 'var(--text-tertiary)',
-                            fontWeight: 'var(--font-medium)'
-                          }}
-                        >
-                          {ratePlan.status === 'active' ? '활성' : '비활성'}
-                        </span>
-                      </div>
-                      <p className="text-xs mb-2" style={{ color: 'var(--primary)', fontWeight: 'var(--font-medium)' }}>
-                        {ratePlan.benefitName}
-                      </p>
-                    </div>
-                    <Link href={`/rateplans/${ratePlan.id}`}>
-                      <button
-                        className="px-2 py-1 rounded text-xs transition-colors"
-                        style={{
-                          backgroundColor: 'var(--primary)',
-                          color: '#ffffff',
-                          fontWeight: 'var(--font-medium)',
-                          borderRadius: 'var(--radius-sm)'
-                        }}
-                      >
-                        상세
-                      </button>
-                    </Link>
-                  </div>
-
-                  <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
-                    <div>
-                      <div className="flex items-center gap-1 mb-0.5">
-                        <Tag className="w-3 h-3" style={{ color: 'var(--text-tertiary)' }} />
-                        <span className="text-xs" style={{ color: 'var(--text-tertiary)' }}>요금 타입</span>
-                      </div>
-                      <p className="text-xs" style={{ color: 'var(--text-primary)', fontWeight: 'var(--font-medium)' }}>
-                        {PRICE_TYPE_LABELS[ratePlan.priceType]}
-                      </p>
-                    </div>
-                    <div>
-                      <div className="text-xs mb-0.5" style={{ color: 'var(--text-tertiary)' }}>식사</div>
-                      <p className="text-xs" style={{ color: 'var(--text-primary)', fontWeight: 'var(--font-medium)' }}>
-                        {ratePlan.mealPlan === 'none' ? '미포함' : '포함'}
-                      </p>
-                    </div>
-                    <div>
-                      <div className="text-xs mb-0.5" style={{ color: 'var(--text-tertiary)' }}>최소 숙박</div>
-                      <p className="text-xs" style={{ color: 'var(--text-primary)', fontWeight: 'var(--font-medium)' }}>
-                        {ratePlan.setting?.minLos || '-'}박
-                      </p>
-                    </div>
-                    <div>
-                      <div className="text-xs mb-0.5" style={{ color: 'var(--text-tertiary)' }}>최대 숙박</div>
-                      <p className="text-xs" style={{ color: 'var(--text-primary)', fontWeight: 'var(--font-medium)' }}>
-                        {ratePlan.setting?.maxLos || '-'}박
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
+        <Card className="mt-lg p-lg" hover={false}>
+          <div className="mb-md flex items-center justify-between gap-md">
+            <h2 className="text-xl font-bold text-text-primary">
+              요금정책 ({accommodationRatePlans.length}개)
+            </h2>
+            <Link href="/rateplans">
+              <Button type="button" variant="secondary">
+                전체 보기
+              </Button>
+            </Link>
           </div>
-        </div>
+
+          <div className="grid gap-sm">
+            {accommodationRatePlans.map((ratePlan) => (
+              <div
+                key={ratePlan.id}
+                className="grid gap-sm rounded border border-border bg-bg-secondary p-md md:grid-cols-4"
+              >
+                <div className="md:col-span-2">
+                  <p className="font-bold text-text-primary">{ratePlan.name}</p>
+                  <p className="text-base font-light text-primary">{ratePlan.benefitName}</p>
+                </div>
+                <InfoItem icon={Tag} label="요금 타입" value={PRICE_TYPE_LABELS[ratePlan.priceType]} />
+                <InfoItem
+                  icon={Calendar}
+                  label="숙박"
+                  value={`${ratePlan.setting?.minLos || '-'}박 - ${ratePlan.setting?.maxLos || '-'}박`}
+                />
+              </div>
+            ))}
+          </div>
+        </Card>
       )}
 
-      {/* Metadata */}
-      <div className="mt-4 pt-3 border-t" style={{ borderColor: 'var(--border-color)' }}>
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-xs" style={{ color: 'var(--text-tertiary)' }}>
-          <div className="flex items-center gap-2">
-            <Calendar className="w-4 h-4" />
-            <span>생성일: {accommodation.createdAt.toLocaleDateString('ko-KR')}</span>
-          </div>
-          <div className="flex items-center gap-2">
-            <Calendar className="w-4 h-4" />
-            <span>수정일: {accommodation.updatedAt.toLocaleDateString('ko-KR')}</span>
-          </div>
-          <div className="flex items-center gap-2">
-            <User className="w-4 h-4" />
-            <span>생성자: {accommodation.createdBy}</span>
-          </div>
-          <div className="flex items-center gap-2">
-            <User className="w-4 h-4" />
-            <span>수정자: {accommodation.updatedBy}</span>
-          </div>
+      <div className="mt-lg border-t border-border pt-md">
+        <div className="grid gap-sm text-base font-light text-text-tertiary md:grid-cols-4">
+          <span className="flex items-center gap-sm">
+            <User className="h-icon-md w-icon-md" />
+            생성자: {accommodation.createdBy || '-'}
+          </span>
+          <span className="flex items-center gap-sm">
+            <Calendar className="h-icon-md w-icon-md" />
+            생성일: {formatDateTime(accommodation.createdAt)}
+          </span>
+          <span className="flex items-center gap-sm">
+            <User className="h-icon-md w-icon-md" />
+            수정자: {accommodation.updatedBy || '-'}
+          </span>
+          <span className="flex items-center gap-sm">
+            <Calendar className="h-icon-md w-icon-md" />
+            수정일: {formatDateTime(accommodation.updatedAt)}
+          </span>
         </div>
       </div>
     </div>

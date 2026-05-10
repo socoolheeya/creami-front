@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
+import { notification } from '@creami/ui'
 import { useCreateRatePlan, useUpdateRatePlan } from '@/hooks/useRatePlans'
 import type {
   RatePlan,
@@ -116,14 +117,28 @@ export default function RatePlanForm({ initialData }: RatePlanFormProps) {
           id: initialData.id,
           data: ratePlanData,
         })
+        notification.success({
+          message: '수정이 완료되었습니다.',
+          placement: 'top-right',
+          direction: 'right'
+        })
         router.push(`/rateplans/${initialData.id}`)
       } else {
         await createRatePlan.mutateAsync(ratePlanData)
+        notification.success({
+          message: '저장이 완료되었습니다.',
+          placement: 'top-right',
+          direction: 'right'
+        })
         router.push('/rateplans')
       }
     } catch (error) {
       console.error('Failed to submit rateplan:', error)
-      alert(`요금제 ${isEdit ? '수정' : '등록'}에 실패했습니다. 다시 시도해주세요.`)
+      notification.error({
+        message: `${isEdit ? '수정' : '저장'}에 실패했습니다.`,
+        placement: 'top-right',
+        direction: 'right'
+      })
     } finally {
       setIsSubmitting(false)
     }

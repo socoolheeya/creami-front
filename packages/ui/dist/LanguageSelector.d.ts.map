@@ -1,0 +1,1 @@
+{"version":3,"file":"LanguageSelector.d.ts","sourceRoot":"","sources":["../components/LanguageSelector.tsx"],"names":[],"mappings":"AAMA,OAAO,EAAwB,KAAK,MAAM,EAAE,MAAM,cAAc,CAAA;AAEhE,MAAM,WAAW,qBAAqB;IACpC,aAAa,EAAE,MAAM,CAAA;IACrB,cAAc,CAAC,EAAE,CAAC,MAAM,EAAE,MAAM,KAAK,IAAI,CAAA;CAC1C;AAED,wBAAgB,gBAAgB,CAAC,EAAE,aAAa,EAAE,cAAc,EAAE,EAAE,qBAAqB,2CAwDxF"}

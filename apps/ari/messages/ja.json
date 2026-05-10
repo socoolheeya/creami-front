@@ -1,0 +1,205 @@
+{
+  "nav": {
+    "dashboard": "ダッシュボード",
+    "rates": "料金管理",
+    "inventories": "在庫管理"
+  },
+  "ari": {
+    "dashboard": {
+      "title": "ARIダッシュボード",
+      "notice": "お知らせ",
+      "welcome": "Creami ARIへようこそ。",
+      "stats": {
+        "inventory": "在庫状況",
+        "averagePrice": "平均価格",
+        "availableDays": "予約可能日",
+        "occupancy": "稼働率"
+      }
+    },
+    "common": {
+      "searchConditions": "検索条件",
+      "selectConditions": "検索条件を選択してください",
+      "search": "検索",
+      "reset": "初期化",
+      "cancel": "キャンセル",
+      "apply": "適用",
+      "save": "保存",
+      "copy": "コピー",
+      "edit": "編集",
+      "selectAll": "すべて選択",
+      "deselectAll": "選択解除",
+      "noSearchResults": "検索結果がありません",
+      "startDate": "開始日",
+      "endDate": "終了日",
+      "selectStartDate": "開始日を選択",
+      "selectEndDate": "終了日を選択",
+      "selectPeriod": "期間選択",
+      "quickPeriod": "クイック期間選択",
+      "selectedCount": "{count}件選択済み",
+      "selectedOfTotal": "{selected}/{total} 選択済み",
+      "applyCount": "適用 ({count}件)",
+      "days": "{count}日",
+      "dateDay": "{day}日",
+      "fullPeriod": "全期間: {startDate} ~ {endDate}",
+      "bulkEdit": "一括修正",
+      "bulkRegister": "一括登録",
+      "usage": "使い方:",
+      "gridHelp": "ドラッグで範囲選択 • ダブルクリックで個別修正 • 一括登録で素早く入力",
+      "view": {
+        "week": "週間",
+        "month": "月間",
+        "all": "全体"
+      },
+      "weekdays": {
+        "sun": "日",
+        "mon": "月",
+        "tue": "火",
+        "wed": "水",
+        "thu": "木",
+        "fri": "金",
+        "sat": "土"
+      }
+    },
+    "rates": {
+      "title": "料金管理",
+      "criteriaType": "検索基準",
+      "packageCriteria": "パッケージ基準",
+      "roomCriteria": "客室基準",
+      "propertySelect": "宿泊施設選択",
+      "propertyPlaceholder": "宿泊施設を選択してください",
+      "propertySearchPlaceholder": "宿泊施設ID、コード、名前で検索",
+      "packageSelect": "パッケージ選択",
+      "packagePlaceholder": "パッケージを選択してください",
+      "packageSearchPlaceholder": "パッケージID、コード、名前で検索",
+      "roomSelect": "客室タイプ選択",
+      "roomPlaceholder": "客室タイプを選択してください",
+      "roomSearchPlaceholder": "客室ID、コード、名前で検索",
+      "selectedRooms": "{count}件の客室を選択済み",
+      "selectedPackages": "{count}件のパッケージを選択済み",
+      "noSelectedRooms": "選択された客室がありません",
+      "noSelectedPackages": "選択されたパッケージがありません",
+      "emptyDescription": "宿泊施設、パッケージ/客室、条件を選択して検索ボタンを押してください",
+      "rowHeaderRoomType": "客室タイプ",
+      "rowHeaderPackage": "パッケージ",
+      "bulkTargetRoom": "客室",
+      "bulkTargetPackage": "パッケージ",
+      "table": {
+        "status": "状態",
+        "code": "料金コード",
+        "name": "料金名",
+        "type": "タイプ",
+        "roomType": "客室タイプ",
+        "baseRate": "基本料金",
+        "period": "期間",
+        "manage": "管理"
+      },
+      "status": {
+        "active": "有効",
+        "scheduled": "予定",
+        "inactive": "無効",
+        "expired": "期限切れ"
+      },
+      "types": {
+        "standard": "基本料金",
+        "corporate": "企業料金",
+        "government": "官公庁料金",
+        "promotional": "プロモーション料金",
+        "package": "パッケージ料金",
+        "group": "団体料金"
+      },
+      "grid": {
+        "rateTypes": {
+          "net_rate": "入金額",
+          "sell_rate_no_commission": "販売額",
+          "commission_included": "コミッション込み",
+          "net_and_sell": "入金額/販売額"
+        },
+        "commissionPercent": "コミッション {value}%",
+        "commissionFixed": "コミッション {value}ウォン",
+        "invalidDateRange": "開始日は終了日より後にできません。",
+        "dateRangeExceeded": "検索日付範囲を超過しました。",
+        "weekdayBulkEdit": "曜日別修正",
+        "bulkEditDescription": "選択された{count}件のセルの料金を一括変更します。",
+        "rateKrw": "料金 (KRW)",
+        "numberPlaceholder": "数字を入力",
+        "weekdayBulkTitle": "曜日別料金一括修正",
+        "occupancyRateSteps": "{count}段階の人数別料金",
+        "breakfastIncluded": "朝食込み",
+        "taxIncluded": "税込み"
+      }
+    },
+    "inventories": {
+      "title": "在庫管理",
+      "propertySearch": "宿泊施設検索",
+      "propertySearchPlaceholder": "宿泊施設ID、コード、名前で検索...",
+      "roomSelect": "客室タイプ選択",
+      "roomPlaceholder": "客室タイプを選択してください",
+      "roomSearchPlaceholder": "客室ID、コード、名前で検索",
+      "noSelectedRooms": "選択された客室がありません",
+      "emptyDescription": "宿泊施設、客室、期間を選択して検索ボタンを押してください",
+      "grid": {
+        "roomType": "客室タイプ",
+        "bulkEditDescription": "選択された{count}件のセルの利用可能客室数を一括変更します。",
+        "availableRooms": "利用可能客室数",
+        "inventoryBulkRegister": "在庫一括登録",
+        "register": "登録",
+        "weekdaySelect": "曜日選択",
+        "weekdaysOnly": "平日のみ",
+        "weekendsOnly": "週末のみ",
+        "appliedRooms": "適用客室 ({count}件)",
+        "preview": "適用プレビュー",
+        "room": "客室",
+        "weekday": "曜日",
+        "inputInventory": "入力在庫",
+        "totalInventory": "総在庫",
+        "booked": "予約",
+        "emptyPreview": "曜日別在庫を入力すると適用結果が表示されます。"
+      },
+      "calendar": {
+        "total": "全体: {count}室",
+        "booked": "予約: {count}室",
+        "available": "利用可能: {count}室",
+        "blocks": "{count}件のブロック",
+        "monthTitle": "{year}年{month}月",
+        "legend": {
+          "low": "余裕",
+          "normal": "通常",
+          "warning": "注意",
+          "busy": "混雑",
+          "full": "満室"
+        }
+      },
+      "table": {
+        "status": "状態",
+        "code": "在庫コード",
+        "name": "在庫名",
+        "type": "タイプ",
+        "organization": "団体名",
+        "roomStatus": "客室状況",
+        "utilization": "利用率",
+        "period": "期間",
+        "manage": "管理"
+      },
+      "block": {
+        "roomUsage": "客室利用率",
+        "booked": "予約: {count}室",
+        "total": "全体: {count}室",
+        "releaseDate": "リリース日: {date}",
+        "types": {
+          "allotment": "割当ブロック",
+          "group": "団体ブロック",
+          "event": "イベントブロック",
+          "maintenance": "整備ブロック",
+          "owner": "オーナーブロック",
+          "corporate": "企業ブロック"
+        },
+        "status": {
+          "active": "有効",
+          "released": "リリース済み",
+          "cancelled": "キャンセル済み",
+          "expired": "期限切れ"
+        }
+      }
+    }
+  }
+}

@@ -1,12 +1,12 @@
 'use client'
 
-import { ThemeProvider as NextThemesProvider } from 'next-themes'
 import { ReactNode } from 'react'
+import { CreamiThemeProvider } from '@creami/ui'
 
 export function ThemeProvider({ children }: { children: ReactNode }) {
   return (
-    <NextThemesProvider attribute="data-theme" defaultTheme="dark" enableSystem={false}>
+    <CreamiThemeProvider>
       {children}
-    </NextThemesProvider>
+    </CreamiThemeProvider>
   )
 }

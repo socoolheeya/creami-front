@@ -2,15 +2,18 @@
 
 import { Calendar, Users, Tag } from 'lucide-react'
 import Link from 'next/link'
-import { Rate, RATE_TYPE_LABELS } from '@/lib/types/rate'
+import { useLocale, useTranslations } from 'next-intl'
+import { Rate } from '@/lib/types/rate'
 
 interface RateCardProps {
   rate: Rate
 }
 
 export function RateCard({ rate }: RateCardProps) {
+  const t = useTranslations()
+  const locale = useLocale()
   const formatDate = (date: Date) => {
-    return new Date(date).toLocaleDateString('ko-KR', {
+    return new Date(date).toLocaleDateString(locale, {
       year: 'numeric',
       month: '2-digit',
       day: '2-digit'
@@ -18,7 +21,7 @@ export function RateCard({ rate }: RateCardProps) {
   }
 
   const formatCurrency = (amount: number) => {
-    return new Intl.NumberFormat('ko-KR', {
+    return new Intl.NumberFormat(locale, {
       style: 'currency',
       currency: rate.currency || 'KRW'
     }).format(amount)
@@ -36,21 +39,6 @@ export function RateCard({ rate }: RateCardProps) {
         return '#ef4444'
       default:
         return 'var(--text-tertiary)'
-    }
-  }
-
-  const getStatusLabel = (status: string) => {
-    switch (status) {
-      case 'active':
-        return '활성'
-      case 'scheduled':
-        return '예정'
-      case 'inactive':
-        return '비활성'
-      case 'expired':
-        return '만료'
-      default:
-        return status
     }
   }
 
@@ -75,7 +63,7 @@ export function RateCard({ rate }: RateCardProps) {
               fontWeight: 'var(--font-medium)'
             }}
           >
-            {RATE_TYPE_LABELS[rate.type]}
+            {t(`ari.rates.types.${rate.type}`)}
           </div>
 
           <div
@@ -86,7 +74,7 @@ export function RateCard({ rate }: RateCardProps) {
               fontWeight: 'var(--font-medium)'
             }}
           >
-            {getStatusLabel(rate.status)}
+            {t(`ari.rates.status.${rate.status}`)}
           </div>
         </div>
 
@@ -146,7 +134,7 @@ export function RateCard({ rate }: RateCardProps) {
               fontWeight: 'var(--font-light)'
             }}
           >
-            기본 요금
+            {t('ari.rates.table.baseRate')}
           </div>
         </div>
 
@@ -168,7 +156,7 @@ export function RateCard({ rate }: RateCardProps) {
         {rate.occupancyRates && rate.occupancyRates.length > 0 && (
           <div className="flex items-center gap-2 text-sm" style={{ color: 'var(--text-secondary)' }}>
             <Users className="w-4 h-4" style={{ color: 'var(--text-tertiary)' }} />
-            <span>{rate.occupancyRates.length}단계 인원별 요금</span>
+            <span>{t('ari.rates.grid.occupancyRateSteps', { count: rate.occupancyRates.length })}</span>
           </div>
         )}
 
@@ -182,7 +170,7 @@ export function RateCard({ rate }: RateCardProps) {
                 color: 'var(--text-secondary)'
               }}
             >
-              조식 포함
+              {t('ari.rates.grid.breakfastIncluded')}
             </span>
           )}
           {rate.includesTax && (
@@ -193,7 +181,7 @@ export function RateCard({ rate }: RateCardProps) {
                 color: 'var(--text-secondary)'
               }}
             >
-              세금 포함
+              {t('ari.rates.grid.taxIncluded')}
             </span>
           )}
         </div>

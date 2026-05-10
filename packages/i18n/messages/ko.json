@@ -1,0 +1,68 @@
+{
+  "common": {
+    "language": "언어",
+    "notification": "알림",
+    "profile": "프로필",
+    "settings": "설정",
+    "logout": "로그아웃",
+    "search": "검색",
+    "filter": "필터",
+    "save": "저장",
+    "cancel": "취소",
+    "delete": "삭제",
+    "edit": "수정",
+    "add": "추가",
+    "close": "닫기",
+    "confirm": "확인"
+  },
+  "sidebar": {
+    "collapse": "사이드바 접기",
+    "expand": "사이드바 펼치기"
+  },
+  "notification": {
+    "empty": "알림이 없습니다",
+    "title": "알림"
+  },
+  "language": {
+    "select": "언어 선택",
+    "ko": "한국어",
+    "en": "English",
+    "ja": "日本語"
+  },
+  "appSwitcher": {
+    "title": "앱 전환",
+    "current": "현재"
+  },
+  "apps": {
+    "home": "Creami Home",
+    "accommodation": "Creami Accommodation",
+    "ari": "Creami ARI",
+    "discount": "Creami Discount",
+    "booking": "Creami Booking",
+    "invoice": "Creami Invoice",
+    "setting": "Creami Setting"
+  },
+  "nav": {
+    "dashboard": "대시보드",
+    "homeDashboard": "홈 대시보드",
+    "ariDashboard": "ARI 대시보드",
+    "discountDashboard": "할인 대시보드",
+    "invoiceDashboard": "인보이스 대시보드",
+    "masterProperties": "대표숙소 관리",
+    "properties": "숙소 관리",
+    "rooms": "객실 관리",
+    "rateplans": "요금제 관리",
+    "rates": "요금 관리",
+    "inventories": "재고 관리",
+    "discounts": "할인 관리",
+    "discountMappings": "할인-요금제 매핑",
+    "bookings": "예약 목록",
+    "newBooking": "예약하기",
+    "invoices": "청구 목록",
+    "profile": "개인 설정",
+    "users": "사용자 관리",
+    "permissions": "권한 관리",
+    "policies": "정책 관리",
+    "subscriptions": "구독 관리"
+  }
+}

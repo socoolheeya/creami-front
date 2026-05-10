@@ -4,6 +4,7 @@ import { Accommodation } from '@/lib/types/accommodation'
 import { Building2, Search } from 'lucide-react'
 import { ChangeEvent, KeyboardEvent, useId, useState } from 'react'
 import { Button, Card } from '@creami/ui'
+import { useTranslations } from 'next-intl'
 
 interface AccommodationSelectorProps {
   accommodations: Accommodation[]
@@ -13,6 +14,7 @@ interface AccommodationSelectorProps {
 }
 
 export function AccommodationSelector({ accommodations, selectedId, onSelect, compact = false }: AccommodationSelectorProps) {
+  const t = useTranslations()
   const [searchQuery, setSearchQuery] = useState('')
   const accommodationListId = useId()
 
@@ -71,7 +73,7 @@ export function AccommodationSelector({ accommodations, selectedId, onSelect, co
       <div className={`flex items-center justify-between ${compact ? 'mb-sm' : 'mb-md'}`}>
         <h2 className="text-xl flex items-center gap-sm font-bold text-text-primary">
           <Building2 className="h-icon-md w-icon-md text-primary" />
-          숙소 선택
+          {t('discount.mappings.accommodation.title')}
         </h2>
         {selectedId && (
           <Button
@@ -80,7 +82,7 @@ export function AccommodationSelector({ accommodations, selectedId, onSelect, co
             variant="secondary"
             size="small"
           >
-            선택 해제
+            {t('discount.mappings.accommodation.clear')}
           </Button>
         )}
       </div>
@@ -91,7 +93,7 @@ export function AccommodationSelector({ accommodations, selectedId, onSelect, co
           <Search className="absolute left-md top-1/2 -translate-y-1/2 h-md w-md" style={{ color: 'var(--text-tertiary)' }} />
           <input
             type="text"
-            placeholder="ID 또는 숙소명으로 검색..."
+            placeholder={t('discount.mappings.accommodation.placeholder')}
             list={accommodationListId}
             value={searchQuery}
             onChange={handleSearchChange}
@@ -144,7 +146,7 @@ export function AccommodationSelector({ accommodations, selectedId, onSelect, co
       {searchQuery && !selectedAccommodation && filteredAccommodations.length === 0 && (
         <div className="text-center py-xl">
           <p style={{ color: 'var(--text-secondary)', fontWeight: 'var(--font-light)' }}>
-            검색 결과가 없습니다
+            {t('discount.common.noSearchResults')}
           </p>
         </div>
       )}

@@ -1,0 +1,68 @@
+{
+  "common": {
+    "language": "言語",
+    "notification": "通知",
+    "profile": "プロフィール",
+    "settings": "設定",
+    "logout": "ログアウト",
+    "search": "検索",
+    "filter": "フィルター",
+    "save": "保存",
+    "cancel": "キャンセル",
+    "delete": "削除",
+    "edit": "編集",
+    "add": "追加",
+    "close": "閉じる",
+    "confirm": "確認"
+  },
+  "sidebar": {
+    "collapse": "サイドバーを折りたたむ",
+    "expand": "サイドバーを展開"
+  },
+  "notification": {
+    "empty": "通知がありません",
+    "title": "通知"
+  },
+  "language": {
+    "select": "言語を選択",
+    "ko": "한국어",
+    "en": "English",
+    "ja": "日本語"
+  },
+  "appSwitcher": {
+    "title": "アプリ切替",
+    "current": "現在"
+  },
+  "apps": {
+    "home": "Creami Home",
+    "accommodation": "Creami Accommodation",
+    "ari": "Creami ARI",
+    "discount": "Creami Discount",
+    "booking": "Creami Booking",
+    "invoice": "Creami Invoice",
+    "setting": "Creami Setting"
+  },
+  "nav": {
+    "dashboard": "ダッシュボード",
+    "homeDashboard": "ホームダッシュボード",
+    "ariDashboard": "ARIダッシュボード",
+    "discountDashboard": "割引ダッシュボード",
+    "invoiceDashboard": "請求ダッシュボード",
+    "masterProperties": "代表宿泊施設管理",
+    "properties": "宿泊施設管理",
+    "rooms": "客室管理",
+    "rateplans": "料金プラン管理",
+    "rates": "料金管理",
+    "inventories": "在庫管理",
+    "discounts": "割引管理",
+    "discountMappings": "割引・料金プラン連携",
+    "bookings": "予約一覧",
+    "newBooking": "予約作成",
+    "invoices": "請求一覧",
+    "profile": "個人設定",
+    "users": "ユーザー管理",
+    "permissions": "権限管理",
+    "policies": "ポリシー管理",
+    "subscriptions": "サブスクリプション管理"
+  }
+}

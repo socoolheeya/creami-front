@@ -4,6 +4,7 @@ import { Moon, Sun } from 'lucide-react'
 import { useTheme } from 'next-themes'
 import { useEffect, useState } from 'react'
 import { Button } from './Button'
+import { writeThemeCookie, type CreamiTheme } from './ThemeProvider'
 
 export function ThemeToggle() {
   const { theme, setTheme } = useTheme()
@@ -18,6 +19,7 @@ export function ThemeToggle() {
   }
 
   const isDark = theme === 'dark'
+  const nextTheme: CreamiTheme = isDark ? 'light' : 'dark'
 
   return (
     <Button
@@ -25,7 +27,10 @@ export function ThemeToggle() {
       variant="tertiary"
       size="normal"
       iconOnly
-      onClick={() => setTheme(isDark ? 'light' : 'dark')}
+      onClick={() => {
+        writeThemeCookie(nextTheme)
+        setTheme(nextTheme)
+      }}
       aria-label={isDark ? '라이트 모드로 전환' : '다크 모드로 전환'}
       title={isDark ? '라이트 모드로 전환' : '다크 모드로 전환'}
     >

@@ -1,18 +1,21 @@
 'use client'
 
-import { Building2, DoorOpen, Receipt } from 'lucide-react'
+import { Building2, DoorOpen, Hotel, Receipt } from 'lucide-react'
+import { useTranslations } from 'next-intl'
 import { usePathname } from 'next/navigation'
 import { Sidebar as SidebarComponent, SidebarMenu, SidebarMenuItem, useSidebar } from '@creami/ui'
 
 const menuItems = [
-  { icon: Building2, label: '숙소 관리', href: '/properties' },
-  { icon: DoorOpen, label: '객실 관리', href: '/rooms' },
-  { icon: Receipt, label: '요금제 관리', href: '/rateplans' }
+  { icon: Hotel, labelKey: 'nav.masterProperties', href: '/master-properties' },
+  { icon: Building2, labelKey: 'nav.properties', href: '/properties' },
+  { icon: DoorOpen, labelKey: 'nav.rooms', href: '/rooms' },
+  { icon: Receipt, labelKey: 'nav.rateplans', href: '/rateplans' }
 ]
 
 export function Sidebar() {
   const { isCollapsed } = useSidebar()
   const pathname = usePathname()
+  const t = useTranslations()
 
   const getIsActive = (href: string) => {
     if (href === '/') {
@@ -28,7 +31,7 @@ export function Sidebar() {
           <SidebarMenuItem
             key={item.href}
             icon={item.icon}
-            label={item.label}
+            label={t(item.labelKey)}
             href={item.href}
             isActive={getIsActive(item.href)}
             isCollapsed={isCollapsed}

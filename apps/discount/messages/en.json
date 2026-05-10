@@ -1,0 +1,104 @@
+{
+  "nav": {
+    "discountDashboard": "Discount Dashboard",
+    "discounts": "Discount Management",
+    "discountMappings": "Discount-Rate Plan Mapping"
+  },
+  "discount": {
+    "dashboard": {
+      "title": "Discount Dashboard",
+      "notice": "Notices",
+      "welcome": "Welcome to Creami Discount.",
+      "stats": {
+        "activeDiscounts": "Active Discounts",
+        "averageRate": "Average Discount Rate",
+        "discountRevenue": "Discount Revenue",
+        "usedCustomers": "Customers Used"
+      }
+    },
+    "common": {
+      "new": "New",
+      "search": "Search...",
+      "save": "Save",
+      "edit": "Edit",
+      "apply": "Apply",
+      "selectAll": "Select All",
+      "clearSelection": "Clear Selection",
+      "noSearchResults": "No search results",
+      "count": "{count}",
+      "showMore": "Show {count} more",
+      "shownOfTotal": "Showing {shown} of {total}",
+      "viewCard": "Card view",
+      "viewTable": "Table view"
+    },
+    "labels": {
+      "types": {
+        "percentage": "Percentage Discount",
+        "fixed": "Fixed Discount"
+      },
+      "targets": {
+        "all": "All",
+        "accommodation": "Specific Property",
+        "room": "Specific Room",
+        "rateplan": "Specific Rate Plan"
+      },
+      "status": {
+        "active": "Active",
+        "scheduled": "Scheduled",
+        "expired": "Expired",
+        "disabled": "Disabled"
+      },
+      "amountWon": "KRW {value}",
+      "target": "Target: {target}",
+      "used": "{count} used",
+      "usageLimit": "/ limit {count}"
+    },
+    "discounts": {
+      "title": "Discount Management",
+      "searchPlaceholder": "Search by discount name or code...",
+      "empty": "No discounts registered",
+      "emptySearch": "No search results",
+      "emptyHelp": "Register your first discount.",
+      "create": "Register Discount",
+      "table": {
+        "name": "Discount Name",
+        "code": "Code",
+        "type": "Type",
+        "value": "Discount Amount/Rate",
+        "period": "Period",
+        "usage": "Usage",
+        "status": "Status",
+        "all": "All"
+      }
+    },
+    "mappings": {
+      "title": "Discount-Rate Plan Mapping",
+      "selectedContext": "Selected property and rate plans",
+      "selectAccommodationFirst": "Select a property first",
+      "selectAccommodationHelp": "Select a property above to view its rate plans.",
+      "selectRatePlanFirst": "Select rate plans",
+      "selectRatePlanHelp": "Select rate plans above to map discounts.",
+      "selectRatePlanAlert": "Please select a rate plan first.",
+      "saveSuccess": "Mapping has been saved.",
+      "beforeTitle": "Available Discounts",
+      "beforeDescription": "Only active discounts available during the current period are shown.",
+      "afterTitle": "Mapped Discounts",
+      "availableSearchPlaceholder": "Search by discount ID, code, or type...",
+      "emptyAvailableSearch": "No discounts found",
+      "emptyAvailable": "All discounts are mapped",
+      "emptyMapped": "No discounts mapped",
+      "accommodation": {
+        "title": "Select Property",
+        "clear": "Clear Selection",
+        "placeholder": "Search by ID or property name..."
+      },
+      "ratePlan": {
+        "title": "Select Rate Plans ({selected}/{total})",
+        "placeholder": "Search by ID or rate plan name...",
+        "disabledPlaceholder": "Select a property first",
+        "select": "Select",
+        "deselect": "Clear Selection"
+      }
+    }
+  }
+}

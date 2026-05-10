@@ -2,15 +2,18 @@
 
 import { Calendar, Building, User, Tag } from 'lucide-react'
 import Link from 'next/link'
-import { Block, BLOCK_TYPE_LABELS, BLOCK_STATUS_LABELS } from '@/lib/types/block'
+import { useLocale, useTranslations } from 'next-intl'
+import { Block } from '@/lib/types/block'
 
 interface BlockCardProps {
   block: Block
 }
 
 export function BlockCard({ block }: BlockCardProps) {
+  const t = useTranslations()
+  const locale = useLocale()
   const formatDate = (date: Date) => {
-    return new Date(date).toLocaleDateString('ko-KR', {
+    return new Date(date).toLocaleDateString(locale, {
       year: 'numeric',
       month: '2-digit',
       day: '2-digit'
@@ -60,7 +63,7 @@ export function BlockCard({ block }: BlockCardProps) {
               fontWeight: 'var(--font-medium)'
             }}
           >
-            {BLOCK_TYPE_LABELS[block.type]}
+            {t(`ari.inventories.block.types.${block.type}`)}
           </div>
 
           <div
@@ -71,7 +74,7 @@ export function BlockCard({ block }: BlockCardProps) {
               fontWeight: 'var(--font-medium)'
             }}
           >
-            {BLOCK_STATUS_LABELS[block.status]}
+            {t(`ari.inventories.block.status.${block.status}`)}
           </div>
         </div>
 
@@ -132,7 +135,7 @@ export function BlockCard({ block }: BlockCardProps) {
                 fontWeight: 'var(--font-light)'
               }}
             >
-              객실 사용률
+              {t('ari.inventories.block.roomUsage')}
             </span>
             <span
               className="text-lg"
@@ -168,8 +171,8 @@ export function BlockCard({ block }: BlockCardProps) {
               fontWeight: 'var(--font-light)'
             }}
           >
-            <span>예약: {block.bookedRooms}실</span>
-            <span>전체: {block.totalRooms}실</span>
+            <span>{t('ari.inventories.block.booked', { count: block.bookedRooms })}</span>
+            <span>{t('ari.inventories.block.total', { count: block.totalRooms })}</span>
           </div>
         </div>
 
@@ -210,7 +213,7 @@ export function BlockCard({ block }: BlockCardProps) {
                 fontWeight: 'var(--font-light)'
               }}
             >
-              릴리즈일: {formatDate(block.releaseDate)}
+              {t('ari.inventories.block.releaseDate', { date: formatDate(block.releaseDate) })}
             </span>
           </div>
         )}

@@ -2,7 +2,8 @@
 
 import { useState, useRef, useEffect, useMemo } from 'react'
 import { ChevronLeft, ChevronRight, Edit2, Copy, Save, X, CalendarRange } from 'lucide-react'
-import { WeekdayRateBulkModal, type WeekdayRatePreviewRow, type WeekdayRateValues } from '@creami/ui'
+import { WeekdayRateBulkModal, notification, type WeekdayRatePreviewRow, type WeekdayRateValues } from '@creami/ui'
+import { useLocale, useTranslations } from 'next-intl'
 
 interface RoomRate {
   roomId: string
@@ -43,30 +44,15 @@ interface RatePlanPricingSetting {
   }
 }
 
-const RATE_TYPE_LABELS: Record<RateType, string> = {
-  net_rate: '입금가',
-  sell_rate_no_commission: '판매가',
-  commission_included: '커미션 포함가',
-  net_and_sell: '입금가/판매가'
-}
-
-const WEEKDAY_LABELS: Record<number, string> = {
-  0: '일',
-  1: '월',
-  2: '화',
-  3: '수',
-  4: '목',
-  5: '금',
-  6: '토'
-}
+const WEEKDAY_KEYS = ['sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat'] as const
 
 export function RateGrid({
   startDate,
   endDate,
   selectedRooms,
   packageName,
-  rowHeaderLabel = '객실 타입',
-  bulkTargetLabel = '객실',
+  rowHeaderLabel,
+  bulkTargetLabel,
   ratePlanPricing = {
     rateType: 'commission_included',
     commission: {
@@ -75,6 +61,10 @@ export function RateGrid({
     }
   }
 }: RateGridProps) {
+  const t = useTranslations()
+  const locale = useLocale()
+  const resolvedRowHeaderLabel = rowHeaderLabel ?? t('ari.rates.rowHeaderRoomType')
+  const resolvedBulkTargetLabel = bulkTargetLabel ?? t('ari.rates.bulkTargetRoom')
   const [viewMode, setViewMode] = useState<ViewMode>('week')
   const [currentWeekStart, setCurrentWeekStart] = useState(new Date(startDate))
   const [rateData, setRateData] = useState<Record<string, RoomRate>>({})
@@ -316,6 +306,11 @@ export function RateGrid({
       setShowBulkEdit(false)
       setBulkEditValue('')
       setSelectedCells([])
+      notification.success({
+        message: '저장이 완료되었습니다.',
+        placement: 'top-right',
+        direction: 'right'
+      })
     }
   }
 
@@ -353,7 +348,7 @@ export function RateGrid({
   }
 
   const formatCurrency = (amount: number) => {
-    return new Intl.NumberFormat('ko-KR').format(amount)
+    return new Intl.NumberFormat(locale).format(amount)
   }
 
   const getCommissionAmount = (sellRate: number) => {
@@ -399,14 +394,14 @@ export function RateGrid({
   }
 
   const getRateTypeLabel = () => {
-    return `Rate type: ${RATE_TYPE_LABELS[ratePlanPricing.rateType]}`
+    return t(`ari.rates.grid.rateTypes.${ratePlanPricing.rateType}`)
   }
 
   const getCommissionLabel = () => {
     const { commission } = ratePlanPricing
     return commission.type === 'percentage'
-      ? `커미션 ${commission.value}%`
-      : `커미션 ${formatCurrency(commission.value)}원`
+      ? t('ari.rates.grid.commissionPercent', { value: commission.value })
+      : t('ari.rates.grid.commissionFixed', { value: formatCurrency(commission.value) })
   }
 
   const hasBulkRegisterValue = () => {
@@ -428,11 +423,11 @@ export function RateGrid({
     if (!nextStart || !nextEnd) return ''
 
     if (nextStart > nextEnd) {
-      return '시작일은 종료일보다 늦을 수 없습니다.'
+      return t('ari.rates.grid.invalidDateRange')
     }
 
     if (nextStart < startDate || nextEnd > endDate) {
-      return '조회날짜 범위 초과하였습니다.'
+      return t('ari.rates.grid.dateRangeExceeded')
     }
 
     return ''
@@ -486,7 +481,7 @@ export function RateGrid({
         day: Number(day),
         value: parseInt(value)
       }))
-      .filter(({ day, value }) => bulkRegisterActiveWeekdays.includes(day) && WEEKDAY_LABELS[day] && !isNaN(value))
+      .filter(({ day, value }) => bulkRegisterActiveWeekdays.includes(day) && WEEKDAY_KEYS[day] && !isNaN(value))
       .sort((a, b) => {
         const order = [1, 2, 3, 4, 5, 6, 0]
         return order.indexOf(a.day) - order.indexOf(b.day)
@@ -499,7 +494,7 @@ export function RateGrid({
       name: room.name,
       cells: validCells.map(({ day, value }) => ({
         day,
-        label: WEEKDAY_LABELS[day],
+        label: t(`ari.common.weekdays.${WEEKDAY_KEYS[day]}`),
         inputAmount: value,
         ...calculateRateByType(value)
       }))
@@ -628,7 +623,7 @@ export function RateGrid({
                   fontWeight: 'var(--font-medium)'
                 }}
               >
-                주간
+                {t('ari.common.view.week')}
               </button>
               <button
                 onClick={() => setViewMode('month')}
@@ -640,7 +635,7 @@ export function RateGrid({
                   fontWeight: 'var(--font-medium)'
                 }}
               >
-                월간
+                {t('ari.common.view.month')}
               </button>
               <button
                 onClick={() => setViewMode('all')}
@@ -652,7 +647,7 @@ export function RateGrid({
                   fontWeight: 'var(--font-medium)'
                 }}
               >
-                전체
+                {t('ari.common.view.all')}
               </button>
             </div>
 
@@ -680,7 +675,7 @@ export function RateGrid({
             }}
           >
             <CalendarRange className="w-icon-md h-icon-md" />
-            요일별 수정
+            {t('ari.rates.grid.weekdayBulkEdit')}
           </button>
         </div>
 
@@ -710,13 +705,13 @@ export function RateGrid({
                 >
                   {viewMode === 'week' ? (
                     <>
-                      {currentWeekStart.toLocaleDateString('ko-KR', { year: 'numeric', month: 'long', day: 'numeric' })}
+                      {currentWeekStart.toLocaleDateString(locale, { year: 'numeric', month: 'long', day: 'numeric' })}
                       {' - '}
-                      {new Date(currentWeekStart.getTime() + 6 * 24 * 60 * 60 * 1000).toLocaleDateString('ko-KR', { month: 'long', day: 'numeric' })}
+                      {new Date(currentWeekStart.getTime() + 6 * 24 * 60 * 60 * 1000).toLocaleDateString(locale, { month: 'long', day: 'numeric' })}
                     </>
                   ) : (
                     <>
-                      {currentWeekStart.toLocaleDateString('ko-KR', { year: 'numeric', month: 'long' })}
+                      {currentWeekStart.toLocaleDateString(locale, { year: 'numeric', month: 'long' })}
                     </>
                   )}
                 </div>
@@ -742,7 +737,7 @@ export function RateGrid({
                   color: 'var(--text-primary)'
                 }}
               >
-                전체 기간: {startDate} ~ {endDate}
+                {t('ari.common.fullPeriod', { startDate, endDate })}
               </div>
             )}
           </div>
@@ -758,7 +753,7 @@ export function RateGrid({
                   fontWeight: 'var(--font-medium)'
                 }}
               >
-                {selectedCells.length}개 선택됨
+                {t('ari.common.selectedCount', { count: selectedCells.length })}
               </span>
 
               <button
@@ -772,7 +767,7 @@ export function RateGrid({
                 }}
               >
                 <Edit2 className="w-md h-md" />
-                일괄 수정
+                {t('ari.common.bulkEdit')}
               </button>
 
               <button
@@ -787,7 +782,7 @@ export function RateGrid({
                 }}
               >
                 <Copy className="w-md h-md" />
-                복사
+                {t('ari.common.copy')}
               </button>
 
               <button
@@ -822,7 +817,7 @@ export function RateGrid({
                   minWidth: 'var(--rate-row-header-width)'
                 }}
               >
-                {rowHeaderLabel}
+                {resolvedRowHeaderLabel}
               </th>
               {viewDates.map((date) => {
                 const dayOfWeek = date.getDay()
@@ -840,9 +835,9 @@ export function RateGrid({
                       backgroundColor: isWeekend ? 'var(--bg-tertiary)' : 'var(--bg-secondary)'
                     }}
                   >
-                    <div>{date.getDate()}일</div>
+                    <div>{t('ari.common.dateDay', { day: date.getDate() })}</div>
                     <div className="text-base" style={{ fontWeight: 'var(--font-light)' }}>
-                      {['일', '월', '화', '수', '목', '금', '토'][dayOfWeek]}
+                      {t(`ari.common.weekdays.${WEEKDAY_KEYS[dayOfWeek]}`)}
                     </div>
                   </th>
                 )
@@ -970,7 +965,7 @@ export function RateGrid({
                 color: 'var(--text-primary)'
               }}
             >
-              일괄 수정
+              {t('ari.common.bulkEdit')}
             </h3>
 
             <p
@@ -980,7 +975,7 @@ export function RateGrid({
                 fontWeight: 'var(--font-light)'
               }}
             >
-              선택된 {selectedCells.length}개 셀의 요금을 일괄 변경합니다.
+              {t('ari.rates.grid.bulkEditDescription', { count: selectedCells.length })}
             </p>
 
             <label
@@ -990,13 +985,13 @@ export function RateGrid({
                 fontWeight: 'var(--font-medium)'
               }}
             >
-              요금 (KRW)
+              {t('ari.rates.grid.rateKrw')}
             </label>
             <input
               type="number"
               value={bulkEditValue}
               onChange={(e) => setBulkEditValue(e.target.value)}
-              placeholder="숫자 입력"
+              placeholder={t('ari.rates.grid.numberPlaceholder')}
               className="w-full px-control-px-lg py-sm rounded mb-md text-base"
               style={{
                 backgroundColor: 'var(--bg-secondary)',
@@ -1019,7 +1014,7 @@ export function RateGrid({
                 }}
               >
                 <Save className="w-md h-md" />
-                저장
+                {t('ari.common.save')}
               </button>
               <button
                 onClick={() => {
@@ -1035,7 +1030,7 @@ export function RateGrid({
                   border: '1px solid var(--border-color)'
                 }}
               >
-                취소
+                {t('ari.common.cancel')}
               </button>
             </div>
           </div>
@@ -1044,11 +1039,11 @@ export function RateGrid({
 
       <WeekdayRateBulkModal
         isOpen={showBulkRegister}
-        title="요일별 요금 일괄 수정"
+        title={t('ari.rates.grid.weekdayBulkTitle')}
         startDate={bulkRegisterStart}
         endDate={bulkRegisterEnd}
         values={bulkRegisterValues}
-        targetLabel={bulkTargetLabel}
+        targetLabel={resolvedBulkTargetLabel}
         rateTypeLabel={getRateTypeLabel()}
         commissionLabel={getCommissionLabel()}
         previewRows={bulkRegisterPreviewRows}
@@ -1089,8 +1084,8 @@ export function RateGrid({
         }}
       >
         <div className="text-base" style={{ color: 'var(--text-secondary)' }}>
-          <span style={{ fontWeight: 'var(--font-medium)' }}>사용법:</span>
-          {' '}드래그로 범위 선택 • 더블클릭으로 개별 수정 • 대량 등록으로 빠른 입력
+          <span style={{ fontWeight: 'var(--font-medium)' }}>{t('ari.common.usage')}</span>
+          {' '}{t('ari.common.gridHelp')}
         </div>
       </div>
     </div>
