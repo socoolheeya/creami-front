@@ -59,15 +59,15 @@
   --z-modal: 50;
   --border-width: 1px;
 
-  /* ========== Font Sizes (rem) ========== */
-  --font-size-xs: 0.75rem;    /* 12px */
-  --font-size-sm: 0.875rem;   /* 14px */
-  --font-size-base: 1rem;     /* 16px */
-  --font-size-lg: 1.125rem;   /* 18px */
-  --font-size-xl: 1.25rem;    /* 20px */
-  --font-size-2xl: 1.5rem;    /* 24px */
-  --font-size-3xl: 1.875rem;  /* 30px */
-  --font-size-4xl: 2.25rem;   /* 36px */
+  /* ========== Font Sizes (rem) - 14px Base ========== */
+  --font-size-xs: 0.6875rem;   /* 11px */
+  --font-size-sm: 0.75rem;     /* 12px */
+  --font-size-base: 0.875rem;  /* 14px - 기본 텍스트 */
+  --font-size-lg: 1rem;        /* 16px */
+  --font-size-xl: 1.125rem;    /* 18px */
+  --font-size-2xl: 1.375rem;   /* 22px */
+  --font-size-3xl: 1.6875rem;  /* 27px */
+  --font-size-4xl: 2rem;       /* 32px */
 
   /* ========== Font Weights ========== */
   --font-light: 300;
@@ -127,6 +127,10 @@
    Base Styles (최소한만)
    ============================================ */
 
+html {
+  font-size: 16px; /* rem 계산 기준 */
+}
+
 * {
   font-family: 'Pretendard Variable', -apple-system, BlinkMacSystemFont, system-ui, Roboto, sans-serif;
   font-weight: var(--font-medium);
@@ -135,6 +139,7 @@
 body {
   background-color: var(--bg-secondary);
   color: var(--text-primary);
+  font-size: var(--font-size-base); /* 14px - 기본 텍스트 */
 }
 
 h1, h2, h3, h4, h5, h6 {

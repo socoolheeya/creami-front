@@ -1,7 +1,8 @@
 'use client'
 
 import { Search, Table, LayoutGrid } from 'lucide-react'
-import { RatePlanStatus, RATE_PLAN_STATUS_LABELS } from '@/lib/types/rateplan'
+import { useTranslations } from 'next-intl'
+import { RatePlanStatus } from '@/lib/types/rateplan'
 
 interface FilterBarProps {
   statusFilter: RatePlanStatus | 'all'
@@ -14,13 +15,6 @@ interface FilterBarProps {
   filteredCount: number
 }
 
-const STATUS_OPTIONS: Array<{ value: RatePlanStatus | 'all'; label: string }> = [
-  { value: 'all', label: '전체' },
-  { value: 'draft', label: RATE_PLAN_STATUS_LABELS.draft },
-  { value: 'active', label: RATE_PLAN_STATUS_LABELS.active },
-  { value: 'inactive', label: RATE_PLAN_STATUS_LABELS.inactive },
-]
-
 export function FilterBar({
   statusFilter,
   searchQuery,
@@ -31,12 +25,21 @@ export function FilterBar({
   totalCount,
   filteredCount,
 }: FilterBarProps) {
+  const t = useTranslations('accommodation.rateplans')
+  const commonT = useTranslations('accommodation.common')
+  const statusOptions: Array<{ value: RatePlanStatus | 'all'; label: string }> = [
+    { value: 'all', label: commonT('all') },
+    { value: 'draft', label: t('statuses.draft') },
+    { value: 'active', label: t('statuses.active') },
+    { value: 'inactive', label: t('statuses.inactive') },
+  ]
+
   return (
     <div className="filter-container">
       <div className="filter-top">
         {/* Status Filter */}
         <div className="status-filters">
-          {STATUS_OPTIONS.map((option) => (
+          {statusOptions.map((option) => (
             <button
               key={option.value}
               onClick={() => onStatusFilterChange(option.value)}
@@ -52,14 +55,14 @@ export function FilterBar({
           <button
             onClick={() => onViewModeChange('table')}
             className={`view-btn ${viewMode === 'table' ? 'active' : ''}`}
-            title="테이블 뷰"
+            title={t('filter.tableView')}
           >
             <Table className="view-icon" />
           </button>
           <button
             onClick={() => onViewModeChange('card')}
             className={`view-btn ${viewMode === 'card' ? 'active' : ''}`}
-            title="카드 뷰"
+            title={t('filter.cardView')}
           >
             <LayoutGrid className="view-icon" />
           </button>
@@ -72,7 +75,7 @@ export function FilterBar({
           <Search className="search-icon" />
           <input
             type="text"
-            placeholder="요금제명, 혜택명으로 검색..."
+            placeholder={t('filter.searchPlaceholder')}
             value={searchQuery}
             onChange={(e) => onSearchQueryChange(e.target.value)}
             className="search-input"
@@ -87,7 +90,7 @@ export function FilterBar({
               <span className="count-separator">/</span>
             </>
           )}
-          <span className="count-total">{totalCount}개</span>
+          <span className="count-total">{commonT('countItems', { count: totalCount })}</span>
         </div>
       </div>
 

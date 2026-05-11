@@ -211,6 +211,13 @@ export const PROPERTY_TYPE_LABELS: Record<PropertyType, string> = {
   other: '기타'
 }
 
+export const PROPERTY_STATUS_LABELS: Record<PropertyStatus, string> = {
+  draft: 'Draft',
+  active: 'Active',
+  inactive: 'Inactive',
+  archived: 'Archived'
+}
+
 // API Response Types
 export interface GetPropertiesResponse {
   properties: Property[]

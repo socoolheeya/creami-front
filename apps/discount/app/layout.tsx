@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { NextIntlClientProvider } from "next-intl";
 import { getLocale, getMessages } from "next-intl/server";
+import { cookies } from "next/headers";
 import "./globals.css";
 import { Providers } from "./providers";
 import { MainLayout } from "@/components/layout/MainLayout";
@@ -21,9 +22,12 @@ export default async function RootLayout({
 }>) {
   const locale = await getLocale();
   const messages = await getMessages();
+  const cookieStore = await cookies();
+  const themeCookie = cookieStore.get("CREAMI_THEME")?.value;
+  const theme = themeCookie === "light" ? "light" : "dark";
 
   return (
-    <html lang={locale} suppressHydrationWarning>
+    <html lang={locale} data-theme={theme} suppressHydrationWarning>
       <body>
         <NextIntlClientProvider messages={messages}>
           <Providers>

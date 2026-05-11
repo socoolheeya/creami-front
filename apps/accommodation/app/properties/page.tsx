@@ -72,17 +72,16 @@ export default function PropertiesPage() {
             숙소 관리
           </h1>
         </div>
+      </div>
 
+      <div className="mb-md flex justify-end gap-sm">
+        <ViewToggle view={viewMode} onViewChange={setViewMode} />
         <Link href="/properties/new">
           <Button>
             <Plus className="h-icon-md w-icon-md" />
             신규 등록
           </Button>
         </Link>
-      </div>
-
-      <div className="mb-md flex justify-end">
-        <ViewToggle view={viewMode} onViewChange={setViewMode} />
       </div>
 
       {/* Content */}

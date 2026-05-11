@@ -1,7 +1,9 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
-import dts from 'vite-plugin-dts'
-import path from 'path'
+import dtsModule = require('vite-plugin-dts')
+import * as path from 'node:path'
+
+const dts = (dtsModule as unknown as { default?: typeof dtsModule }).default ?? dtsModule
 
 export default defineConfig({
   plugins: [

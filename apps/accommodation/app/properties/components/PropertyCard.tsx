@@ -5,7 +5,7 @@ import Link from 'next/link'
 import { ImageIcon, MapPin } from 'lucide-react'
 import { useState } from 'react'
 import { Card } from '@creami/ui'
-import { Property, PROPERTY_TYPE_LABELS } from '@/lib/types/property'
+import { Property, PROPERTY_STATUS_LABELS, PROPERTY_TYPE_LABELS } from '@/lib/types/property'
 
 interface AccommodationCardProps {
   accommodation: Property
@@ -37,7 +37,7 @@ export function PropertyCard({ accommodation }: AccommodationCardProps) {
           )}
 
           <div className="absolute right-sm top-sm rounded bg-primary px-control-px-sm py-xs text-base font-bold text-white">
-            {accommodation.status === 'active' ? '운영중' : '중지'}
+            {PROPERTY_STATUS_LABELS[accommodation.status]}
           </div>
         </div>
 

@@ -1,7 +1,14 @@
 'use client'
 
-import { RoomFormData, ROOM_TYPE_LABELS, RoomType, VIEW_TYPE_LABELS, ViewType } from '@/lib/types/room'
+import { type ReactNode } from 'react'
+import { useTranslations } from 'next-intl'
+import {
+  type RoomFormData,
+  type RoomType,
+  type ViewType
+} from '@/lib/types/room'
 import { mockAccommodations } from '@/lib/data/mock-accommodations'
+import { Input, Select } from '@creami/ui'
 
 interface Step1BasicProps {
   formData: RoomFormData
@@ -10,226 +17,154 @@ interface Step1BasicProps {
   isEditMode?: boolean
 }
 
-export function Step1Basic({ formData, onChange, preselectedAccommodationId, isEditMode = false }: Step1BasicProps) {
+function SectionTitle() {
+  const t = useTranslations('accommodation.rooms')
+
+  return (
+    <div>
+      <h2 className="mb-xs text-xl font-bold text-text-primary">
+        {t('sections.basic')}
+      </h2>
+      <p className="text-base font-light text-text-secondary">
+        {t('descriptions.basic')}
+      </p>
+    </div>
+  )
+}
+
+function Field({
+  label,
+  required = false,
+  children
+}: {
+  label: string
+  required?: boolean
+  children: ReactNode
+}) {
+  return (
+    <label className="block">
+      <span className="mb-xs block text-base font-medium text-text-primary">
+        {label}
+        {required && <span className="text-error"> *</span>}
+      </span>
+      {children}
+    </label>
+  )
+}
+
+export function Step1Basic({
+  formData,
+  onChange,
+  preselectedAccommodationId,
+  isEditMode = false
+}: Step1BasicProps) {
+  const t = useTranslations('accommodation.rooms')
   const isAccommodationLocked = !!preselectedAccommodationId
 
   return (
-    <div className="space-y-4">
-      <div>
-        <h2
-          className="text-xl mb-1"
-          style={{
-            fontWeight: 'var(--font-bold)',
-            color: 'var(--text-primary)'
-          }}
-        >
-          기본 정보
-        </h2>
-        <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>
-          객실의 기본 정보를 입력해주세요
-        </p>
-      </div>
+    <div className="space-y-lg">
+      <SectionTitle />
 
-      {/* 객실명 (한글) */}
-      <div>
-        <label
-          className="block mb-1.5 text-sm"
-          style={{
-            color: 'var(--text-primary)',
-            fontWeight: 'var(--font-medium)'
-          }}
-        >
-          객실명 (한글) <span style={{ color: 'var(--error)' }}>*</span>
-        </label>
-        <input
-          type="text"
-          value={formData.name || ''}
-          onChange={(e) => onChange({ name: e.target.value })}
-          placeholder="예: 101호, 디럭스 오션뷰"
-          className="w-full max-w-md px-3 py-2 text-sm rounded-lg"
-          style={{
-            backgroundColor: 'var(--bg-primary)',
-            border: '1px solid var(--border-color)',
-            color: 'var(--text-primary)',
-            borderRadius: 'var(--radius-sm)'
-          }}
-        />
-      </div>
+      <div className="grid grid-cols-1 gap-md lg:grid-cols-2">
+        <Field label={t('fields.roomNameKo')} required>
+          <Input
+            value={formData.name || ''}
+            onChange={(event) => onChange({ name: event.target.value })}
+            placeholder={t('placeholders.nameKo')}
+          />
+        </Field>
 
-      {/* 객실명 (영문) */}
-      <div>
-        <label
-          className="block mb-1.5 text-sm"
-          style={{
-            color: 'var(--text-primary)',
-            fontWeight: 'var(--font-medium)'
-          }}
-        >
-          객실명 (영문)
-        </label>
-        <input
-          type="text"
-          value={formData.enName || ''}
-          onChange={(e) => onChange({ enName: e.target.value })}
-          placeholder="예: Room 101, Deluxe Ocean View"
-          className="w-full max-w-md px-3 py-2 text-sm rounded-lg"
-          style={{
-            backgroundColor: 'var(--bg-primary)',
-            border: '1px solid var(--border-color)',
-            color: 'var(--text-primary)',
-            borderRadius: 'var(--radius-sm)'
-          }}
-        />
-      </div>
+        <Field label={t('fields.roomNameEn')}>
+          <Input
+            value={formData.enName || ''}
+            onChange={(event) => onChange({ enName: event.target.value })}
+            placeholder={t('placeholders.nameEn')}
+          />
+        </Field>
 
-      {/* 객실 타입 */}
-      <div>
-        <label
-          className="block mb-1.5 text-sm"
-          style={{
-            color: 'var(--text-primary)',
-            fontWeight: 'var(--font-medium)'
-          }}
-        >
-          객실 타입 <span style={{ color: 'var(--error)' }}>*</span>
-        </label>
-        <select
-          value={formData.type || ''}
-          onChange={(e) => onChange({ type: e.target.value as RoomType })}
-          className="w-full max-w-xs px-3 py-2 text-sm rounded-lg"
-          style={{
-            backgroundColor: 'var(--bg-primary)',
-            border: '1px solid var(--border-color)',
-            color: 'var(--text-primary)',
-            borderRadius: 'var(--radius-sm)'
-          }}
-        >
-          <option value="">선택하세요</option>
-          {Object.entries(ROOM_TYPE_LABELS).map(([value, label]) => (
-            <option key={value} value={value}>
-              {label}
-            </option>
-          ))}
-        </select>
-      </div>
-
-      {/* 뷰 타입 */}
-      <div>
-        <label
-          className="block mb-1.5 text-sm"
-          style={{
-            color: 'var(--text-primary)',
-            fontWeight: 'var(--font-medium)'
-          }}
-        >
-          뷰 타입 <span style={{ color: 'var(--error)' }}>*</span>
-        </label>
-        <select
-          value={formData.viewType || ''}
-          onChange={(e) => onChange({ viewType: e.target.value as ViewType })}
-          className="w-full max-w-xs px-3 py-2 text-sm rounded-lg"
-          style={{
-            backgroundColor: 'var(--bg-primary)',
-            border: '1px solid var(--border-color)',
-            color: 'var(--text-primary)',
-            borderRadius: 'var(--radius-sm)'
-          }}
-        >
-          <option value="">선택하세요</option>
-          {Object.entries(VIEW_TYPE_LABELS).map(([value, label]) => (
-            <option key={value} value={value}>
-              {label}
-            </option>
-          ))}
-        </select>
-      </div>
-
-      {/* 흡연 가능 */}
-      <div>
-        <label
-          className="block mb-1.5 text-sm"
-          style={{
-            color: 'var(--text-primary)',
-            fontWeight: 'var(--font-medium)'
-          }}
-        >
-          흡연 <span style={{ color: 'var(--error)' }}>*</span>
-        </label>
-        <div className="flex gap-4">
-          <label className="flex items-center gap-2 cursor-pointer">
-            <input
-              type="radio"
-              name="smoking"
-              checked={formData.smokingAllowed === false}
-              onChange={() => onChange({ smokingAllowed: false })}
-              className="w-4 h-4"
-              style={{ accentColor: 'var(--primary)' }}
-            />
-            <span className="text-sm" style={{ color: 'var(--text-primary)' }}>금연</span>
-          </label>
-          <label className="flex items-center gap-2 cursor-pointer">
-            <input
-              type="radio"
-              name="smoking"
-              checked={formData.smokingAllowed === true}
-              onChange={() => onChange({ smokingAllowed: true })}
-              className="w-4 h-4"
-              style={{ accentColor: 'var(--primary)' }}
-            />
-            <span className="text-sm" style={{ color: 'var(--text-primary)' }}>흡연 가능</span>
-          </label>
-        </div>
-      </div>
-
-      {/* 소속 숙소 - 수정 모드에서는 숨김 */}
-      {!isEditMode && (
-        <div>
-          <label
-            className="block mb-1.5 text-sm"
-            style={{
-              color: 'var(--text-primary)',
-              fontWeight: 'var(--font-medium)'
-            }}
+        <Field label={t('fields.roomType')} required>
+          <Select
+            value={formData.type || ''}
+            onChange={(event) => onChange({ type: event.target.value as RoomType })}
           >
-            소속 숙소 <span style={{ color: 'var(--error)' }}>*</span>
-          </label>
-          <select
-            value={formData.accommodationId || preselectedAccommodationId || ''}
-            onChange={(e) => {
-              const selectedId = e.target.value
-              const selectedAccommodation = mockAccommodations.find(acc => acc.id === selectedId)
-              onChange({
-                accommodationId: selectedId,
-                accommodationName: selectedAccommodation?.name
-              })
-            }}
-            disabled={isAccommodationLocked}
-            className="w-full max-w-md px-3 py-2 text-sm rounded-lg"
-            style={{
-              backgroundColor: isAccommodationLocked ? 'var(--bg-tertiary)' : 'var(--bg-primary)',
-              border: '1px solid var(--border-color)',
-              color: 'var(--text-primary)',
-              borderRadius: 'var(--radius-sm)',
-              cursor: isAccommodationLocked ? 'not-allowed' : 'pointer'
-            }}
-          >
-            <option value="">선택하세요</option>
-            {mockAccommodations.map(acc => (
-              <option key={acc.id} value={acc.id}>
-                {acc.name}
+            <option value="">{t('placeholders.select')}</option>
+            {(['single', 'double', 'twin', 'suite', 'deluxe', 'family'] as RoomType[]).map((value) => (
+              <option key={value} value={value}>
+                {t(`types.${value}`)}
               </option>
             ))}
-          </select>
-          {isAccommodationLocked && (
-            <p
-              className="text-xs mt-1"
-              style={{ color: 'var(--text-tertiary)' }}
+          </Select>
+        </Field>
+
+        <Field label={t('fields.viewType')} required>
+          <Select
+            value={formData.viewType || ''}
+            onChange={(event) => onChange({ viewType: event.target.value as ViewType })}
+          >
+            <option value="">{t('placeholders.select')}</option>
+            {(['ocean', 'city', 'garden', 'mountain', 'pool', 'none'] as ViewType[]).map((value) => (
+              <option key={value} value={value}>
+                {t(`views.${value}`)}
+              </option>
+            ))}
+          </Select>
+        </Field>
+
+        <Field label={t('fields.smoking')} required>
+          <div className="flex h-control-md items-center gap-md">
+            <label className="flex cursor-pointer items-center gap-sm text-base font-medium text-text-primary">
+              <input
+                type="radio"
+                name="smoking"
+                checked={formData.smokingAllowed === false}
+                onChange={() => onChange({ smokingAllowed: false })}
+                className="h-icon-md w-icon-md accent-primary"
+              />
+              {t('fields.nonSmoking')}
+            </label>
+            <label className="flex cursor-pointer items-center gap-sm text-base font-medium text-text-primary">
+              <input
+                type="radio"
+                name="smoking"
+                checked={formData.smokingAllowed === true}
+                onChange={() => onChange({ smokingAllowed: true })}
+                className="h-icon-md w-icon-md accent-primary"
+              />
+              {t('fields.smokingAllowed')}
+            </label>
+          </div>
+        </Field>
+
+        {!isEditMode && (
+          <Field label={t('fields.property')} required>
+            <Select
+              value={formData.accommodationId || preselectedAccommodationId || ''}
+              onChange={(event) => {
+                const selectedId = event.target.value
+                const selectedAccommodation = mockAccommodations.find((item) => item.id === selectedId)
+
+                onChange({
+                  accommodationId: selectedId,
+                  accommodationName: selectedAccommodation?.name
+                })
+              }}
+              disabled={isAccommodationLocked}
             >
-              숙소가 미리 선택되었습니다
-            </p>
-          )}
-        </div>
-      )}
+              <option value="">{t('placeholders.select')}</option>
+              {mockAccommodations.map((accommodation) => (
+                <option key={accommodation.id} value={accommodation.id}>
+                  {accommodation.name}
+                </option>
+              ))}
+            </Select>
+            {isAccommodationLocked && (
+              <p className="mt-xs text-base font-light text-text-tertiary">
+                {t('messages.propertyPreselected')}
+              </p>
+            )}
+          </Field>
+        )}
+      </div>
     </div>
   )
 }

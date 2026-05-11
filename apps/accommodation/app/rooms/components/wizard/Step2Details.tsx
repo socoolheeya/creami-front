@@ -1,14 +1,42 @@
 'use client'
 
-import { RoomFormData, BedConfig, BED_TYPE_LABELS, BedType } from '@/lib/types/room'
+import { type ReactNode } from 'react'
+import { useTranslations } from 'next-intl'
+import {
+  type BedConfig,
+  type BedType,
+  type RoomFormData
+} from '@/lib/types/room'
 import { Plus, Trash2 } from 'lucide-react'
+import { Button, Input, Select } from '@creami/ui'
 
 interface Step2DetailsProps {
   formData: RoomFormData
   onChange: (data: Partial<RoomFormData>) => void
 }
 
+function Field({
+  label,
+  required = false,
+  children
+}: {
+  label: string
+  required?: boolean
+  children: ReactNode
+}) {
+  return (
+    <label className="block">
+      <span className="mb-xs block text-base font-medium text-text-primary">
+        {label}
+        {required && <span className="text-error"> *</span>}
+      </span>
+      {children}
+    </label>
+  )
+}
+
 export function Step2Details({ formData, onChange }: Step2DetailsProps) {
+  const t = useTranslations('accommodation.rooms')
   const bedConfiguration = formData.bedConfiguration || []
 
   const addBed = () => {
@@ -19,7 +47,7 @@ export function Step2Details({ formData, onChange }: Step2DetailsProps) {
 
   const removeBed = (index: number) => {
     onChange({
-      bedConfiguration: bedConfiguration.filter((_, i) => i !== index)
+      bedConfiguration: bedConfiguration.filter((_, itemIndex) => itemIndex !== index)
     })
   }
 
@@ -30,229 +58,120 @@ export function Step2Details({ formData, onChange }: Step2DetailsProps) {
   }
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-lg">
       <div>
-        <h2
-          className="text-xl mb-1"
-          style={{
-            fontWeight: 'var(--font-bold)',
-            color: 'var(--text-primary)'
-          }}
-        >
-          객실 정보
+        <h2 className="mb-xs text-xl font-bold text-text-primary">
+          {t('sections.details')}
         </h2>
-        <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>
-          객실의 상세 정보를 입력해주세요
+        <p className="text-base font-light text-text-secondary">
+          {t('descriptions.details')}
         </p>
       </div>
 
-      {/* 객실 크기 */}
-      <div className="grid grid-cols-2 gap-3 max-w-md">
-        <div>
-          <label
-            className="block mb-1.5 text-sm"
-            style={{
-              color: 'var(--text-primary)',
-              fontWeight: 'var(--font-medium)'
-            }}
-          >
-            객실 크기 <span style={{ color: 'var(--error)' }}>*</span>
-          </label>
-          <input
+      <div className="grid grid-cols-1 gap-md lg:grid-cols-2">
+        <Field label={t('fields.roomSize')} required>
+          <Input
             type="number"
             value={formData.size || ''}
-            onChange={(e) => onChange({ size: Number(e.target.value) })}
+            onChange={(event) => onChange({ size: Number(event.target.value) })}
             placeholder="30"
             min="0"
             step="0.1"
-            className="w-full px-3 py-2 text-sm rounded-lg"
-            style={{
-              backgroundColor: 'var(--bg-primary)',
-              border: '1px solid var(--border-color)',
-              color: 'var(--text-primary)',
-              borderRadius: 'var(--radius-sm)'
-            }}
           />
-        </div>
-        <div>
-          <label
-            className="block mb-1.5 text-sm"
-            style={{
-              color: 'var(--text-primary)',
-              fontWeight: 'var(--font-medium)'
-            }}
-          >
-            단위 <span style={{ color: 'var(--error)' }}>*</span>
-          </label>
-          <select
+        </Field>
+
+        <Field label={t('fields.unit')} required>
+          <Select
             value={formData.sizeUnit || 'sqm'}
-            onChange={(e) => onChange({ sizeUnit: e.target.value as 'sqm' | 'pyeong' })}
-            className="w-full px-3 py-2 text-sm rounded-lg"
-            style={{
-              backgroundColor: 'var(--bg-primary)',
-              border: '1px solid var(--border-color)',
-              color: 'var(--text-primary)',
-              borderRadius: 'var(--radius-sm)'
-            }}
+            onChange={(event) => onChange({ sizeUnit: event.target.value as 'sqm' | 'pyeong' })}
           >
-            <option value="sqm">㎡</option>
-            <option value="pyeong">평</option>
-          </select>
-        </div>
+            <option value="sqm">{t('units.sqm')}</option>
+            <option value="pyeong">{t('units.pyeong')}</option>
+          </Select>
+        </Field>
+
+        <Field label={t('fields.floor')} required>
+          <Input
+            type="number"
+            value={formData.floor || ''}
+            onChange={(event) => onChange({ floor: Number(event.target.value) })}
+            placeholder="1"
+            min="0"
+          />
+        </Field>
       </div>
 
-      {/* 층수 */}
-      <div className="max-w-xs">
-        <label
-          className="block mb-1.5 text-sm"
-          style={{
-            color: 'var(--text-primary)',
-            fontWeight: 'var(--font-medium)'
-          }}
-        >
-          층수 <span style={{ color: 'var(--error)' }}>*</span>
-        </label>
-        <input
-          type="number"
-          value={formData.floor || ''}
-          onChange={(e) => onChange({ floor: Number(e.target.value) })}
-          placeholder="1"
-          min="0"
-          className="w-full px-3 py-2 text-sm rounded-lg"
-          style={{
-            backgroundColor: 'var(--bg-primary)',
-            border: '1px solid var(--border-color)',
-            color: 'var(--text-primary)',
-            borderRadius: 'var(--radius-sm)'
-          }}
-        />
-      </div>
-
-      {/* 침대 구성 */}
       <div>
-        <label
-          className="block mb-1.5 text-sm"
-          style={{
-            color: 'var(--text-primary)',
-            fontWeight: 'var(--font-medium)'
-          }}
-        >
-          침대 구성 <span style={{ color: 'var(--error)' }}>*</span>
-        </label>
+        <div className="mb-sm flex items-center justify-between">
+          <span className="text-base font-medium text-text-primary">
+            {t('sections.beds')} <span className="text-error">*</span>
+          </span>
+          <Button type="button" variant="secondary" size="small" onClick={addBed}>
+            <Plus className="h-icon-md w-icon-md" />
+            {t('actions.addBed')}
+          </Button>
+        </div>
 
-        <div className="space-y-2">
+        <div className="space-y-sm">
           {bedConfiguration.map((bed, index) => (
-            <div key={index} className="flex gap-2 max-w-lg">
-              <select
+            <div key={`${bed.type}-${index}`} className="grid grid-cols-[1fr_auto_auto] gap-sm">
+              <Select
                 value={bed.type}
-                onChange={(e) => updateBed(index, 'type', e.target.value as BedType)}
-                className="flex-1 px-3 py-2 text-sm rounded-lg"
-                style={{
-                  backgroundColor: 'var(--bg-primary)',
-                  border: '1px solid var(--border-color)',
-                  color: 'var(--text-primary)',
-                  borderRadius: 'var(--radius-sm)'
-                }}
+                onChange={(event) => updateBed(index, 'type', event.target.value as BedType)}
               >
-                {Object.entries(BED_TYPE_LABELS).map(([value, label]) => (
+                {(['single', 'double', 'queen', 'king', 'sofa'] as BedType[]).map((value) => (
                   <option key={value} value={value}>
-                    {label}
+                    {t(`beds.${value}`)}
                   </option>
                 ))}
-              </select>
-              <input
+              </Select>
+              <Input
                 type="number"
                 value={bed.count}
-                onChange={(e) => updateBed(index, 'count', Number(e.target.value))}
+                onChange={(event) => updateBed(index, 'count', Number(event.target.value))}
                 min="1"
-                className="w-20 px-3 py-2 text-sm rounded-lg"
-                style={{
-                  backgroundColor: 'var(--bg-primary)',
-                  border: '1px solid var(--border-color)',
-                  color: 'var(--text-primary)',
-                  borderRadius: 'var(--radius-sm)'
-                }}
+                className="w-control-lg"
               />
-              <button
+              <Button
+                type="button"
+                variant="secondary"
+                iconOnly
                 onClick={() => removeBed(index)}
-                className="px-2 py-2 rounded-lg transition-colors"
-                style={{
-                  backgroundColor: 'var(--error)',
-                  color: '#ffffff',
-                  borderRadius: 'var(--radius-sm)'
-                }}
+                aria-label={t('actions.deleteBed')}
               >
-                <Trash2 className="w-4 h-4" />
-              </button>
+                <Trash2 className="h-icon-md w-icon-md" />
+              </Button>
             </div>
           ))}
         </div>
-
-        <button
-          onClick={addBed}
-          className="flex items-center gap-2 px-3 py-1.5 mt-2 text-sm rounded-lg transition-colors"
-          style={{
-            backgroundColor: 'var(--bg-secondary)',
-            color: 'var(--text-primary)',
-            borderRadius: 'var(--radius-sm)',
-            fontWeight: 'var(--font-medium)'
-          }}
-        >
-          <Plus className="w-4 h-4" />
-          침대 추가
-        </button>
       </div>
 
-      {/* 엑스트라 베드 */}
-      <div>
-        <label className="flex items-center gap-2 cursor-pointer">
+      <div className="space-y-sm">
+        <label className="flex cursor-pointer items-center gap-sm text-base font-medium text-text-primary">
           <input
             type="checkbox"
             checked={formData.extraBedAvailable || false}
-            onChange={(e) => onChange({
-              extraBedAvailable: e.target.checked,
-              extraBedCount: e.target.checked ? formData.extraBedCount : undefined
-            })}
-            className="w-4 h-4 rounded"
-            style={{ accentColor: 'var(--primary)' }}
+            onChange={(event) =>
+              onChange({
+                extraBedAvailable: event.target.checked,
+                extraBedCount: event.target.checked ? formData.extraBedCount : undefined
+              })
+            }
+            className="h-icon-md w-icon-md rounded accent-primary"
           />
-          <span
-            className="text-sm"
-            style={{
-              color: 'var(--text-primary)',
-              fontWeight: 'var(--font-medium)'
-            }}
-          >
-            엑스트라 베드 가능
-          </span>
+          {t('fields.extraBedAvailable')}
         </label>
 
         {formData.extraBedAvailable && (
-          <div className="mt-2 max-w-xs">
-            <label
-              className="block mb-1.5 text-sm"
-              style={{
-                color: 'var(--text-primary)',
-                fontWeight: 'var(--font-medium)'
-              }}
-            >
-              엑스트라 베드 개수
-            </label>
-            <input
+          <Field label={t('fields.extraBedCount')}>
+            <Input
               type="number"
               value={formData.extraBedCount || ''}
-              onChange={(e) => onChange({ extraBedCount: Number(e.target.value) })}
+              onChange={(event) => onChange({ extraBedCount: Number(event.target.value) })}
               placeholder="2"
               min="1"
-              className="w-full px-3 py-2 text-sm rounded-lg"
-              style={{
-                backgroundColor: 'var(--bg-primary)',
-                border: '1px solid var(--border-color)',
-                color: 'var(--text-primary)',
-                borderRadius: 'var(--radius-sm)'
-              }}
             />
-          </div>
+          </Field>
         )}
       </div>
     </div>

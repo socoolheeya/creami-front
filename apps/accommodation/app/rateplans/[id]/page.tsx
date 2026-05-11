@@ -3,12 +3,8 @@
 import { use } from 'react'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
+import { useTranslations } from 'next-intl'
 import { mockRatePlans } from '@/lib/data/mock-rateplans'
-import {
-  RATE_PLAN_TYPE_LABELS,
-  MEAL_PLAN_LABELS,
-  RATE_PLAN_STATUS_LABELS
-} from '@/lib/types/rateplan'
 
 interface RatePlanPageProps {
   params: Promise<{
@@ -17,6 +13,8 @@ interface RatePlanPageProps {
 }
 
 export default function RatePlanPage({ params }: RatePlanPageProps) {
+  const t = useTranslations('accommodation.rateplans')
+  const commonT = useTranslations('accommodation.common')
   const { id } = use(params)
   const ratePlan = mockRatePlans.find(rp => rp.id === id)
 
@@ -29,7 +27,7 @@ export default function RatePlanPage({ params }: RatePlanPageProps) {
       <div className="page-header">
         <div>
           <div className="breadcrumb">
-            <Link href="/rateplans">요금제 관리</Link>
+            <Link href="/rateplans">{t('title')}</Link>
             <span className="separator">/</span>
             <span>{ratePlan.name}</span>
           </div>
@@ -40,10 +38,10 @@ export default function RatePlanPage({ params }: RatePlanPageProps) {
         </div>
         <div className="header-actions">
           <Link href={`/rateplans/${id}/edit`} className="btn btn-primary">
-            수정
+            {commonT('edit')}
           </Link>
           <span className={`badge badge-${ratePlan.status}`}>
-            {RATE_PLAN_STATUS_LABELS[ratePlan.status]}
+            {t(`statuses.${ratePlan.status}`)}
           </span>
         </div>
       </div>
@@ -51,40 +49,40 @@ export default function RatePlanPage({ params }: RatePlanPageProps) {
       <div className="content-grid">
         {/* Basic Information */}
         <div className="section-card">
-          <h2 className="section-title">기본 정보</h2>
+          <h2 className="section-title">{t('sections.basic')}</h2>
           <div className="info-grid">
             <div className="info-item">
-              <span className="info-label">요금제 ID</span>
+              <span className="info-label">{t('fields.ratePlanId')}</span>
               <span className="info-value">{ratePlan.id}</span>
             </div>
             {ratePlan.roomId && (
               <div className="info-item">
-                <span className="info-label">객실 ID</span>
+                <span className="info-label">{t('fields.roomId')}</span>
                 <span className="info-value">{ratePlan.roomId}</span>
               </div>
             )}
             <div className="info-item">
-              <span className="info-label">요금제 유형</span>
+              <span className="info-label">{t('fields.ratePlanType')}</span>
               <span className="info-value">
-                {RATE_PLAN_TYPE_LABELS[ratePlan.ratePlanType]}
+                {t(`types.${ratePlan.ratePlanType}`)}
               </span>
             </div>
             <div className="info-item">
-              <span className="info-label">식사 포함</span>
+              <span className="info-label">{t('fields.mealIncluded')}</span>
               <span className="info-value">
-                {MEAL_PLAN_LABELS[ratePlan.mealPlan]}
+                {t(`mealPlans.${ratePlan.mealPlan}`)}
               </span>
             </div>
             <div className="info-item">
-              <span className="info-label">활성 여부</span>
+              <span className="info-label">{t('fields.enabled')}</span>
               <span className="info-value">
-                {ratePlan.enabled ? '활성' : '비활성'}
+                {ratePlan.enabled ? t('values.enabled') : t('values.disabled')}
               </span>
             </div>
             <div className="info-item">
-              <span className="info-label">상태</span>
+              <span className="info-label">{t('fields.status')}</span>
               <span className="info-value">
-                {RATE_PLAN_STATUS_LABELS[ratePlan.status]}
+                {t(`statuses.${ratePlan.status}`)}
               </span>
             </div>
           </div>
@@ -106,7 +104,7 @@ export default function RatePlanPage({ params }: RatePlanPageProps) {
                 d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
               />
             </svg>
-            <h2 className="section-title">혜택</h2>
+            <h2 className="section-title">{t('sections.benefit')}</h2>
           </div>
           <p className="benefit-text">{ratePlan.benefitName}</p>
         </div>
@@ -114,11 +112,11 @@ export default function RatePlanPage({ params }: RatePlanPageProps) {
         {/* Description */}
         {ratePlan.description && (
           <div className="section-card full-width">
-            <h2 className="section-title">설명</h2>
+            <h2 className="section-title">{t('sections.description')}</h2>
             <div className="description-content">
               {ratePlan.description.description && (
                 <div className="description-item">
-                  <span className="description-label">한글</span>
+                  <span className="description-label">{t('fields.descriptionKo')}</span>
                   <p className="description-text">
                     {ratePlan.description.description}
                   </p>
@@ -139,81 +137,81 @@ export default function RatePlanPage({ params }: RatePlanPageProps) {
         {/* Settings */}
         {ratePlan.setting && (
           <div className="section-card full-width">
-            <h2 className="section-title">요금제 설정</h2>
+            <h2 className="section-title">{t('sections.settings')}</h2>
             <div className="settings-grid">
               <div className="setting-group">
-                <h3 className="group-title">숙박 기간</h3>
+                <h3 className="group-title">{t('sections.stay')}</h3>
                 <div className="setting-items">
                   <div className="setting-item">
-                    <span className="setting-label">최소 숙박</span>
+                    <span className="setting-label">{t('fields.minLos')}</span>
                     <span className="setting-value">
-                      {ratePlan.setting.minLos}박
+                      {commonT('night', { count: ratePlan.setting.minLos })}
                     </span>
                   </div>
                   <div className="setting-item">
-                    <span className="setting-label">최대 숙박</span>
+                    <span className="setting-label">{t('fields.maxLos')}</span>
                     <span className="setting-value">
-                      {ratePlan.setting.maxLos}박
+                      {commonT('night', { count: ratePlan.setting.maxLos })}
                     </span>
                   </div>
                 </div>
               </div>
 
               <div className="setting-group">
-                <h3 className="group-title">체류 일수</h3>
+                <h3 className="group-title">{t('sections.throughDays')}</h3>
                 <div className="setting-items">
                   <div className="setting-item">
-                    <span className="setting-label">최소 체류</span>
+                    <span className="setting-label">{t('fields.minThroughDays')}</span>
                     <span className="setting-value">
-                      {ratePlan.setting.minThroughDays}일
+                      {commonT('day', { count: ratePlan.setting.minThroughDays })}
                     </span>
                   </div>
                   <div className="setting-item">
-                    <span className="setting-label">최대 체류</span>
+                    <span className="setting-label">{t('fields.maxThroughDays')}</span>
                     <span className="setting-value">
-                      {ratePlan.setting.maxThroughDays}일
+                      {commonT('day', { count: ratePlan.setting.maxThroughDays })}
                     </span>
                   </div>
                 </div>
               </div>
 
               <div className="setting-group">
-                <h3 className="group-title">사전 예약</h3>
+                <h3 className="group-title">{t('sections.advance')}</h3>
                 <div className="setting-items">
                   <div className="setting-item">
-                    <span className="setting-label">최소 사전 예약</span>
+                    <span className="setting-label">{t('fields.minAdvanceDays')}</span>
                     <span className="setting-value">
-                      {ratePlan.setting.minAdvanceDays}일 전
+                      {commonT('dayBefore', { count: ratePlan.setting.minAdvanceDays })}
                     </span>
                   </div>
                   <div className="setting-item">
-                    <span className="setting-label">최대 사전 예약</span>
+                    <span className="setting-label">{t('fields.maxAdvanceDays')}</span>
                     <span className="setting-value">
-                      {ratePlan.setting.maxAdvanceDays}일 전
+                      {commonT('dayBefore', { count: ratePlan.setting.maxAdvanceDays })}
                     </span>
                   </div>
                 </div>
               </div>
 
               <div className="setting-group">
-                <h3 className="group-title">재고 및 제한</h3>
+                <h3 className="group-title">{t('sections.inventory')}</h3>
                 <div className="setting-items">
                   <div className="setting-item">
-                    <span className="setting-label">배정 재고</span>
+                    <span className="setting-label">{t('fields.allotment')}</span>
                     <span className="setting-value">
                       {ratePlan.setting.allotment}
                     </span>
                   </div>
                   <div className="setting-item">
-                    <span className="setting-label">입실 제한</span>
+                    <span className="setting-label">{t('fields.closedToArrival')}</span>
                     <span className="setting-value">
-                      {ratePlan.setting.closedToArrival ? '제한' : '허용'}
+                      {ratePlan.setting.closedToArrival ? t('values.restricted') : t('values.allowed')}
                     </span>
                   </div>
                   <div className="setting-item">
-                    <span className="setting-label">퇴실 제한</span>
+                    <span className="setting-label">{t('fields.closedToDeparture')}</span>
                     <span className="setting-value">
-                      {ratePlan.setting.closedToDeparture ? '제한' : '허용'}
+                      {ratePlan.setting.closedToDeparture ? t('values.restricted') : t('values.allowed')}
                     </span>
                   </div>
                 </div>
@@ -225,10 +223,10 @@ export default function RatePlanPage({ params }: RatePlanPageProps) {
         {/* Sale Period */}
         {ratePlan.salePeriod && (
           <div className="section-card full-width">
-            <h2 className="section-title">판매 기간</h2>
+            <h2 className="section-title">{t('sections.salePeriod')}</h2>
             <div className="period-grid">
               <div className="period-group">
-                <h3 className="group-title">예약 가능 기간</h3>
+                <h3 className="group-title">{t('sections.bookingPeriod')}</h3>
                 <div className="period-range">
                   <span className="period-date">
                     {ratePlan.salePeriod.bookingStartDate}
@@ -240,7 +238,7 @@ export default function RatePlanPage({ params }: RatePlanPageProps) {
                 </div>
               </div>
               <div className="period-group">
-                <h3 className="group-title">숙박 가능 기간</h3>
+                <h3 className="group-title">{t('sections.stayPeriod')}</h3>
                 <div className="period-range">
                   <span className="period-date">
                     {ratePlan.salePeriod.stayStartDate}
@@ -258,19 +256,19 @@ export default function RatePlanPage({ params }: RatePlanPageProps) {
         {/* Cancellation Policies */}
         {ratePlan.cancellationPolicies.length > 0 && (
           <div className="section-card full-width">
-            <h2 className="section-title">취소 정책</h2>
+            <h2 className="section-title">{t('sections.cancellationPolicies')}</h2>
             <div className="policies-list">
               {ratePlan.cancellationPolicies.map((policy) => (
                 <div key={policy.id} className="policy-card">
                   <div className="policy-header">
                     <h3 className="policy-name">{policy.name}</h3>
                     <span className="policy-priority">
-                      우선순위 {policy.priority}
+                      {t('fields.priority')} {policy.priority}
                     </span>
                   </div>
 
                   <div className="policy-period">
-                    <span className="period-label">적용 기간</span>
+                    <span className="period-label">{t('fields.period')}</span>
                     <div className="period-range">
                       <span>{policy.startDateTime}</span>
                       <span className="period-separator">~</span>
@@ -279,40 +277,40 @@ export default function RatePlanPage({ params }: RatePlanPageProps) {
                   </div>
 
                   <div className="policy-days">
-                    <span className="days-label">적용 요일</span>
+                    <span className="days-label">{t('fields.daysOfWeek')}</span>
                     <div className="days-grid">
                       <span className={policy.sunday ? 'day active' : 'day'}>
-                        일
+                        {t('weekdays.sunday')}
                       </span>
                       <span className={policy.monday ? 'day active' : 'day'}>
-                        월
+                        {t('weekdays.monday')}
                       </span>
                       <span className={policy.tuesday ? 'day active' : 'day'}>
-                        화
+                        {t('weekdays.tuesday')}
                       </span>
                       <span className={policy.wednesday ? 'day active' : 'day'}>
-                        수
+                        {t('weekdays.wednesday')}
                       </span>
                       <span className={policy.thursday ? 'day active' : 'day'}>
-                        목
+                        {t('weekdays.thursday')}
                       </span>
                       <span className={policy.friday ? 'day active' : 'day'}>
-                        금
+                        {t('weekdays.friday')}
                       </span>
                       <span className={policy.saturday ? 'day active' : 'day'}>
-                        토
+                        {t('weekdays.saturday')}
                       </span>
                     </div>
                   </div>
 
                   {policy.penalties.length > 0 && (
                     <div className="penalties-section">
-                      <span className="penalties-label">위약금</span>
+                      <span className="penalties-label">{t('fields.penalty')}</span>
                       <div className="penalties-list">
                         {policy.penalties.map((penalty) => (
                           <div key={penalty.id} className="penalty-item">
                             <span className="penalty-days">
-                              {penalty.days}일 전
+                              {commonT('dayBefore', { count: penalty.days })}
                             </span>
                             <span className="penalty-amount">
                               {penalty.unit === 'percentage'
@@ -332,18 +330,18 @@ export default function RatePlanPage({ params }: RatePlanPageProps) {
 
         {/* Metadata */}
         <div className="section-card full-width">
-          <h2 className="section-title">메타데이터</h2>
+          <h2 className="section-title">{t('sections.metadata')}</h2>
           <div className="info-grid">
             <div className="info-item">
-              <span className="info-label">생성일</span>
+              <span className="info-label">{commonT('createdAt')}</span>
               <span className="info-value">
-                {ratePlan.createdAt.toLocaleString('ko-KR')}
+                {ratePlan.createdAt.toLocaleString()}
               </span>
             </div>
             <div className="info-item">
-              <span className="info-label">수정일</span>
+              <span className="info-label">{commonT('updatedAt')}</span>
               <span className="info-value">
-                {ratePlan.updatedAt.toLocaleString('ko-KR')}
+                {ratePlan.updatedAt.toLocaleString()}
               </span>
             </div>
           </div>

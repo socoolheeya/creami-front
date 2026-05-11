@@ -87,7 +87,7 @@ export function TableCell({
   const alignClass = align === 'center' ? 'text-center' : align === 'right' ? 'text-right' : 'text-left'
 
   return (
-    <td className={`px-md py-md text-base text-text-primary border-b border-border ${alignClass} ${className}`} {...props}>
+    <td className={`px-md py-xs text-base text-text-primary border-b border-border ${alignClass} ${className}`} {...props}>
       {children}
     </td>
   )
@@ -102,7 +102,7 @@ export function TableHead({
   const alignClass = align === 'center' ? 'text-center' : align === 'right' ? 'text-right' : 'text-left'
 
   return (
-    <th className={`px-md py-md text-base font-bold text-text-primary ${alignClass} ${className}`} {...props}>
+    <th className={`px-md py-xs text-base font-bold text-text-primary ${alignClass} ${className}`} {...props}>
       {children}
     </th>
   )

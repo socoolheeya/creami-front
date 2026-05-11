@@ -3,6 +3,7 @@
 import { Property, PROPERTY_TYPE_LABELS } from '../../../lib/types/property'
 import { Building2, Search } from 'lucide-react'
 import { useState } from 'react'
+import { useTranslations } from 'next-intl'
 
 interface AccommodationSelectorProps {
   accommodations: Property[]
@@ -11,6 +12,8 @@ interface AccommodationSelectorProps {
 }
 
 export function AccommodationSelector({ accommodations, selectedId, onSelect }: AccommodationSelectorProps) {
+  const t = useTranslations('accommodation.rateplans')
+  const commonT = useTranslations('accommodation.common')
   const [searchQuery, setSearchQuery] = useState('')
 
   const filteredAccommodations = accommodations.filter(acc =>
@@ -26,14 +29,14 @@ export function AccommodationSelector({ accommodations, selectedId, onSelect }: 
       <div className="selector-header">
         <h2 className="selector-title">
           <Building2 className="title-icon" />
-          숙소 선택
+          {t('filter.propertySelect')}
         </h2>
         {selectedId && (
           <button
             onClick={() => onSelect(null)}
             className="clear-btn"
           >
-            선택 해제
+            {t('filter.clearSelection')}
           </button>
         )}
       </div>
@@ -43,7 +46,7 @@ export function AccommodationSelector({ accommodations, selectedId, onSelect }: 
         <Search className="search-icon" />
         <input
           type="text"
-          placeholder="숙소명 또는 주소로 검색..."
+          placeholder={t('filter.propertySearchPlaceholder')}
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
           className="search-input"
@@ -56,7 +59,7 @@ export function AccommodationSelector({ accommodations, selectedId, onSelect }: 
           <div className="selected-content">
             <div>
               <h3 className="selected-title">
-                선택된 숙소: {selectedAccommodation.name}
+                {t('filter.selectedProperty', { name: selectedAccommodation.name })}
               </h3>
               {selectedAccommodation.address && (
                 <p className="selected-subtitle">
@@ -105,7 +108,7 @@ export function AccommodationSelector({ accommodations, selectedId, onSelect }: 
 
       {filteredAccommodations.length === 0 && (
         <div className="empty-state">
-          <p className="empty-text">검색 결과가 없습니다</p>
+          <p className="empty-text">{commonT('noSearchResults')}</p>
         </div>
       )}
 

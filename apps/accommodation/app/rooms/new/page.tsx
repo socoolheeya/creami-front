@@ -2,6 +2,7 @@
 
 import { useState, Suspense } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
+import { useTranslations } from 'next-intl'
 import { RoomFormData } from '@/lib/types/room'
 import { useCreateRoom } from '@/hooks/useRooms'
 import { StepIndicator } from '../components/wizard/StepIndicator'
@@ -14,13 +15,21 @@ import { Step5Features } from '../components/wizard/Step5Features'
 import { Step6Images } from '../components/wizard/Step6Images'
 import { notification } from '@creami/ui'
 
-const STEPS = ['기본정보', '객실정보', '인원정보', '상세설명', '특징', '이미지']
-
 function NewRoomPageContent() {
+  const t = useTranslations('accommodation.rooms')
+  const commonT = useTranslations('accommodation.common')
   const router = useRouter()
   const searchParams = useSearchParams()
   const preselectedAccommodationId = searchParams?.get('accommodation') || undefined
   const createRoom = useCreateRoom()
+  const steps = [
+    t('steps.basic'),
+    t('steps.details'),
+    t('steps.occupancy'),
+    t('steps.description'),
+    t('steps.features'),
+    t('steps.images')
+  ]
 
   const [currentStep, setCurrentStep] = useState(1)
   const [isSubmitting, setIsSubmitting] = useState(false)
@@ -59,18 +68,18 @@ function NewRoomPageContent() {
           formData.maxOccupancy >= formData.standardOccupancy
         )
       case 4:
-        return true // 상세설명은 선택사항
+        return true
       case 5:
         return !!(formData.viewType && formData.smokingAllowed !== undefined)
       case 6:
-        return true // 이미지는 선택사항
+        return true
       default:
         return false
     }
   }
 
   const handleNext = () => {
-    if (canProceed() && currentStep < STEPS.length) {
+    if (canProceed() && currentStep < steps.length) {
       setCurrentStep(prev => prev + 1)
     }
   }
@@ -87,21 +96,19 @@ function NewRoomPageContent() {
     setIsSubmitting(true)
 
     try {
-      // API 호출하여 객실 생성
       await createRoom.mutateAsync(formData)
 
       notification.success({
-        message: '저장이 완료되었습니다.',
+        message: commonT('successSaved'),
         placement: 'top-right',
         direction: 'right'
       })
 
-      // 목록 페이지로 이동
       router.push('/rooms')
     } catch (error) {
       console.error('Failed to create room:', error)
       notification.error({
-        message: '저장에 실패했습니다.',
+        message: commonT('saveFailed'),
         placement: 'top-right',
         direction: 'right'
       })
@@ -119,7 +126,6 @@ function NewRoomPageContent() {
           border: '1px solid var(--border-color)'
         }}
       >
-        {/* 헤더 */}
         <div className="mb-8">
           <h1
             className="text-2xl mb-2"
@@ -128,18 +134,18 @@ function NewRoomPageContent() {
               color: 'var(--text-primary)'
             }}
           >
-            신규 객실 등록
+            {t('newTitle')}
           </h1>
           <p style={{ color: 'var(--text-secondary)' }}>
-            객실 정보를 단계별로 입력해주세요
+            {t('newDescription')}
           </p>
         </div>
 
         {/* Step Indicator */}
         <StepIndicator
           currentStep={currentStep}
-          totalSteps={STEPS.length}
-          steps={STEPS}
+          totalSteps={steps.length}
+          steps={steps}
         />
 
         {/* Form Content */}
@@ -171,7 +177,7 @@ function NewRoomPageContent() {
         {/* Navigation */}
         <WizardNavigation
           currentStep={currentStep}
-          totalSteps={STEPS.length}
+          totalSteps={steps.length}
           onPrevious={handlePrevious}
           onNext={handleNext}
           onSubmit={handleSubmit}
@@ -184,8 +190,10 @@ function NewRoomPageContent() {
 }
 
 export default function NewRoomPage() {
+  const commonT = useTranslations('accommodation.common')
+
   return (
-    <Suspense fallback={<div className="p-6">로딩 중...</div>}>
+    <Suspense fallback={<div className="p-6">{commonT('loading')}</div>}>
       <NewRoomPageContent />
     </Suspense>
   )

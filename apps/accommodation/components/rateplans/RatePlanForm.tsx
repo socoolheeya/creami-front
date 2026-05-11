@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
+import { useTranslations } from 'next-intl'
 import { notification } from '@creami/ui'
 import { useCreateRatePlan, useUpdateRatePlan } from '@/hooks/useRatePlans'
 import type {
@@ -15,18 +16,13 @@ import type {
   RatePlanCancellationPenalty,
   CancellationPenaltyUnit
 } from '@/lib/types/rateplan'
-import {
-  RATE_PLAN_TYPE_LABELS,
-  MEAL_PLAN_LABELS,
-  RATE_PLAN_STATUS_LABELS,
-  PRICE_TYPE_LABELS
-} from '@/lib/types/rateplan'
-
 interface RatePlanFormProps {
   initialData?: RatePlan
 }
 
 export default function RatePlanForm({ initialData }: RatePlanFormProps) {
+  const t = useTranslations('accommodation.rateplans')
+  const commonT = useTranslations('accommodation.common')
   const router = useRouter()
   const isEdit = !!initialData
   const createRatePlan = useCreateRatePlan()
@@ -118,7 +114,7 @@ export default function RatePlanForm({ initialData }: RatePlanFormProps) {
           data: ratePlanData,
         })
         notification.success({
-          message: '수정이 완료되었습니다.',
+          message: commonT('successUpdated'),
           placement: 'top-right',
           direction: 'right'
         })
@@ -126,16 +122,16 @@ export default function RatePlanForm({ initialData }: RatePlanFormProps) {
       } else {
         await createRatePlan.mutateAsync(ratePlanData)
         notification.success({
-          message: '저장이 완료되었습니다.',
+          message: commonT('successSaved'),
           placement: 'top-right',
           direction: 'right'
         })
         router.push('/rateplans')
       }
     } catch (error) {
-      console.error('Failed to submit rateplan:', error)
+      console.error(t('messages.submitLogFailed'), error)
       notification.error({
-        message: `${isEdit ? '수정' : '저장'}에 실패했습니다.`,
+        message: isEdit ? commonT('updateFailed') : commonT('saveFailed'),
         placement: 'top-right',
         direction: 'right'
       })
@@ -210,12 +206,12 @@ export default function RatePlanForm({ initialData }: RatePlanFormProps) {
       <div className="page-header">
         <div>
           <div className="breadcrumb">
-            <Link href="/rateplans">요금제 관리</Link>
+            <Link href="/rateplans">{t('title')}</Link>
             <span className="separator">/</span>
-            <span>{isEdit ? '수정' : '새 요금제'}</span>
+            <span>{isEdit ? commonT('edit') : t('newCrumb')}</span>
           </div>
           <h1 className="page-title">
-            {isEdit ? '요금제 수정' : '새 요금제 추가'}
+            {isEdit ? t('editTitle') : t('newTitle')}
           </h1>
         </div>
       </div>
@@ -223,11 +219,11 @@ export default function RatePlanForm({ initialData }: RatePlanFormProps) {
       <form onSubmit={handleSubmit} className="form-container">
         {/* Basic Information */}
         <div className="form-section">
-          <h2 className="section-title">기본 정보</h2>
+          <h2 className="section-title">{t('sections.basic')}</h2>
           <div className="form-grid">
             <div className="form-group">
               <label htmlFor="name" className="form-label required">
-                요금제 이름
+                {t('fields.nameForm')}
               </label>
               <input
                 type="text"
@@ -241,7 +237,7 @@ export default function RatePlanForm({ initialData }: RatePlanFormProps) {
 
             <div className="form-group">
               <label htmlFor="enName" className="form-label">
-                영문 이름
+                {t('fields.enName')}
               </label>
               <input
                 type="text"
@@ -254,7 +250,7 @@ export default function RatePlanForm({ initialData }: RatePlanFormProps) {
 
             <div className="form-group full-width">
               <label htmlFor="benefitName" className="form-label required">
-                혜택 설명
+                {t('fields.benefitDescription')}
               </label>
               <input
                 type="text"
@@ -262,14 +258,14 @@ export default function RatePlanForm({ initialData }: RatePlanFormProps) {
                 className="form-input"
                 value={formData.benefitName}
                 onChange={(e) => setFormData({ ...formData, benefitName: e.target.value })}
-                placeholder="예: 30일 전 예약 시 20% 할인"
+                placeholder={t('messages.benefitPlaceholder')}
                 required
               />
             </div>
 
             <div className="form-group">
               <label htmlFor="roomId" className="form-label">
-                객실 ID
+                {t('fields.roomId')}
               </label>
               <input
                 type="text"
@@ -282,7 +278,7 @@ export default function RatePlanForm({ initialData }: RatePlanFormProps) {
 
             <div className="form-group">
               <label htmlFor="ratePlanType" className="form-label required">
-                요금제 유형
+                {t('fields.ratePlanType')}
               </label>
               <select
                 id="ratePlanType"
@@ -293,9 +289,9 @@ export default function RatePlanForm({ initialData }: RatePlanFormProps) {
                 }
                 required
               >
-                {Object.entries(RATE_PLAN_TYPE_LABELS).map(([value, label]) => (
+                {(['standalone', 'package', 'business', 'opaque', 'b2b'] as RatePlanType[]).map((value) => (
                   <option key={value} value={value}>
-                    {label}
+                    {t(`types.${value}`)}
                   </option>
                 ))}
               </select>
@@ -303,7 +299,7 @@ export default function RatePlanForm({ initialData }: RatePlanFormProps) {
 
             <div className="form-group">
               <label htmlFor="mealPlan" className="form-label required">
-                식사 포함
+                {t('fields.mealIncluded')}
               </label>
               <select
                 id="mealPlan"
@@ -314,9 +310,9 @@ export default function RatePlanForm({ initialData }: RatePlanFormProps) {
                 }
                 required
               >
-                {Object.entries(MEAL_PLAN_LABELS).map(([value, label]) => (
+                {(['none', 'breakfast', 'lunch', 'dinner', 'all_inclusive', 'breakfast_and_lunch', 'lunch_and_dinner', 'bed_and_breakfast', 'buffet_breakfast'] as MealPlan[]).map((value) => (
                   <option key={value} value={value}>
-                    {label}
+                    {t(`mealPlans.${value}`)}
                   </option>
                 ))}
               </select>
@@ -324,7 +320,7 @@ export default function RatePlanForm({ initialData }: RatePlanFormProps) {
 
             <div className="form-group">
               <label htmlFor="priceType" className="form-label required">
-                요금 타입
+                {t('fields.priceType')}
               </label>
               <select
                 id="priceType"
@@ -335,9 +331,9 @@ export default function RatePlanForm({ initialData }: RatePlanFormProps) {
                 }
                 required
               >
-                {Object.entries(PRICE_TYPE_LABELS).map(([value, label]) => (
+                {(['net_rate', 'sell_rate_no_commission', 'commission_included', 'net_and_sell'] as PriceType[]).map((value) => (
                   <option key={value} value={value}>
-                    {label}
+                    {t(`priceTypes.${value}`)}
                   </option>
                 ))}
               </select>
@@ -345,7 +341,7 @@ export default function RatePlanForm({ initialData }: RatePlanFormProps) {
 
             <div className="form-group">
               <label htmlFor="status" className="form-label required">
-                상태
+                {t('fields.status')}
               </label>
               <select
                 id="status"
@@ -356,9 +352,9 @@ export default function RatePlanForm({ initialData }: RatePlanFormProps) {
                 }
                 required
               >
-                {Object.entries(RATE_PLAN_STATUS_LABELS).map(([value, label]) => (
+                {(['draft', 'active', 'inactive', 'archived'] as RatePlanStatus[]).map((value) => (
                   <option key={value} value={value}>
-                    {label}
+                    {t(`statuses.${value}`)}
                   </option>
                 ))}
               </select>
@@ -371,7 +367,7 @@ export default function RatePlanForm({ initialData }: RatePlanFormProps) {
                   checked={formData.enabled}
                   onChange={(e) => setFormData({ ...formData, enabled: e.target.checked })}
                 />
-                <span>활성화</span>
+                <span>{commonT('enabled')}</span>
               </label>
             </div>
           </div>
@@ -379,11 +375,11 @@ export default function RatePlanForm({ initialData }: RatePlanFormProps) {
 
         {/* Description */}
         <div className="form-section">
-          <h2 className="section-title">상세 설명</h2>
+          <h2 className="section-title">{t('sections.details')}</h2>
           <div className="form-grid">
             <div className="form-group full-width">
               <label htmlFor="description" className="form-label">
-                한글 설명
+                {t('fields.descriptionKo')}
               </label>
               <textarea
                 id="description"
@@ -396,7 +392,7 @@ export default function RatePlanForm({ initialData }: RatePlanFormProps) {
 
             <div className="form-group full-width">
               <label htmlFor="enDescription" className="form-label">
-                영문 설명
+                {t('fields.descriptionEn')}
               </label>
               <textarea
                 id="enDescription"
@@ -411,14 +407,14 @@ export default function RatePlanForm({ initialData }: RatePlanFormProps) {
 
         {/* Settings */}
         <div className="form-section">
-          <h2 className="section-title">요금제 설정</h2>
+          <h2 className="section-title">{t('sections.settings')}</h2>
           <div className="settings-layout">
             <div className="settings-group">
-              <h3 className="group-title">숙박 기간</h3>
+              <h3 className="group-title">{t('sections.stay')}</h3>
               <div className="form-row">
                 <div className="form-group">
                   <label htmlFor="minLos" className="form-label">
-                    최소 숙박 (박)
+                    {t('fields.minLosWithUnit')}
                   </label>
                   <input
                     type="number"
@@ -433,7 +429,7 @@ export default function RatePlanForm({ initialData }: RatePlanFormProps) {
                 </div>
                 <div className="form-group">
                   <label htmlFor="maxLos" className="form-label">
-                    최대 숙박 (박)
+                    {t('fields.maxLosWithUnit')}
                   </label>
                   <input
                     type="number"
@@ -450,11 +446,11 @@ export default function RatePlanForm({ initialData }: RatePlanFormProps) {
             </div>
 
             <div className="settings-group">
-              <h3 className="group-title">체류 일수</h3>
+              <h3 className="group-title">{t('sections.throughDays')}</h3>
               <div className="form-row">
                 <div className="form-group">
                   <label htmlFor="minThroughDays" className="form-label">
-                    최소 체류 (일)
+                    {t('fields.minThroughDaysWithUnit')}
                   </label>
                   <input
                     type="number"
@@ -469,7 +465,7 @@ export default function RatePlanForm({ initialData }: RatePlanFormProps) {
                 </div>
                 <div className="form-group">
                   <label htmlFor="maxThroughDays" className="form-label">
-                    최대 체류 (일)
+                    {t('fields.maxThroughDaysWithUnit')}
                   </label>
                   <input
                     type="number"
@@ -486,11 +482,11 @@ export default function RatePlanForm({ initialData }: RatePlanFormProps) {
             </div>
 
             <div className="settings-group">
-              <h3 className="group-title">사전 예약</h3>
+              <h3 className="group-title">{t('sections.advance')}</h3>
               <div className="form-row">
                 <div className="form-group">
                   <label htmlFor="minAdvanceDays" className="form-label">
-                    최소 사전 예약 (일)
+                    {t('fields.minAdvanceDaysWithUnit')}
                   </label>
                   <input
                     type="number"
@@ -505,7 +501,7 @@ export default function RatePlanForm({ initialData }: RatePlanFormProps) {
                 </div>
                 <div className="form-group">
                   <label htmlFor="maxAdvanceDays" className="form-label">
-                    최대 사전 예약 (일)
+                    {t('fields.maxAdvanceDaysWithUnit')}
                   </label>
                   <input
                     type="number"
@@ -522,11 +518,11 @@ export default function RatePlanForm({ initialData }: RatePlanFormProps) {
             </div>
 
             <div className="settings-group">
-              <h3 className="group-title">재고 및 제한</h3>
+              <h3 className="group-title">{t('sections.inventory')}</h3>
               <div className="form-row">
                 <div className="form-group">
                   <label htmlFor="allotment" className="form-label">
-                    배정 재고
+                    {t('fields.allotment')}
                   </label>
                   <input
                     type="number"
@@ -548,7 +544,7 @@ export default function RatePlanForm({ initialData }: RatePlanFormProps) {
                         setFormData({ ...formData, closedToArrival: e.target.checked })
                       }
                     />
-                    <span>입실 제한</span>
+                    <span>{t('fields.closedToArrival')}</span>
                   </label>
                   <label className="checkbox-label">
                     <input
@@ -558,7 +554,7 @@ export default function RatePlanForm({ initialData }: RatePlanFormProps) {
                         setFormData({ ...formData, closedToDeparture: e.target.checked })
                       }
                     />
-                    <span>퇴실 제한</span>
+                    <span>{t('fields.closedToDeparture')}</span>
                   </label>
                 </div>
               </div>
@@ -568,11 +564,11 @@ export default function RatePlanForm({ initialData }: RatePlanFormProps) {
 
         {/* Sale Period */}
         <div className="form-section">
-          <h2 className="section-title">판매 기간</h2>
+          <h2 className="section-title">{t('sections.salePeriod')}</h2>
           <div className="form-grid">
             <div className="form-group">
               <label htmlFor="bookingStartDate" className="form-label">
-                예약 시작일
+                {t('fields.bookingStartDate')}
               </label>
               <input
                 type="date"
@@ -587,7 +583,7 @@ export default function RatePlanForm({ initialData }: RatePlanFormProps) {
 
             <div className="form-group">
               <label htmlFor="bookingEndDate" className="form-label">
-                예약 종료일
+                {t('fields.bookingEndDate')}
               </label>
               <input
                 type="date"
@@ -600,7 +596,7 @@ export default function RatePlanForm({ initialData }: RatePlanFormProps) {
 
             <div className="form-group">
               <label htmlFor="stayStartDate" className="form-label">
-                숙박 시작일
+                {t('fields.stayStartDate')}
               </label>
               <input
                 type="date"
@@ -613,7 +609,7 @@ export default function RatePlanForm({ initialData }: RatePlanFormProps) {
 
             <div className="form-group">
               <label htmlFor="stayEndDate" className="form-label">
-                숙박 종료일
+                {t('fields.stayEndDate')}
               </label>
               <input
                 type="date"
@@ -629,13 +625,13 @@ export default function RatePlanForm({ initialData }: RatePlanFormProps) {
         {/* Cancellation Policies */}
         <div className="form-section">
           <div className="section-header">
-            <h2 className="section-title">취소 정책</h2>
+            <h2 className="section-title">{t('sections.cancellationPolicies')}</h2>
             <button
               type="button"
               onClick={addCancellationPolicy}
               className="btn btn-secondary"
             >
-              정책 추가
+              {t('actions.addPolicy')}
             </button>
           </div>
 
@@ -643,19 +639,19 @@ export default function RatePlanForm({ initialData }: RatePlanFormProps) {
             {cancellationPolicies.map((policy, policyIndex) => (
               <div key={policy.id} className="policy-card">
                 <div className="policy-header">
-                  <h3 className="policy-title">취소 정책 #{policyIndex + 1}</h3>
+                  <h3 className="policy-title">{t('actions.policyTitle', { index: policyIndex + 1 })}</h3>
                   <button
                     type="button"
                     onClick={() => removeCancellationPolicy(policyIndex)}
                     className="btn btn-danger-text"
                   >
-                    삭제
+                    {commonT('delete')}
                   </button>
                 </div>
 
                 <div className="form-grid">
                   <div className="form-group full-width">
-                    <label className="form-label">정책 이름</label>
+                    <label className="form-label">{t('fields.policyName')}</label>
                     <input
                       type="text"
                       className="form-input"
@@ -667,7 +663,7 @@ export default function RatePlanForm({ initialData }: RatePlanFormProps) {
                   </div>
 
                   <div className="form-group">
-                    <label className="form-label">시작 일시</label>
+                    <label className="form-label">{t('fields.startDateTime')}</label>
                     <input
                       type="datetime-local"
                       className="form-input"
@@ -679,7 +675,7 @@ export default function RatePlanForm({ initialData }: RatePlanFormProps) {
                   </div>
 
                   <div className="form-group">
-                    <label className="form-label">종료 일시</label>
+                    <label className="form-label">{t('fields.endDateTime')}</label>
                     <input
                       type="datetime-local"
                       className="form-input"
@@ -691,7 +687,7 @@ export default function RatePlanForm({ initialData }: RatePlanFormProps) {
                   </div>
 
                   <div className="form-group">
-                    <label className="form-label">우선순위</label>
+                    <label className="form-label">{t('fields.priority')}</label>
                     <input
                       type="number"
                       className="form-input"
@@ -706,16 +702,16 @@ export default function RatePlanForm({ initialData }: RatePlanFormProps) {
                   </div>
 
                   <div className="form-group full-width">
-                    <label className="form-label">적용 요일</label>
+                    <label className="form-label">{t('fields.daysOfWeek')}</label>
                     <div className="days-selector">
                       {[
-                        { key: 'sunday', label: '일' },
-                        { key: 'monday', label: '월' },
-                        { key: 'tuesday', label: '화' },
-                        { key: 'wednesday', label: '수' },
-                        { key: 'thursday', label: '목' },
-                        { key: 'friday', label: '금' },
-                        { key: 'saturday', label: '토' }
+                        { key: 'sunday', label: t('weekdays.sunday') },
+                        { key: 'monday', label: t('weekdays.monday') },
+                        { key: 'tuesday', label: t('weekdays.tuesday') },
+                        { key: 'wednesday', label: t('weekdays.wednesday') },
+                        { key: 'thursday', label: t('weekdays.thursday') },
+                        { key: 'friday', label: t('weekdays.friday') },
+                        { key: 'saturday', label: t('weekdays.saturday') }
                       ].map(({ key, label }) => (
                         <label key={key} className="day-checkbox">
                           <input
@@ -737,20 +733,20 @@ export default function RatePlanForm({ initialData }: RatePlanFormProps) {
                 {/* Penalties */}
                 <div className="penalties-section">
                   <div className="penalties-header">
-                    <h4 className="penalties-title">위약금</h4>
+                    <h4 className="penalties-title">{t('fields.penalty')}</h4>
                     <button
                       type="button"
                       onClick={() => addPenalty(policyIndex)}
                       className="btn btn-secondary btn-sm"
                     >
-                      위약금 추가
+                      {t('actions.addPenalty')}
                     </button>
                   </div>
 
                   {policy.penalties.map((penalty, penaltyIndex) => (
                     <div key={penalty.id} className="penalty-row">
                       <div className="form-group">
-                        <label className="form-label">일수</label>
+                        <label className="form-label">{t('fields.days')}</label>
                         <input
                           type="number"
                           className="form-input"
@@ -761,12 +757,12 @@ export default function RatePlanForm({ initialData }: RatePlanFormProps) {
                             })
                           }
                           min="0"
-                          placeholder="일 전"
+                          placeholder={t('values.daysBeforePlaceholder')}
                         />
                       </div>
 
                       <div className="form-group">
-                        <label className="form-label">유형</label>
+                        <label className="form-label">{t('fields.penaltyType')}</label>
                         <select
                           className="form-select"
                           value={penalty.unit}
@@ -776,13 +772,13 @@ export default function RatePlanForm({ initialData }: RatePlanFormProps) {
                             })
                           }
                         >
-                          <option value="percentage">비율 (%)</option>
-                          <option value="fixed">고정 금액</option>
+                          <option value="percentage">{t('values.percentage')}</option>
+                          <option value="fixed">{t('values.fixed')}</option>
                         </select>
                       </div>
 
                       <div className="form-group">
-                        <label className="form-label">금액</label>
+                        <label className="form-label">{t('fields.amount')}</label>
                         <input
                           type="number"
                           className="form-input"
@@ -799,7 +795,7 @@ export default function RatePlanForm({ initialData }: RatePlanFormProps) {
 
                       {penalty.unit === 'fixed' && (
                         <div className="form-group">
-                          <label className="form-label">통화</label>
+                          <label className="form-label">{t('fields.currency')}</label>
                           <input
                             type="text"
                             className="form-input"
@@ -818,7 +814,7 @@ export default function RatePlanForm({ initialData }: RatePlanFormProps) {
                         onClick={() => removePenalty(policyIndex, penaltyIndex)}
                         className="btn btn-danger-text btn-sm"
                       >
-                        삭제
+                        {commonT('delete')}
                       </button>
                     </div>
                   ))}
@@ -831,10 +827,12 @@ export default function RatePlanForm({ initialData }: RatePlanFormProps) {
         {/* Form Actions */}
         <div className="form-actions">
           <Link href="/rateplans" className="btn btn-secondary">
-            취소
+            {commonT('cancel')}
           </Link>
           <button type="submit" className="btn btn-primary" disabled={isSubmitting}>
-            {isSubmitting ? (isEdit ? '수정 중...' : '등록 중...') : (isEdit ? '수정 완료' : '생성')}
+            {isSubmitting
+              ? (isEdit ? commonT('submittingUpdate') : commonT('submittingCreate'))
+              : (isEdit ? commonT('completeUpdate') : commonT('create'))}
           </button>
         </div>
       </form>

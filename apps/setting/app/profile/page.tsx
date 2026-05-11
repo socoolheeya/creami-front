@@ -1,7 +1,6 @@
 'use client'
 
 import { ChangeEvent, useEffect, useRef, useState } from 'react'
-import { useTheme } from 'next-themes'
 import Image from 'next/image'
 import { useLocale, useTranslations } from 'next-intl'
 import { Building2, Camera, LockKeyhole, Mail, Moon, Phone, Save, Sun, UserCog } from 'lucide-react'
@@ -39,7 +38,6 @@ function isPasswordPolicyValid(password: string) {
 }
 
 export default function ProfilePage() {
-  const { theme, setTheme } = useTheme()
   const t = useTranslations()
   const locale = useLocale()
   const [email, setEmail] = useState(profile.email)
@@ -59,8 +57,6 @@ export default function ProfilePage() {
       }
     }
   }, [avatarUrl])
-
-  const isDark = theme !== 'light'
 
   const handleAvatarChange = (event: ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0]
@@ -121,7 +117,6 @@ export default function ProfilePage() {
 
   const handleThemeChange = (nextTheme: CreamiTheme) => {
     writeThemeCookie(nextTheme)
-    setTheme(nextTheme)
   }
 
   return (
@@ -219,22 +214,22 @@ export default function ProfilePage() {
               {t('setting.profile.displayMode')}
             </p>
             <div className="flex flex-wrap gap-sm">
-              <Button
+              <button
                 type="button"
-                variant={isDark ? 'primary' : 'secondary'}
+                className="profile-theme-option profile-theme-option-dark"
                 onClick={() => handleThemeChange('dark')}
               >
                 <Moon className="h-icon-md w-icon-md" />
                 {t('setting.profile.darkMode')}
-              </Button>
-              <Button
+              </button>
+              <button
                 type="button"
-                variant={!isDark ? 'primary' : 'secondary'}
+                className="profile-theme-option profile-theme-option-light"
                 onClick={() => handleThemeChange('light')}
               >
                 <Sun className="h-icon-md w-icon-md" />
                 {t('setting.profile.lightMode')}
-              </Button>
+              </button>
             </div>
           </div>
         </section>
@@ -348,6 +343,40 @@ export default function ProfilePage() {
           </form>
         </section>
       </div>
+      <style jsx>{`
+        .profile-theme-option {
+          display: inline-flex;
+          height: var(--control-height-md);
+          flex-shrink: 0;
+          align-items: center;
+          justify-content: center;
+          gap: var(--spacing-sm);
+          border: none;
+          border-radius: var(--radius);
+          padding: 0 var(--control-padding-x-md);
+          font-size: var(--font-size-base);
+          font-weight: var(--font-medium);
+          line-height: 1;
+          cursor: pointer;
+          transition: background-color 0.2s, color 0.2s;
+        }
+
+        :global(html[data-theme='dark']) .profile-theme-option-dark,
+        :global(html[data-theme='light']) .profile-theme-option-light {
+          background: var(--primary);
+          color: white;
+        }
+
+        :global(html[data-theme='dark']) .profile-theme-option-light,
+        :global(html[data-theme='light']) .profile-theme-option-dark {
+          background: var(--bg-secondary);
+          color: var(--text-primary);
+        }
+
+        .profile-theme-option:hover {
+          opacity: 0.9;
+        }
+      `}</style>
     </div>
   )
 }

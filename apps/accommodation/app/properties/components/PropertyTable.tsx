@@ -16,6 +16,7 @@ import {
 } from '@creami/ui'
 import {
   Property,
+  PROPERTY_STATUS_LABELS,
   PROPERTY_TYPE_LABELS,
   type PropertyStatus,
   type PropertyType
@@ -27,13 +28,6 @@ interface PropertyTableProps {
 
 type SortField = 'name' | 'type' | 'status' | 'countryCode' | 'city' | 'createdAt'
 type SortOrder = 'asc' | 'desc'
-
-const PROPERTY_STATUS_LABELS: Record<PropertyStatus, string> = {
-  draft: 'DRAFT',
-  active: 'ACTIVE',
-  inactive: 'INACTIVE',
-  archived: 'ARCHIVED'
-}
 
 const createdDateFormatter = new Intl.DateTimeFormat('ko-KR', {
   year: 'numeric',

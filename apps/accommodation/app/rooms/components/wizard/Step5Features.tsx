@@ -1,119 +1,105 @@
 'use client'
 
-import { RoomFormData, ROOM_AMENITY_OPTIONS, ACCESSIBILITY_OPTIONS } from '@/lib/types/room'
+import { useTranslations } from 'next-intl'
+import {
+  ACCESSIBILITY_OPTIONS,
+  ROOM_AMENITY_OPTIONS,
+  type RoomFormData
+} from '@/lib/types/room'
 
 interface Step5FeaturesProps {
   formData: RoomFormData
   onChange: (data: Partial<RoomFormData>) => void
 }
 
+function ToggleOption({
+  label,
+  checked,
+  onChange
+}: {
+  label: string
+  checked: boolean
+  onChange: () => void
+}) {
+  const stateClass = checked
+    ? 'border-primary bg-primary text-white'
+    : 'border-border bg-bg-secondary text-text-primary'
+
+  return (
+    <label className={`flex cursor-pointer items-center gap-sm rounded border p-sm ${stateClass}`}>
+      <input
+        type="checkbox"
+        checked={checked}
+        onChange={onChange}
+        className="h-icon-md w-icon-md rounded accent-primary"
+      />
+      <span className="text-base font-medium">
+        {label}
+      </span>
+    </label>
+  )
+}
+
 export function Step5Features({ formData, onChange }: Step5FeaturesProps) {
+  const t = useTranslations('accommodation.rooms')
   const amenities = formData.amenities || []
   const accessibilityFeatures = formData.accessibilityFeatures || []
 
   const toggleAmenity = (amenity: string) => {
-    if (amenities.includes(amenity)) {
-      onChange({ amenities: amenities.filter(a => a !== amenity) })
-    } else {
-      onChange({ amenities: [...amenities, amenity] })
-    }
+    onChange({
+      amenities: amenities.includes(amenity)
+        ? amenities.filter((item) => item !== amenity)
+        : [...amenities, amenity]
+    })
   }
 
   const toggleAccessibility = (feature: string) => {
-    if (accessibilityFeatures.includes(feature)) {
-      onChange({ accessibilityFeatures: accessibilityFeatures.filter(f => f !== feature) })
-    } else {
-      onChange({ accessibilityFeatures: [...accessibilityFeatures, feature] })
-    }
+    onChange({
+      accessibilityFeatures: accessibilityFeatures.includes(feature)
+        ? accessibilityFeatures.filter((item) => item !== feature)
+        : [...accessibilityFeatures, feature]
+    })
   }
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-lg">
       <div>
-        <h2
-          className="text-xl mb-1"
-          style={{
-            fontWeight: 'var(--font-bold)',
-            color: 'var(--text-primary)'
-          }}
-        >
-          편의시설
+        <h2 className="mb-xs text-xl font-bold text-text-primary">
+          {t('sections.features')}
         </h2>
-        <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>
-          객실에 제공되는 편의시설을 선택해주세요
+        <p className="text-base font-light text-text-secondary">
+          {t('descriptions.features')}
         </p>
       </div>
 
-      {/* 객실 편의시설 */}
       <div>
-        <label
-          className="block mb-1.5 text-sm"
-          style={{
-            color: 'var(--text-primary)',
-            fontWeight: 'var(--font-medium)'
-          }}
-        >
-          객실 편의시설
-        </label>
-        <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
-          {ROOM_AMENITY_OPTIONS.map(amenity => (
-            <label
+        <p className="mb-sm text-base font-medium text-text-primary">
+          {t('sections.roomAmenities')}
+        </p>
+        <div className="grid grid-cols-1 gap-sm md:grid-cols-2 lg:grid-cols-3">
+          {ROOM_AMENITY_OPTIONS.map((amenity) => (
+            <ToggleOption
               key={amenity}
-              className="flex items-center gap-2 cursor-pointer p-2 rounded-lg transition-colors"
-              style={{
-                backgroundColor: amenities.includes(amenity) ? 'var(--primary)' : 'var(--bg-secondary)',
-                color: amenities.includes(amenity) ? '#ffffff' : 'var(--text-primary)',
-                borderRadius: 'var(--radius-sm)'
-              }}
-            >
-              <input
-                type="checkbox"
-                checked={amenities.includes(amenity)}
-                onChange={() => toggleAmenity(amenity)}
-                className="w-4 h-4 rounded"
-                style={{ accentColor: 'var(--primary)' }}
-              />
-              <span className="text-sm" style={{ fontWeight: 'var(--font-medium)' }}>
-                {amenity}
-              </span>
-            </label>
+              label={amenity}
+              checked={amenities.includes(amenity)}
+              onChange={() => toggleAmenity(amenity)}
+            />
           ))}
         </div>
       </div>
 
-      {/* 장애인 편의시설 */}
       <div>
-        <label
-          className="block mb-1.5 text-sm"
-          style={{
-            color: 'var(--text-primary)',
-            fontWeight: 'var(--font-medium)'
-          }}
-        >
-          장애인 편의시설
-        </label>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
-          {ACCESSIBILITY_OPTIONS.map(feature => (
-            <label
+        <p className="mb-sm text-base font-medium text-text-primary">
+          {t('sections.accessibility')}
+        </p>
+        <div className="grid grid-cols-1 gap-sm md:grid-cols-2">
+          {ACCESSIBILITY_OPTIONS.map((feature) => (
+            <ToggleOption
               key={feature}
-              className="flex items-center gap-2 cursor-pointer p-2 rounded-lg transition-colors"
-              style={{
-                backgroundColor: accessibilityFeatures.includes(feature) ? 'var(--primary)' : 'var(--bg-secondary)',
-                color: accessibilityFeatures.includes(feature) ? '#ffffff' : 'var(--text-primary)',
-                borderRadius: 'var(--radius-sm)'
-              }}
-            >
-              <input
-                type="checkbox"
-                checked={accessibilityFeatures.includes(feature)}
-                onChange={() => toggleAccessibility(feature)}
-                className="w-4 h-4 rounded"
-                style={{ accentColor: 'var(--primary)' }}
-              />
-              <span className="text-sm" style={{ fontWeight: 'var(--font-medium)' }}>
-                {feature}
-              </span>
-            </label>
+              label={feature}
+              checked={accessibilityFeatures.includes(feature)}
+              onChange={() => toggleAccessibility(feature)}
+            />
           ))}
         </div>
       </div>

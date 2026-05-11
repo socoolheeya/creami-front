@@ -52,14 +52,15 @@
   --social-google-text: #212529;
   --social-google-border: #dee2e6;
 
-  --font-size-xs: 0.75rem;
-  --font-size-sm: 0.875rem;
-  --font-size-base: 1rem;
-  --font-size-lg: 1.125rem;
-  --font-size-xl: 1.25rem;
-  --font-size-2xl: 1.5rem;
-  --font-size-3xl: 1.875rem;
-  --font-size-4xl: 2.25rem;
+  /* ========== Font Sizes (rem) - 14px Base ========== */
+  --font-size-xs: 0.6875rem;   /* 11px */
+  --font-size-sm: 0.75rem;     /* 12px */
+  --font-size-base: 0.875rem;  /* 14px - 기본 텍스트 */
+  --font-size-lg: 1rem;        /* 16px */
+  --font-size-xl: 1.125rem;    /* 18px */
+  --font-size-2xl: 1.375rem;   /* 22px */
+  --font-size-3xl: 1.6875rem;  /* 27px */
+  --font-size-4xl: 2rem;       /* 32px */
 
   --font-light: 300;
   --font-medium: 500;
@@ -107,6 +108,10 @@
   --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.3);
 }
 
+html {
+  font-size: 16px; /* rem 계산 기준 */
+}
+
 * {
   font-family: 'Pretendard Variable', -apple-system, BlinkMacSystemFont, system-ui, Roboto, sans-serif;
   font-weight: var(--font-medium);
@@ -115,6 +120,7 @@
 body {
   background-color: var(--bg-secondary);
   color: var(--text-primary);
+  font-size: var(--font-size-base); /* 14px - 기본 텍스트 */
 }
 
 h1,

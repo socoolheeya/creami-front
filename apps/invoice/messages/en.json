@@ -5,8 +5,82 @@
   },
   "nav": {
     "dashboard": "Dashboard",
+    "invoiceDashboard": "Invoice Dashboard",
     "invoices": "Invoice Management",
     "payments": "Payment Management",
     "reports": "Reports"
+  },
+  "invoice": {
+    "title": "Invoice Management",
+    "description": "Manage invoice issuance, due dates, and payment status by property.",
+    "results": "{count} results",
+    "empty": "No invoices found.",
+    "summary": {
+      "totalCount": "Total Invoices",
+      "totalAmount": "Total Billed",
+      "unpaidAmount": "Unpaid Amount",
+      "issuedCount": "{count} issued",
+      "overdueCount": "Overdue",
+      "requiresAction": "Invoices requiring review"
+    },
+    "filters": {
+      "searchPlaceholder": "Search invoice, property, recipient",
+      "allStatuses": "All statuses"
+    },
+    "actions": {
+      "create": "New Invoice",
+      "cancel": "Cancel",
+      "issue": "Issue Invoice",
+      "backToList": "Back to list"
+    },
+    "create": {
+      "title": "Create Invoice",
+      "description": "Enter basic invoice details and billing items."
+    },
+    "statuses": {
+      "draft": "Draft",
+      "issued": "Issued",
+      "paid": "Paid",
+      "overdue": "Overdue",
+      "cancelled": "Cancelled"
+    },
+    "columns": {
+      "invoiceId": "Invoice ID",
+      "property": "Property",
+      "recipient": "Recipient",
+      "totalAmount": "Total",
+      "issueDate": "Issue Date",
+      "dueDate": "Due Date",
+      "status": "Status",
+      "description": "Description",
+      "quantity": "Quantity",
+      "unitPrice": "Unit Price",
+      "amount": "Amount"
+    },
+    "sections": {
+      "basic": "Basic Information",
+      "recipient": "Recipient",
+      "amount": "Amount",
+      "items": "Line Items"
+    },
+    "fields": {
+      "invoiceId": "Invoice ID",
+      "property": "Property",
+      "status": "Status",
+      "issueDate": "Issue Date",
+      "dueDate": "Due Date",
+      "recipientName": "Recipient Name",
+      "recipientEmail": "Recipient Email",
+      "subtotal": "Subtotal",
+      "taxAmount": "Tax",
+      "paidAmount": "Paid",
+      "balance": "Balance"
+    },
+    "placeholders": {
+      "property": "Enter property name",
+      "recipientName": "Enter recipient name",
+      "recipientEmail": "billing@example.com",
+      "description": "Enter billing item"
+    }
   }
 }

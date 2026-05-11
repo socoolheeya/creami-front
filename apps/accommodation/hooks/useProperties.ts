@@ -116,7 +116,15 @@ function normalizePropertyType(type?: string) {
 }
 
 function normalizePropertyStatus(status?: string) {
-  return (status ?? 'draft').toLowerCase() as PropertyStatus
+  const normalizedStatus = (status ?? 'draft').toLowerCase()
+
+  if (normalizedStatus === 'deactive') {
+    return 'inactive'
+  }
+
+  return ['draft', 'active', 'inactive', 'archived'].includes(normalizedStatus)
+    ? normalizedStatus as PropertyStatus
+    : 'draft'
 }
 
 function normalizeDate(value: string | Date | null | undefined) {

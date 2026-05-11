@@ -73,12 +73,12 @@ export function AppSwitcher({ apps, currentAppId }: AppSwitcherProps) {
         variant={isOpen ? 'tertiary' : 'ghost'}
         size="normal"
         onClick={() => setIsOpen((prev) => !prev)}
-        className="justify-start !text-base font-medium"
+        className="justify-start !text-lg font-medium"
         aria-expanded={isOpen}
         aria-haspopup="menu"
       >
         <CurrentIcon className="h-lg w-lg text-primary" />
-        <span className="whitespace-nowrap !text-base font-medium">
+        <span className="whitespace-nowrap !text-lg font-medium">
           {currentApp ? getAppName(currentApp) : ''}
         </span>
         <ChevronDown
@@ -115,7 +115,7 @@ export function AppSwitcher({ apps, currentAppId }: AppSwitcherProps) {
                     size="large"
                     fullWidth
                     onClick={() => handleAppClick(app.url)}
-                    className="h-auto justify-start gap-lg text-left !text-base font-medium leading-normal"
+                    className="h-auto justify-start gap-lg text-left !text-lg font-medium leading-normal"
                     style={{
                       height: 'auto',
                       minHeight: 'calc(var(--control-height-lg) + var(--spacing-sm))',
@@ -128,7 +128,7 @@ export function AppSwitcher({ apps, currentAppId }: AppSwitcherProps) {
                       <Icon className="h-lg w-lg" />
                     </span>
                     <span className="min-w-0 flex-1 leading-normal">
-                      <span className="block truncate !text-base font-medium">
+                      <span className="block truncate !text-lg font-medium">
                         {getAppName(app)}
                       </span>
                       <span

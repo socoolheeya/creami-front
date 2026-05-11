@@ -35,7 +35,7 @@ export const mockRooms: Room[] = [
         order: 1
       }
     ],
-    status: 'available',
+    status: 'active',
     createdAt: new Date('2024-01-15'),
     updatedAt: new Date('2024-01-15'),
     createdBy: 'admin',
@@ -70,7 +70,7 @@ export const mockRooms: Room[] = [
         order: 0
       }
     ],
-    status: 'available',
+    status: 'active',
     createdAt: new Date('2024-01-15'),
     updatedAt: new Date('2024-01-15'),
     createdBy: 'admin',
@@ -104,7 +104,7 @@ export const mockRooms: Room[] = [
         order: 0
       }
     ],
-    status: 'available',
+    status: 'active',
     createdAt: new Date('2024-01-16'),
     updatedAt: new Date('2024-01-16'),
     createdBy: 'admin',
@@ -138,7 +138,7 @@ export const mockRooms: Room[] = [
         order: 0
       }
     ],
-    status: 'available',
+    status: 'active',
     createdAt: new Date('2024-02-01'),
     updatedAt: new Date('2024-02-01'),
     createdBy: 'admin',
@@ -173,7 +173,7 @@ export const mockRooms: Room[] = [
         order: 0
       }
     ],
-    status: 'available',
+    status: 'active',
     createdAt: new Date('2024-02-01'),
     updatedAt: new Date('2024-02-01'),
     createdBy: 'admin',
@@ -206,7 +206,7 @@ export const mockRooms: Room[] = [
         order: 0
       }
     ],
-    status: 'available',
+    status: 'active',
     createdAt: new Date('2024-03-10'),
     updatedAt: new Date('2024-03-10'),
     createdBy: 'admin',
@@ -239,7 +239,7 @@ export const mockRooms: Room[] = [
         order: 0
       }
     ],
-    status: 'maintenance',
+    status: 'inactive',
     createdAt: new Date('2024-03-10'),
     updatedAt: new Date('2024-03-10'),
     createdBy: 'admin',

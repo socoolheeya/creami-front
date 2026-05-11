@@ -1,4 +1,6 @@
-import { ChevronLeft, ChevronRight, Check, Loader2 } from 'lucide-react'
+import { Check, ChevronLeft, ChevronRight, Loader2 } from 'lucide-react'
+import { Button } from '@creami/ui'
+import { useTranslations } from 'next-intl'
 
 interface WizardNavigationProps {
   currentStep: number
@@ -18,78 +20,48 @@ export function WizardNavigation({
   onNext,
   onSubmit,
   canProceed,
-  submitLabel = '완료',
+  submitLabel,
   isSubmitting = false
 }: WizardNavigationProps) {
+  const t = useTranslations('accommodation.rooms')
+  const commonT = useTranslations('accommodation.common')
   const isFirstStep = currentStep === 1
   const isLastStep = currentStep === totalSteps
+  const finalSubmitLabel = submitLabel ?? t('steps.done')
 
   return (
-    <div className="flex items-center justify-between pt-6 border-t" style={{ borderColor: 'var(--border-color)' }}>
-      {/* Previous Button */}
-      {!isFirstStep && (
-        <button
-          onClick={onPrevious}
-          className="flex items-center gap-2 px-4 py-2 rounded-lg transition-colors"
-          style={{
-            backgroundColor: 'var(--bg-tertiary)',
-            color: 'var(--text-primary)',
-            borderRadius: 'var(--radius-sm)',
-            fontWeight: 'var(--font-medium)'
-          }}
-        >
-          <ChevronLeft className="w-5 h-5" />
-          이전
-        </button>
-      )}
+    <div className="flex items-center justify-between border-t border-border pt-lg">
+      <div>
+        {!isFirstStep && (
+          <Button variant="secondary" onClick={onPrevious}>
+            <ChevronLeft className="h-icon-md w-icon-md" />
+            {t('steps.previous')}
+          </Button>
+        )}
+      </div>
 
-      {/* Spacer */}
-      {isFirstStep && <div />}
-
-      {/* Next/Submit Button */}
       {isLastStep ? (
-        <button
+        <Button
           onClick={onSubmit}
           disabled={!canProceed || isSubmitting}
-          className="flex items-center gap-2 px-6 py-2 rounded-lg transition-colors"
-          style={{
-            backgroundColor: canProceed && !isSubmitting ? 'var(--primary)' : 'var(--bg-tertiary)',
-            color: canProceed && !isSubmitting ? '#ffffff' : 'var(--text-tertiary)',
-            borderRadius: 'var(--radius-sm)',
-            fontWeight: 'var(--font-bold)',
-            cursor: canProceed && !isSubmitting ? 'pointer' : 'not-allowed',
-            opacity: canProceed && !isSubmitting ? 1 : 0.5
-          }}
         >
           {isSubmitting ? (
             <>
-              <Loader2 className="w-5 h-5 animate-spin" />
-              등록 중...
+              <Loader2 className="h-icon-md w-icon-md animate-spin" />
+              {commonT('submittingCreate')}
             </>
           ) : (
             <>
-              <Check className="w-5 h-5" />
-              {submitLabel}
+              <Check className="h-icon-md w-icon-md" />
+              {finalSubmitLabel}
             </>
           )}
-        </button>
+        </Button>
       ) : (
-        <button
-          onClick={onNext}
-          disabled={!canProceed}
-          className="flex items-center gap-2 px-4 py-2 rounded-lg transition-colors"
-          style={{
-            backgroundColor: canProceed ? 'var(--primary)' : 'var(--bg-tertiary)',
-            color: canProceed ? '#ffffff' : 'var(--text-tertiary)',
-            borderRadius: 'var(--radius-sm)',
-            fontWeight: 'var(--font-medium)',
-            cursor: canProceed ? 'pointer' : 'not-allowed',
-            opacity: canProceed ? 1 : 0.5
-          }}
-        >
-          다음
-          <ChevronRight className="w-5 h-5" />
-        </button>
+        <Button onClick={onNext} disabled={!canProceed}>
+          {t('steps.next')}
+          <ChevronRight className="h-icon-md w-icon-md" />
+        </Button>
       )}
     </div>
   )

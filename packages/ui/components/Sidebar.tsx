@@ -94,7 +94,7 @@ export function SidebarMenuItem({
 
   const listItemClasses = 'group w-full rounded'
 
-  const itemClasses = `relative flex min-h-2xl w-full items-center bg-transparent text-base font-medium no-underline transition-colors duration-200 focus-visible:outline focus-visible:outline-primary ${
+  const itemClasses = `relative flex min-h-2xl w-full items-center bg-transparent text-lg font-medium no-underline transition-colors duration-200 focus-visible:outline focus-visible:outline-primary ${
     isActive
       ? 'text-white'
       : 'text-text-secondary group-hover:text-text-primary'

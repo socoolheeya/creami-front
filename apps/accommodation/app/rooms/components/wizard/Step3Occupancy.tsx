@@ -1,282 +1,201 @@
 'use client'
 
-import { RoomFormData } from '@/lib/types/room'
+import { type ReactNode } from 'react'
+import { useTranslations } from 'next-intl'
+import { type RoomFormData } from '@/lib/types/room'
+import { Input } from '@creami/ui'
 
 interface Step3OccupancyProps {
   formData: RoomFormData
   onChange: (data: Partial<RoomFormData>) => void
 }
 
-export function Step3Occupancy({ formData, onChange }: Step3OccupancyProps) {
+function Field({
+  label,
+  required = false,
+  children
+}: {
+  label: string
+  required?: boolean
+  children: ReactNode
+}) {
   return (
-    <div className="space-y-4">
+    <label className="block">
+      <span className="mb-xs block text-base font-medium text-text-primary">
+        {label}
+        {required && <span className="text-error"> *</span>}
+      </span>
+      {children}
+    </label>
+  )
+}
+
+function NumberField({
+  label,
+  value,
+  onChange,
+  required = false,
+  min = 0,
+  max
+}: {
+  label: string
+  value: number | undefined
+  onChange: (value: number) => void
+  required?: boolean
+  min?: number
+  max?: number
+}) {
+  return (
+    <Field label={label} required={required}>
+      <Input
+        type="number"
+        value={value ?? ''}
+        onChange={(event) => onChange(Number(event.target.value))}
+        min={min}
+        max={max}
+      />
+    </Field>
+  )
+}
+
+export function Step3Occupancy({ formData, onChange }: Step3OccupancyProps) {
+  const t = useTranslations('accommodation.rooms')
+
+  return (
+    <div className="space-y-lg">
       <div>
-        <h2
-          className="text-xl mb-1"
-          style={{
-            fontWeight: 'var(--font-bold)',
-            color: 'var(--text-primary)'
-          }}
-        >
-          인원 정보
+        <h2 className="mb-xs text-xl font-bold text-text-primary">
+          {t('sections.occupancy')}
         </h2>
-        <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>
-          객실의 인원 정보를 입력해주세요
+        <p className="text-base font-light text-text-secondary">
+          {t('descriptions.occupancy')}
         </p>
       </div>
 
-      {/* 기준 인원 */}
       <div>
-        <label
-          className="block mb-1.5 text-sm"
-          style={{
-            color: 'var(--text-primary)',
-            fontWeight: 'var(--font-medium)'
-          }}
-        >
-          기준 인원 <span style={{ color: 'var(--error)' }}>*</span>
-        </label>
-        <div className="grid grid-cols-2 gap-3 max-w-md">
-          <div>
-            <input
-              type="number"
-              value={formData.standardOccupancyAdult ?? ''}
-              onChange={(e) => onChange({ standardOccupancyAdult: Number(e.target.value) })}
-              placeholder="성인"
-              min="0"
-              className="w-full px-3 py-2 text-sm rounded-lg"
-              style={{
-                backgroundColor: 'var(--bg-primary)',
-                border: '1px solid var(--border-color)',
-                color: 'var(--text-primary)',
-                borderRadius: 'var(--radius-sm)'
-              }}
-            />
-            <p className="text-xs mt-1" style={{ color: 'var(--text-tertiary)' }}>성인</p>
-          </div>
-          <div>
-            <input
-              type="number"
-              value={formData.standardOccupancyChild ?? ''}
-              onChange={(e) => onChange({ standardOccupancyChild: Number(e.target.value) })}
-              placeholder="어린이"
-              min="0"
-              className="w-full px-3 py-2 text-sm rounded-lg"
-              style={{
-                backgroundColor: 'var(--bg-primary)',
-                border: '1px solid var(--border-color)',
-                color: 'var(--text-primary)',
-                borderRadius: 'var(--radius-sm)'
-              }}
-            />
-            <p className="text-xs mt-1" style={{ color: 'var(--text-tertiary)' }}>어린이</p>
-          </div>
+        <p className="mb-sm text-base font-medium text-text-primary">
+          {t('fields.standardOccupancy')} <span className="text-error">*</span>
+        </p>
+        <div className="grid grid-cols-1 gap-md md:grid-cols-2">
+          <NumberField
+            label={t('fields.adult')}
+            value={formData.standardOccupancyAdult}
+            onChange={(value) => onChange({ standardOccupancyAdult: value })}
+            required
+          />
+          <NumberField
+            label={t('fields.child')}
+            value={formData.standardOccupancyChild}
+            onChange={(value) => onChange({ standardOccupancyChild: value })}
+            required
+          />
         </div>
       </div>
 
-      {/* 최소 인원 (선택적) */}
-      <div>
-        <label className="flex items-center gap-2 cursor-pointer mb-2">
+      <div className="space-y-sm">
+        <label className="flex cursor-pointer items-center gap-sm text-base font-medium text-text-primary">
           <input
             type="checkbox"
             checked={formData.useMinOccupancy || false}
-            onChange={(e) => onChange({
-              useMinOccupancy: e.target.checked,
-              minOccupancyAdult: e.target.checked ? formData.minOccupancyAdult : undefined,
-              minOccupancyChild: e.target.checked ? formData.minOccupancyChild : undefined
-            })}
-            className="w-4 h-4 rounded"
-            style={{ accentColor: 'var(--primary)' }}
+            onChange={(event) =>
+              onChange({
+                useMinOccupancy: event.target.checked,
+                minOccupancyAdult: event.target.checked ? formData.minOccupancyAdult : undefined,
+                minOccupancyChild: event.target.checked ? formData.minOccupancyChild : undefined
+              })
+            }
+            className="h-icon-md w-icon-md rounded accent-primary"
           />
-          <span
-            className="text-sm"
-            style={{
-              color: 'var(--text-primary)',
-              fontWeight: 'var(--font-medium)'
-            }}
-          >
-            최소 인원 설정
-          </span>
+          {t('fields.useMinOccupancy')}
         </label>
 
         {formData.useMinOccupancy && (
-          <div className="grid grid-cols-2 gap-3 max-w-md">
-            <div>
-              <input
-                type="number"
-                value={formData.minOccupancyAdult ?? ''}
-                onChange={(e) => onChange({ minOccupancyAdult: Number(e.target.value) })}
-                placeholder="성인"
-                min="0"
-                className="w-full px-3 py-2 text-sm rounded-lg"
-                style={{
-                  backgroundColor: 'var(--bg-primary)',
-                  border: '1px solid var(--border-color)',
-                  color: 'var(--text-primary)',
-                  borderRadius: 'var(--radius-sm)'
-                }}
-              />
-              <p className="text-xs mt-1" style={{ color: 'var(--text-tertiary)' }}>최소 성인</p>
-            </div>
-            <div>
-              <input
-                type="number"
-                value={formData.minOccupancyChild ?? ''}
-                onChange={(e) => onChange({ minOccupancyChild: Number(e.target.value) })}
-                placeholder="어린이"
-                min="0"
-                className="w-full px-3 py-2 text-sm rounded-lg"
-                style={{
-                  backgroundColor: 'var(--bg-primary)',
-                  border: '1px solid var(--border-color)',
-                  color: 'var(--text-primary)',
-                  borderRadius: 'var(--radius-sm)'
-                }}
-              />
-              <p className="text-xs mt-1" style={{ color: 'var(--text-tertiary)' }}>최소 어린이</p>
-            </div>
+          <div className="grid grid-cols-1 gap-md md:grid-cols-2">
+            <NumberField
+              label={t('fields.minAdult')}
+              value={formData.minOccupancyAdult}
+              onChange={(value) => onChange({ minOccupancyAdult: value })}
+            />
+            <NumberField
+              label={t('fields.minChild')}
+              value={formData.minOccupancyChild}
+              onChange={(value) => onChange({ minOccupancyChild: value })}
+            />
           </div>
         )}
       </div>
 
-      {/* 최대인원 방식 선택 */}
-      <div>
-        <label
-          className="block mb-2 text-sm"
-          style={{
-            color: 'var(--text-primary)',
-            fontWeight: 'var(--font-medium)'
-          }}
-        >
-          최대 인원 설정 방식 <span style={{ color: 'var(--error)' }}>*</span>
-        </label>
-        <div className="flex gap-4 mb-3">
-          <label className="flex items-center gap-2 cursor-pointer">
+      <div className="space-y-sm">
+        <p className="text-base font-medium text-text-primary">
+          {t('fields.maxOccupancyMode')} <span className="text-error">*</span>
+        </p>
+        <div className="flex flex-wrap gap-md">
+          <label className="flex cursor-pointer items-center gap-sm text-base font-medium text-text-primary">
             <input
               type="radio"
               checked={formData.useMaxOccupancy === true}
               onChange={() => onChange({ useMaxOccupancy: true, totalOccupancy: undefined })}
-              style={{ accentColor: 'var(--primary)' }}
+              className="h-icon-md w-icon-md accent-primary"
             />
-            <span className="text-sm" style={{ color: 'var(--text-primary)' }}>성인/어린이 구분</span>
+            {t('fields.maxAdultChild')}
           </label>
-          <label className="flex items-center gap-2 cursor-pointer">
+          <label className="flex cursor-pointer items-center gap-sm text-base font-medium text-text-primary">
             <input
               type="radio"
               checked={formData.useMaxOccupancy === false}
-              onChange={() => onChange({ useMaxOccupancy: false, maxOccupancyAdult: undefined, maxOccupancyChild: undefined })}
-              style={{ accentColor: 'var(--primary)' }}
+              onChange={() =>
+                onChange({
+                  useMaxOccupancy: false,
+                  maxOccupancyAdult: undefined,
+                  maxOccupancyChild: undefined
+                })
+              }
+              className="h-icon-md w-icon-md accent-primary"
             />
-            <span className="text-sm" style={{ color: 'var(--text-primary)' }}>전체 인원</span>
+            {t('fields.totalOccupancyMode')}
           </label>
         </div>
 
         {formData.useMaxOccupancy === true ? (
-          <div className="grid grid-cols-2 gap-3 max-w-md">
-            <div>
-              <input
-                type="number"
-                value={formData.maxOccupancyAdult ?? ''}
-                onChange={(e) => onChange({ maxOccupancyAdult: Number(e.target.value) })}
-                placeholder="최대 성인"
-                min="0"
-                className="w-full px-3 py-2 text-sm rounded-lg"
-                style={{
-                  backgroundColor: 'var(--bg-primary)',
-                  border: '1px solid var(--border-color)',
-                  color: 'var(--text-primary)',
-                  borderRadius: 'var(--radius-sm)'
-                }}
-              />
-              <p className="text-xs mt-1" style={{ color: 'var(--text-tertiary)' }}>최대 성인</p>
-            </div>
-            <div>
-              <input
-                type="number"
-                value={formData.maxOccupancyChild ?? ''}
-                onChange={(e) => onChange({ maxOccupancyChild: Number(e.target.value) })}
-                placeholder="최대 어린이"
-                min="0"
-                className="w-full px-3 py-2 text-sm rounded-lg"
-                style={{
-                  backgroundColor: 'var(--bg-primary)',
-                  border: '1px solid var(--border-color)',
-                  color: 'var(--text-primary)',
-                  borderRadius: 'var(--radius-sm)'
-                }}
-              />
-              <p className="text-xs mt-1" style={{ color: 'var(--text-tertiary)' }}>최대 어린이</p>
-            </div>
+          <div className="grid grid-cols-1 gap-md md:grid-cols-2">
+            <NumberField
+              label={t('fields.maxAdult')}
+              value={formData.maxOccupancyAdult}
+              onChange={(value) => onChange({ maxOccupancyAdult: value })}
+            />
+            <NumberField
+              label={t('fields.maxChild')}
+              value={formData.maxOccupancyChild}
+              onChange={(value) => onChange({ maxOccupancyChild: value })}
+            />
           </div>
         ) : formData.useMaxOccupancy === false ? (
-          <div className="max-w-xs">
-            <input
-              type="number"
-              value={formData.totalOccupancy ?? ''}
-              onChange={(e) => onChange({ totalOccupancy: Number(e.target.value) })}
-              placeholder="최대 전체 인원"
-              min="0"
-              className="w-full px-3 py-2 text-sm rounded-lg"
-              style={{
-                backgroundColor: 'var(--bg-primary)',
-                border: '1px solid var(--border-color)',
-                color: 'var(--text-primary)',
-                borderRadius: 'var(--radius-sm)'
-              }}
-            />
-            <p className="text-xs mt-1" style={{ color: 'var(--text-tertiary)' }}>최대 전체 인원 (성인+어린이)</p>
-          </div>
+          <NumberField
+            label={t('fields.maxTotalOccupancy')}
+            value={formData.totalOccupancy}
+            onChange={(value) => onChange({ totalOccupancy: value })}
+          />
         ) : null}
       </div>
 
-      {/* 투숙가능 어린이 나이 */}
       <div>
-        <label
-          className="block mb-1.5 text-sm"
-          style={{
-            color: 'var(--text-primary)',
-            fontWeight: 'var(--font-medium)'
-          }}
-        >
-          투숙가능 어린이 나이 <span style={{ color: 'var(--error)' }}>*</span>
-        </label>
-        <div className="grid grid-cols-2 gap-3 max-w-md">
-          <div>
-            <input
-              type="number"
-              value={formData.minChildAge ?? ''}
-              onChange={(e) => onChange({ minChildAge: Number(e.target.value) })}
-              placeholder="최소 나이"
-              min="0"
-              max="17"
-              className="w-full px-3 py-2 text-sm rounded-lg"
-              style={{
-                backgroundColor: 'var(--bg-primary)',
-                border: '1px solid var(--border-color)',
-                color: 'var(--text-primary)',
-                borderRadius: 'var(--radius-sm)'
-              }}
-            />
-            <p className="text-xs mt-1" style={{ color: 'var(--text-tertiary)' }}>최소 나이</p>
-          </div>
-          <div>
-            <input
-              type="number"
-              value={formData.maxChildAge ?? ''}
-              onChange={(e) => onChange({ maxChildAge: Number(e.target.value) })}
-              placeholder="최대 나이"
-              min={formData.minChildAge || 0}
-              max="17"
-              className="w-full px-3 py-2 text-sm rounded-lg"
-              style={{
-                backgroundColor: 'var(--bg-primary)',
-                border: '1px solid var(--border-color)',
-                color: 'var(--text-primary)',
-                borderRadius: 'var(--radius-sm)'
-              }}
-            />
-            <p className="text-xs mt-1" style={{ color: 'var(--text-tertiary)' }}>최대 나이</p>
-          </div>
+        <p className="mb-sm text-base font-medium text-text-primary">
+          {t('fields.childAge')} <span className="text-error">*</span>
+        </p>
+        <div className="grid grid-cols-1 gap-md md:grid-cols-2">
+          <NumberField
+            label={t('fields.minAge')}
+            value={formData.minChildAge}
+            onChange={(value) => onChange({ minChildAge: value })}
+            max={17}
+          />
+          <NumberField
+            label={t('fields.maxAge')}
+            value={formData.maxChildAge}
+            onChange={(value) => onChange({ maxChildAge: value })}
+            min={formData.minChildAge || 0}
+            max={17}
+          />
         </div>
       </div>
     </div>

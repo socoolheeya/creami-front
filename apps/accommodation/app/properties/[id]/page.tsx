@@ -3,7 +3,7 @@
 import Image from 'next/image'
 import Link from 'next/link'
 import { useParams } from 'next/navigation'
-import { useMemo, useState } from 'react'
+import { type ReactNode, useMemo, useState } from 'react'
 import {
   ArrowLeft,
   Building2,
@@ -23,7 +23,13 @@ import {
 } from 'lucide-react'
 import { Button, Card } from '@creami/ui'
 import { useProperty } from '@/hooks/useProperties'
-import { CURRENCY_OPTIONS, PROPERTY_TYPE_LABELS, type Property } from '@/lib/types/property'
+import {
+  CURRENCY_OPTIONS,
+  PROPERTY_STATUS_LABELS,
+  PROPERTY_TYPE_LABELS,
+  type Property,
+  type PropertyStatus
+} from '@/lib/types/property'
 import { mockRatePlans } from '@/lib/data/mock-rateplans'
 import { PRICE_TYPE_LABELS } from '@/lib/types/rateplan'
 import { PropertyEditForm } from '../components/PropertyEditForm'
@@ -48,15 +54,17 @@ function InfoItem({
   )
 }
 
-function getPropertyStatusLabel(status: string) {
-  const statusMap: Record<string, string> = {
-    draft: 'DRAFT',
-    active: 'ACTIVE',
-    inactive: 'INACTIVE',
-    archived: 'ARCHIVED'
-  }
+function SectionTitle({ children }: { children: ReactNode }) {
+  return (
+    <div className="mb-md flex items-center gap-sm border-b border-border pb-sm">
+      <span aria-hidden="true" className="h-xs w-xs shrink-0 rounded bg-primary" />
+      <h2 className="text-xl font-bold text-text-primary">{children}</h2>
+    </div>
+  )
+}
 
-  return statusMap[status] ?? status
+function getPropertyStatusLabel(status: PropertyStatus) {
+  return PROPERTY_STATUS_LABELS[status] ?? status
 }
 
 function formatDateTime(value: Date) {
@@ -163,50 +171,50 @@ export default function AccommodationDetailPage() {
           숙소 목록으로
         </Link>
 
-        <div className="flex items-start justify-between gap-lg">
-          <div className="min-w-0">
-            <div className="mb-sm flex flex-wrap items-center gap-md">
-              <h1 className="text-2xl font-bold text-text-primary">{accommodation.name}</h1>
-              {accommodation.stars ? (
-                <div className="flex items-center gap-xs">
-                  {Array.from({ length: accommodation.stars }).map((_, index) => (
-                    <Star
-                      key={`${accommodation.id}-star-${index}`}
-                      className="h-icon-md w-icon-md fill-primary text-primary"
-                    />
-                  ))}
-                </div>
-              ) : null}
-            </div>
-
-            {accommodation.enName && (
-              <p className="mb-sm text-base font-medium text-text-secondary">
-                {accommodation.enName}
-              </p>
-            )}
-            <div className="flex min-w-0 items-center gap-sm text-base font-light text-text-secondary">
-              <MapPin className="h-icon-md w-icon-md shrink-0 text-text-tertiary" />
-              <span className="truncate">
-                {accommodation.address}
-                {accommodation.addressDetail ? ` ${accommodation.addressDetail}` : ''}
-                {accommodation.city && accommodation.zipCode
-                  ? ` (${accommodation.city}, ${accommodation.zipCode})`
-                  : ''}
-              </span>
-            </div>
+        <div className="min-w-0">
+          <div className="mb-sm flex flex-wrap items-center gap-md">
+            <h1 className="text-2xl font-bold text-text-primary">{accommodation.name}</h1>
+            {accommodation.stars ? (
+              <div className="flex items-center gap-xs">
+                {Array.from({ length: accommodation.stars }).map((_, index) => (
+                  <Star
+                    key={`${accommodation.id}-star-${index}`}
+                    className="h-icon-md w-icon-md fill-primary text-primary"
+                  />
+                ))}
+              </div>
+            ) : null}
           </div>
 
-          <Button type="button" onClick={() => setIsEditing(true)}>
-            <Edit className="h-icon-md w-icon-md" />
-            수정
-          </Button>
+          {accommodation.enName && (
+            <p className="mb-sm text-base font-medium text-text-secondary">
+              {accommodation.enName}
+            </p>
+          )}
+          <div className="flex min-w-0 items-center gap-sm text-base font-light text-text-secondary">
+            <MapPin className="h-icon-md w-icon-md shrink-0 text-text-tertiary" />
+            <span className="truncate">
+              {accommodation.address}
+              {accommodation.addressDetail ? ` ${accommodation.addressDetail}` : ''}
+              {accommodation.city && accommodation.zipCode
+                ? ` (${accommodation.city}, ${accommodation.zipCode})`
+                : ''}
+            </span>
+          </div>
         </div>
+      </div>
+
+      <div className="mb-md flex justify-end">
+        <Button type="button" onClick={() => setIsEditing(true)}>
+          <Edit className="h-icon-md w-icon-md" />
+          수정
+        </Button>
       </div>
 
       <div className="grid gap-lg lg:grid-cols-3">
         <div className="grid gap-lg lg:col-span-2">
           <Card className="w-full p-lg" hover={false}>
-            <h2 className="mb-md text-xl font-bold text-text-primary">이미지</h2>
+            <SectionTitle>이미지</SectionTitle>
             <div className="flex w-full justify-center">
               <div className="relative h-datepicker w-datepicker max-w-full overflow-hidden rounded bg-bg-tertiary">
                 {selectedImage ? (
@@ -249,7 +257,7 @@ export default function AccommodationDetailPage() {
           </Card>
 
           <Card className="p-lg" hover={false}>
-            <h2 className="mb-md text-xl font-bold text-text-primary">숙소 설명</h2>
+            <SectionTitle>숙소 설명</SectionTitle>
             <div className="grid gap-md">
               <div>
                 <h3 className="mb-xs text-base font-medium text-text-primary">한글</h3>
@@ -269,7 +277,7 @@ export default function AccommodationDetailPage() {
           </Card>
 
           <Card className="p-lg" hover={false}>
-            <h2 className="mb-md text-xl font-bold text-text-primary">편의시설</h2>
+            <SectionTitle>편의시설</SectionTitle>
             <div className="grid gap-sm md:grid-cols-3">
               {accommodation.amenities.length > 0 ? (
                 accommodation.amenities.map((amenity) => (
@@ -290,7 +298,7 @@ export default function AccommodationDetailPage() {
 
         <div className="grid content-start gap-lg">
           <Card className="p-lg" hover={false}>
-            <h2 className="mb-md text-xl font-bold text-text-primary">연락처</h2>
+            <SectionTitle>연락처</SectionTitle>
             <div className="grid gap-md md:grid-cols-2">
               <InfoItem icon={Phone} label="전화번호" value={accommodation.phone} />
               <InfoItem icon={Mail} label="이메일" value={accommodation.email ?? ''} />
@@ -315,7 +323,7 @@ export default function AccommodationDetailPage() {
           </Card>
 
           <Card className="p-lg" hover={false}>
-            <h2 className="mb-md text-xl font-bold text-text-primary">운영 정보</h2>
+            <SectionTitle>운영 정보</SectionTitle>
             <div className="grid gap-md md:grid-cols-2">
               <InfoItem
                 icon={Tag}
@@ -334,7 +342,7 @@ export default function AccommodationDetailPage() {
           </Card>
 
           <Card className="p-lg" hover={false}>
-            <h2 className="mb-md text-xl font-bold text-text-primary">요금 정책</h2>
+            <SectionTitle>요금 정책</SectionTitle>
             <div className="grid gap-md">
               <InfoItem
                 icon={DollarSign}
@@ -362,10 +370,13 @@ export default function AccommodationDetailPage() {
 
       {accommodationRatePlans.length > 0 && (
         <Card className="mt-lg p-lg" hover={false}>
-          <div className="mb-md flex items-center justify-between gap-md">
-            <h2 className="text-xl font-bold text-text-primary">
-              요금정책 ({accommodationRatePlans.length}개)
-            </h2>
+          <div className="mb-md flex items-center justify-between gap-md border-b border-border pb-sm">
+            <div className="flex items-center gap-sm">
+              <span aria-hidden="true" className="h-xs w-xs shrink-0 rounded bg-primary" />
+              <h2 className="text-xl font-bold text-text-primary">
+                요금정책 ({accommodationRatePlans.length}개)
+              </h2>
+            </div>
             <Link href="/rateplans">
               <Button type="button" variant="secondary">
                 전체 보기

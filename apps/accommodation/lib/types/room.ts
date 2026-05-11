@@ -1,6 +1,6 @@
 export type RoomType = 'single' | 'double' | 'twin' | 'suite' | 'deluxe' | 'family'
 
-export type RoomStatus = 'available' | 'unavailable' | 'maintenance'
+export type RoomStatus = 'draft' | 'active' | 'inactive' | 'archived'
 
 export type BedType = 'single' | 'double' | 'queen' | 'king' | 'sofa'
 
@@ -32,6 +32,8 @@ export interface Room {
   size: number                    // 평수 또는 sqm
   sizeUnit: 'sqm' | 'pyeong'     // 단위
   floor: number                   // 층수
+  baseMinLos?: number             // 기본 최소 숙박
+  baseMaxLos?: number             // 기본 최대 숙박
   bedConfiguration: BedConfig[]   // 침대 구성
 
   // 인원 정보 (새로운 구조)
@@ -46,6 +48,8 @@ export interface Room {
   maxOccupancyAdult?: number      // 최대 인원 - 성인 (useMaxOccupancy=true일 때)
   maxOccupancyChild?: number      // 최대 인원 - 어린이 (useMaxOccupancy=true일 때)
   totalOccupancy?: number         // 전체 인원 (useMaxOccupancy=false일 때)
+  maxInfantCount?: number         // 최대 유아 인원
+  freeChildAge?: number           // 무료 아동 나이 기준
 
   // 어린이 나이 제한
   minChildAge: number             // 투숙가능 최소 어린이 나이
@@ -57,6 +61,7 @@ export interface Room {
   // Step 3: Description
   description?: string           // 한글 객실 설명
   enDescription?: string         // 영문 객실 설명
+  cmsDescription?: string        // CMS 객실 설명
 
   // Step 4: Features & Amenities
   viewType: ViewType
@@ -140,9 +145,10 @@ export const ROOM_TYPE_LABELS: Record<RoomType, string> = {
 
 // 상태 라벨
 export const ROOM_STATUS_LABELS: Record<RoomStatus, string> = {
-  available: '이용가능',
-  unavailable: '이용불가',
-  maintenance: '점검중'
+  draft: 'Draft',
+  active: 'Active',
+  inactive: 'Inactive',
+  archived: 'Archived'
 }
 
 // 침대 타입 라벨

@@ -1,45 +1,80 @@
 'use client'
 
 import Link from 'next/link'
-import { useMemo, useState } from 'react'
-import { useRatePlans } from '@/hooks/useRatePlans'
-import { Receipt, Plus, Search } from 'lucide-react'
+import { useEffect, useMemo, useRef, useState } from 'react'
+import { useTranslations } from 'next-intl'
+import { type RatePlanSearchCondition, useInfiniteRatePlans } from '@/hooks/useRatePlans'
+import { type RatePlan } from '@/lib/types/rateplan'
+import { Receipt, Plus } from 'lucide-react'
 import { RatePlanTableView } from './components/RatePlanTableView'
 import { RatePlanCardView } from './components/RatePlanCardView'
-import { ViewToggle, Button, Input, Card } from '@creami/ui'
+import { ViewToggle, Button, Card } from '@creami/ui'
 
 type ViewMode = 'grid' | 'table'
 
 export default function RatePlansPage() {
-  const [viewMode, setViewMode] = useState<ViewMode>('grid')
-  const [searchQuery, setSearchQuery] = useState('')
-  const [searchParams, setSearchParams] = useState<Record<string, unknown> | undefined>(undefined)
+  const t = useTranslations('accommodation.rateplans')
+  const commonT = useTranslations('accommodation.common')
+  const [viewMode, setViewMode] = useState<ViewMode>('table')
+  const searchParams = useMemo<RatePlanSearchCondition>(() => ({
+    size: 10
+  }), [])
+  const loadMoreRef = useRef<HTMLDivElement>(null)
+  const {
+    data,
+    isLoading,
+    error,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage
+  } = useInfiniteRatePlans(searchParams, true)
+  const ratePlans = useMemo(
+    () => {
+      const ratePlanMap = new Map<string, RatePlan>()
 
-  const { data: ratePlans = [], isLoading, error } = useRatePlans(searchParams)
-  const searchedRatePlans = useMemo(() => {
-    const query = searchParams?.search
+      data?.pages
+        .flatMap((page) => page.ratePlans)
+        .forEach((ratePlan, index) => {
+          const ratePlanKey = ratePlan.id || `${ratePlan.name}-${index}`
 
-    if (typeof query !== 'string' || query.trim().length === 0) {
-      return ratePlans
+          if (!ratePlanMap.has(ratePlanKey)) {
+            ratePlanMap.set(ratePlanKey, ratePlan)
+          }
+        })
+
+      return Array.from(ratePlanMap.values())
+    },
+    [data]
+  )
+
+  useEffect(() => {
+    if (!hasNextPage || isFetchingNextPage) {
+      return
     }
 
-    const normalizedQuery = query.trim().toLowerCase()
+    const target = loadMoreRef.current
 
-    return ratePlans.filter((ratePlan) =>
-      ratePlan.id.toLowerCase() === normalizedQuery ||
-      ratePlan.name.toLowerCase().includes(normalizedQuery)
+    if (!target) {
+      return
+    }
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const entry = entries[0]
+
+        if (entry.isIntersecting) {
+          fetchNextPage()
+        }
+      },
+      { rootMargin: '320px' }
     )
-  }, [ratePlans, searchParams])
 
-  const handleSearch = () => {
-    setSearchParams(searchQuery.trim() ? { search: searchQuery.trim() } : {})
-  }
+    observer.observe(target)
 
-  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === 'Enter') {
-      handleSearch()
+    return () => {
+      observer.disconnect()
     }
-  }
+  }, [fetchNextPage, hasNextPage, isFetchingNextPage])
 
   return (
     <div>
@@ -48,76 +83,59 @@ export default function RatePlansPage() {
         <div className="flex items-center gap-md">
           <Receipt className="w-lg h-lg text-primary" />
           <h1 className="text-2xl text-text-primary">
-            요금제 관리
+            {t('title')}
           </h1>
         </div>
+      </div>
 
+      <div className="mb-md flex justify-end gap-sm">
+        <ViewToggle view={viewMode} onViewChange={setViewMode} />
         <Link href="/rateplans/new">
           <Button>
             <Plus className="w-lg h-lg" />
-            신규 등록
+            {t('new')}
           </Button>
         </Link>
       </div>
 
-      {/* Search and View Toggle */}
-      <div className="mb-md flex items-center gap-md">
-        <div className="flex-1 relative flex items-center gap-sm">
-          <Input
-            type="text"
-            placeholder="요금제 ID 또는 요금제명으로 검색..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            onKeyDown={handleKeyDown}
-            className="flex-1"
-          />
-          <Button onClick={handleSearch}>
-            <Search className="w-lg h-lg" />
-            검색
-          </Button>
-        </div>
-
-        <ViewToggle view={viewMode} onViewChange={setViewMode} />
-      </div>
-
       {/* Content */}
-      {!searchParams ? (
-        <Card className="flex flex-col items-center justify-center border-dashed py-2xl text-center" hover={false}>
-          <Search className="h-2xl w-2xl mb-md text-text-tertiary" />
-          <h3 className="text-lg mb-xs font-bold text-text-primary">
-            검색어를 입력하세요
-          </h3>
-          <p className="text-base font-light text-text-secondary">
-            요금제 ID 또는 요금제명으로 검색할 수 있습니다
-          </p>
-        </Card>
-      ) : isLoading ? (
+      {isLoading ? (
         <div className="flex items-center justify-center py-2xl">
-          <div className="text-text-secondary">로딩 중...</div>
+          <div className="text-text-secondary">{commonT('loading')}</div>
         </div>
       ) : error ? (
         <Card className="flex flex-col items-center justify-center border-error py-2xl text-center" hover={false}>
-          <p className="text-error">데이터를 불러오는데 실패했습니다.</p>
+          <p className="text-error">{commonT('loadFailed')}</p>
           <p className="text-base text-text-secondary">{error.message}</p>
         </Card>
-      ) : searchedRatePlans.length === 0 ? (
+      ) : ratePlans.length === 0 ? (
         <Card className="flex flex-col items-center justify-center border-dashed py-2xl text-center" hover={false}>
           <Receipt className="h-2xl w-2xl mb-md text-text-tertiary" />
           <h3 className="text-lg mb-xs font-bold text-text-primary">
-            검색 결과가 없습니다
+            {commonT('noSearchResults')}
           </h3>
           <p className="mb-md text-base font-light text-text-secondary">
-            다른 검색어로 다시 시도해보세요
+            {commonT('tryAnotherSearch')}
           </p>
         </Card>
       ) : viewMode === 'grid' ? (
-        <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
-          {searchedRatePlans.map((ratePlan) => (
-            <RatePlanCardView key={ratePlan.id} ratePlan={ratePlan} />
-          ))}
-        </div>
+        <>
+          <div className="grid grid-cols-1 gap-lg md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
+            {ratePlans.map((ratePlan) => (
+              <RatePlanCardView key={ratePlan.id} ratePlan={ratePlan} />
+            ))}
+          </div>
+          <div ref={loadMoreRef} className="flex justify-center py-lg text-base font-light text-text-tertiary">
+            {isFetchingNextPage ? t('loadingMore') : hasNextPage ? ' ' : t('endOfList')}
+          </div>
+        </>
       ) : (
-        <RatePlanTableView ratePlans={searchedRatePlans} />
+        <>
+          <RatePlanTableView ratePlans={ratePlans} />
+          <div ref={loadMoreRef} className="flex justify-center py-lg text-base font-light text-text-tertiary">
+            {isFetchingNextPage ? t('loadingMore') : hasNextPage ? ' ' : t('endOfList')}
+          </div>
+        </>
       )}
     </div>
   )

@@ -5,8 +5,82 @@
   },
   "nav": {
     "dashboard": "대시보드",
+    "invoiceDashboard": "송장 대시보드",
     "invoices": "송장 관리",
     "payments": "결제 관리",
     "reports": "리포트"
+  },
+  "invoice": {
+    "title": "송장 관리",
+    "description": "숙소별 송장 발행, 납기, 결제 상태를 관리합니다.",
+    "results": "총 {count}건",
+    "empty": "조회된 송장이 없습니다.",
+    "summary": {
+      "totalCount": "전체 송장",
+      "totalAmount": "총 청구 금액",
+      "unpaidAmount": "미수 금액",
+      "issuedCount": "발행 대기 {count}건",
+      "overdueCount": "납기 초과",
+      "requiresAction": "확인이 필요한 송장"
+    },
+    "filters": {
+      "searchPlaceholder": "송장번호, 숙소명, 수신자 검색",
+      "allStatuses": "전체 상태"
+    },
+    "actions": {
+      "create": "신규 등록",
+      "cancel": "취소",
+      "issue": "송장 발행",
+      "backToList": "목록으로"
+    },
+    "create": {
+      "title": "송장 신규 등록",
+      "description": "발행할 송장의 기본 정보와 청구 항목을 입력합니다."
+    },
+    "statuses": {
+      "draft": "작성중",
+      "issued": "발행",
+      "paid": "결제완료",
+      "overdue": "납기초과",
+      "cancelled": "취소"
+    },
+    "columns": {
+      "invoiceId": "송장번호",
+      "property": "숙소",
+      "recipient": "수신자",
+      "totalAmount": "총 금액",
+      "issueDate": "발행일",
+      "dueDate": "납기일",
+      "status": "상태",
+      "description": "항목",
+      "quantity": "수량",
+      "unitPrice": "단가",
+      "amount": "금액"
+    },
+    "sections": {
+      "basic": "기본 정보",
+      "recipient": "수신자 정보",
+      "amount": "금액 정보",
+      "items": "청구 항목"
+    },
+    "fields": {
+      "invoiceId": "송장번호",
+      "property": "숙소",
+      "status": "상태",
+      "issueDate": "발행일",
+      "dueDate": "납기일",
+      "recipientName": "수신자명",
+      "recipientEmail": "수신자 이메일",
+      "subtotal": "공급가",
+      "taxAmount": "세액",
+      "paidAmount": "결제 금액",
+      "balance": "잔액"
+    },
+    "placeholders": {
+      "property": "숙소명을 입력하세요",
+      "recipientName": "수신자명을 입력하세요",
+      "recipientEmail": "billing@example.com",
+      "description": "청구 항목을 입력하세요"
+    }
   }
 }

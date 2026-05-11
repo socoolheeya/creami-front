@@ -6,6 +6,12 @@ import { useTranslations } from 'next-intl'
 import { Button } from './Button'
 import { locales, localeNames, type Locale } from '@creami/i18n'
 
+const localeFlags: Record<Locale, string> = {
+  ko: '🇰🇷',
+  en: '🇺🇸',
+  ja: '🇯🇵'
+}
+
 export interface LanguageSelectorProps {
   currentLocale: Locale
   onLocaleChange?: (locale: Locale) => void
@@ -55,11 +61,14 @@ export function LanguageSelector({ currentLocale, onLocaleChange }: LanguageSele
                 type="button"
                 onClick={() => handleLanguageChange(locale)}
                 disabled={isPending}
-                className={`w-full px-md py-sm text-left text-text-primary hover:bg-bg-tertiary transition-colors first:rounded-t last:rounded-b disabled:opacity-50 disabled:cursor-not-allowed ${
+                className={`flex w-full items-center gap-sm px-md py-sm text-left text-base font-medium text-text-primary hover:bg-bg-tertiary transition-colors first:rounded-t last:rounded-b disabled:opacity-50 disabled:cursor-not-allowed ${
                   currentLocale === locale ? 'bg-bg-tertiary' : ''
                 }`}
               >
-                {localeNames[locale]}
+                <span className="text-lg leading-none" aria-hidden="true">
+                  {localeFlags[locale]}
+                </span>
+                <span>{localeNames[locale]}</span>
               </button>
             ))}
           </div>

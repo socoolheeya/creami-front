@@ -1,14 +1,17 @@
 'use client'
 
 import Link from 'next/link'
-import { RatePlan, RATE_PLAN_TYPE_LABELS, MEAL_PLAN_LABELS, RATE_PLAN_STATUS_LABELS, PRICE_TYPE_LABELS } from '@/lib/types/rateplan'
+import { RatePlan } from '@/lib/types/rateplan'
 import { Eye, Edit } from 'lucide-react'
+import { useTranslations } from 'next-intl'
 
 interface RatePlanCardViewProps {
   ratePlan: RatePlan
 }
 
 export function RatePlanCardView({ ratePlan }: RatePlanCardViewProps) {
+  const t = useTranslations('accommodation.rateplans')
+  const commonT = useTranslations('accommodation.common')
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'active':
@@ -57,7 +60,7 @@ export function RatePlanCardView({ ratePlan }: RatePlanCardViewProps) {
               fontWeight: 'var(--font-medium)'
             }}
           >
-            {RATE_PLAN_STATUS_LABELS[ratePlan.status]}
+            {t(`statuses.${ratePlan.status}`)}
           </span>
         </div>
 
@@ -73,7 +76,7 @@ export function RatePlanCardView({ ratePlan }: RatePlanCardViewProps) {
             className="text-xs mb-0.5"
             style={{ color: 'var(--text-secondary)', fontWeight: 'var(--font-light)' }}
           >
-            혜택명
+            {t('fields.benefitName')}
           </p>
           <p
             className="text-sm"
@@ -93,13 +96,13 @@ export function RatePlanCardView({ ratePlan }: RatePlanCardViewProps) {
               className="text-xs mb-0.5"
               style={{ color: 'var(--text-secondary)', fontWeight: 'var(--font-light)' }}
             >
-              요금제 유형
+              {t('fields.ratePlanType')}
             </p>
             <p
               className="text-sm"
               style={{ color: 'var(--text-primary)', fontWeight: 'var(--font-medium)' }}
             >
-              {RATE_PLAN_TYPE_LABELS[ratePlan.ratePlanType]}
+              {t(`types.${ratePlan.ratePlanType}`)}
             </p>
           </div>
           <div>
@@ -107,13 +110,13 @@ export function RatePlanCardView({ ratePlan }: RatePlanCardViewProps) {
               className="text-xs mb-0.5"
               style={{ color: 'var(--text-secondary)', fontWeight: 'var(--font-light)' }}
             >
-              요금 타입
+              {t('fields.priceType')}
             </p>
             <p
               className="text-sm"
               style={{ color: 'var(--text-primary)', fontWeight: 'var(--font-medium)' }}
             >
-              {PRICE_TYPE_LABELS[ratePlan.priceType]}
+              {t(`priceTypes.${ratePlan.priceType}`)}
             </p>
           </div>
           <div className="col-span-2">
@@ -121,13 +124,13 @@ export function RatePlanCardView({ ratePlan }: RatePlanCardViewProps) {
               className="text-xs mb-0.5"
               style={{ color: 'var(--text-secondary)', fontWeight: 'var(--font-light)' }}
             >
-              식사 포함
+              {t('fields.mealIncluded')}
             </p>
             <p
               className="text-sm"
               style={{ color: 'var(--text-primary)', fontWeight: 'var(--font-medium)' }}
             >
-              {MEAL_PLAN_LABELS[ratePlan.mealPlan]}
+              {t(`mealPlans.${ratePlan.mealPlan}`)}
             </p>
           </div>
         </div>
@@ -143,13 +146,13 @@ export function RatePlanCardView({ ratePlan }: RatePlanCardViewProps) {
                 className="text-xs mb-0.5"
                 style={{ color: 'var(--text-secondary)' }}
               >
-                최소 숙박
+                {t('fields.minLos')}
               </p>
               <p
                 className="text-sm"
                 style={{ fontWeight: 'var(--font-bold)', color: 'var(--text-primary)' }}
               >
-                {ratePlan.setting.minLos}박
+                {commonT('night', { count: ratePlan.setting.minLos })}
               </p>
             </div>
             <div className="text-center">
@@ -157,13 +160,13 @@ export function RatePlanCardView({ ratePlan }: RatePlanCardViewProps) {
                 className="text-xs mb-0.5"
                 style={{ color: 'var(--text-secondary)' }}
               >
-                최대 숙박
+                {t('fields.maxLos')}
               </p>
               <p
                 className="text-sm"
                 style={{ fontWeight: 'var(--font-bold)', color: 'var(--text-primary)' }}
               >
-                {ratePlan.setting.maxLos}박
+                {commonT('night', { count: ratePlan.setting.maxLos })}
               </p>
             </div>
           </div>
@@ -183,7 +186,7 @@ export function RatePlanCardView({ ratePlan }: RatePlanCardViewProps) {
               }}
             >
               <Eye className="w-3 h-3" />
-              상세보기
+              {t('actions.viewDetail')}
             </button>
           </Link>
           <Link href={`/rateplans/${ratePlan.id}/edit`} className="flex-1">
@@ -197,7 +200,7 @@ export function RatePlanCardView({ ratePlan }: RatePlanCardViewProps) {
               }}
             >
               <Edit className="w-3 h-3" />
-              수정
+              {commonT('edit')}
             </button>
           </Link>
         </div>

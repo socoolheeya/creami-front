@@ -1,22 +1,25 @@
 'use client'
 
-import { Room, ROOM_TYPE_LABELS, ROOM_STATUS_LABELS } from '@/lib/types/room'
+import { Room } from '@/lib/types/room'
 import { Users, Maximize2, ImageIcon } from 'lucide-react'
 import Link from 'next/link'
 import Image from 'next/image'
 import { useState } from 'react'
+import { useTranslations } from 'next-intl'
 
 interface RoomCardProps {
   room: Room
 }
 
 export function RoomCard({ room }: RoomCardProps) {
+  const t = useTranslations('accommodation.rooms')
+  const commonT = useTranslations('accommodation.common')
   const primaryImage = room.images.find(img => img.isPrimary) || room.images[0]
   const [imageError, setImageError] = useState(false)
   const statusColor =
-    room.status === 'available' ? 'var(--primary)' :
-    room.status === 'maintenance' ? 'var(--text-tertiary)' :
-    'var(--text-tertiary)'
+    room.status === 'active'
+      ? 'var(--primary)'
+      : 'var(--text-tertiary)'
 
   return (
     <Link href={`/rooms/${room.id}`}>
@@ -46,7 +49,7 @@ export function RoomCard({ room }: RoomCardProps) {
             >
               <ImageIcon className="w-6 h-6 mb-1" style={{ color: 'var(--text-tertiary)' }} />
               <span className="text-xs" style={{ color: 'var(--text-tertiary)' }}>
-                {imageError ? '이미지를 불러올 수 없습니다' : '이미지 없음'}
+                {imageError ? t('image.loadFailed') : t('image.none')}
               </span>
             </div>
           )}
@@ -60,7 +63,7 @@ export function RoomCard({ room }: RoomCardProps) {
               fontWeight: 'var(--font-medium)'
             }}
           >
-            {ROOM_STATUS_LABELS[room.status]}
+            {t(`statuses.${room.status}`)}
           </div>
         </div>
 
@@ -75,7 +78,7 @@ export function RoomCard({ room }: RoomCardProps) {
               fontWeight: 'var(--font-medium)'
             }}
           >
-            {ROOM_TYPE_LABELS[room.type]}
+            {t(`types.${room.type}`)}
           </div>
 
           {/* Name */}
@@ -104,12 +107,15 @@ export function RoomCard({ room }: RoomCardProps) {
           <div className="flex items-center gap-2 text-xs" style={{ color: 'var(--text-secondary)' }}>
             <div className="flex items-center gap-1">
               <Maximize2 className="w-4 h-4" />
-              <span>{room.size}{room.sizeUnit === 'sqm' ? '㎡' : '평'}</span>
+              <span>{room.size}{t(`units.${room.sizeUnit}`)}</span>
             </div>
             <span>•</span>
             <div className="flex items-center gap-1">
               <Users className="w-4 h-4" />
-              <span>{room.standardOccupancy}-{room.maxOccupancy}명</span>
+              <span>
+                {commonT('guest', { count: room.standardOccupancy })}-
+                {commonT('guest', { count: room.maxOccupancy })}
+              </span>
             </div>
           </div>
         </div>
