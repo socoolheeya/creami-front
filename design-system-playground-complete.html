@@ -3644,52 +3644,266 @@ function toggleSidebar(button) {
                             </div>
                         </div>
                         <div class="editor-container">
-                            <textarea class="editor-textarea" id="pagination-html"><!-- 페이지네이션 컴포넌트 예제 -->
-<div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: var(--spacing-md);">
-    <div style="font-size: var(--font-size-sm); color: var(--text-secondary);">
-        총 256개 중 1-10번째 표시
+                            <textarea class="editor-textarea" id="pagination-html"><!-- 공통 페이지네이션 컴포넌트 예제 -->
+<nav class="pagination-shell" aria-label="회원 목록 페이지 이동">
+    <div class="pagination-summary">
+        <span><strong>1-20</strong> / 총 <strong>1,248</strong>명</span>
+        <span>페이지 1 / 63</span>
     </div>
 
-    <div class="pagination">
-        <button class="pagination-btn" disabled>
-            <i data-lucide="chevron-left"></i>
-        </button>
-        <button class="pagination-btn active">1</button>
-        <button class="pagination-btn">2</button>
-        <button class="pagination-btn">3</button>
-        <span style="padding: 0 var(--spacing-xs); color: var(--text-tertiary);">...</span>
-        <button class="pagination-btn">25</button>
-        <button class="pagination-btn">26</button>
-        <button class="pagination-btn">
-            <i data-lucide="chevron-right"></i>
-        </button>
+    <div class="pagination-controls">
+        <select class="pagination-page-size" aria-label="페이지당 표시 개수">
+            <option>20개씩 보기</option>
+            <option>50개씩 보기</option>
+            <option>100개씩 보기</option>
+        </select>
+
+        <div class="pagination" role="group" aria-label="페이지 번호">
+            <button class="pagination-btn icon-only" disabled aria-label="첫 페이지">
+                <i data-lucide="chevrons-left"></i>
+            </button>
+            <button class="pagination-btn icon-only" disabled aria-label="이전 페이지">
+                <i data-lucide="chevron-left"></i>
+            </button>
+            <button class="pagination-btn active" aria-current="page">1</button>
+            <button class="pagination-btn">2</button>
+            <button class="pagination-btn">3</button>
+            <button class="pagination-btn">4</button>
+            <button class="pagination-btn">5</button>
+            <span class="pagination-ellipsis" aria-hidden="true">...</span>
+            <button class="pagination-btn">63</button>
+            <button class="pagination-btn icon-only" aria-label="다음 페이지">
+                <i data-lucide="chevron-right"></i>
+            </button>
+            <button class="pagination-btn icon-only" aria-label="마지막 페이지">
+                <i data-lucide="chevrons-right"></i>
+            </button>
+        </div>
+
+        <label class="pagination-jump">
+            이동
+            <input type="number" min="1" max="63" value="1" aria-label="이동할 페이지" />
+        </label>
     </div>
+</nav>
+
+<div class="pagination-simple" style="margin-top: var(--spacing-xl);">
+    <nav class="pagination-shell" aria-label="간단 페이지 이동">
+        <div class="pagination-summary">
+            <span><strong>41-60</strong> / 총 <strong>87</strong>개</span>
+            <span>페이지 3 / 5</span>
+        </div>
+        <div class="pagination-controls">
+            <div class="pagination" role="group" aria-label="간단 페이지 번호">
+                <button class="pagination-btn">
+                    <i data-lucide="chevron-left"></i>
+                    이전
+                </button>
+                <button class="pagination-btn">1</button>
+                <button class="pagination-btn">2</button>
+                <button class="pagination-btn active" aria-current="page">3</button>
+                <button class="pagination-btn">4</button>
+                <button class="pagination-btn">5</button>
+                <button class="pagination-btn">
+                    다음
+                    <i data-lucide="chevron-right"></i>
+                </button>
+            </div>
+        </div>
+    </nav>
 </div>
 
-<!-- 간단한 버전 -->
-<div style="margin-top: var(--spacing-xl);">
-    <div class="pagination" style="justify-content: center;">
-        <button class="pagination-btn">이전</button>
-        <button class="pagination-btn active">1</button>
-        <button class="pagination-btn">2</button>
-        <button class="pagination-btn">3</button>
-        <button class="pagination-btn">4</button>
-        <button class="pagination-btn">5</button>
-        <button class="pagination-btn">다음</button>
-    </div>
+<div class="pagination-compact" style="margin-top: var(--spacing-xl); max-width: 28rem;">
+    <nav class="pagination-shell" aria-label="좁은 영역 페이지 이동">
+        <div class="pagination-summary">
+            <span><strong>101-120</strong> / 총 <strong>360</strong>개</span>
+        </div>
+        <div class="pagination-controls">
+            <div class="pagination" role="group" aria-label="좁은 영역 페이지 번호">
+                <button class="pagination-btn icon-only" aria-label="이전 페이지">
+                    <i data-lucide="chevron-left"></i>
+                </button>
+                <button class="pagination-btn">4</button>
+                <button class="pagination-btn active" aria-current="page">5</button>
+                <button class="pagination-btn">6</button>
+                <button class="pagination-btn icon-only" aria-label="다음 페이지">
+                    <i data-lucide="chevron-right"></i>
+                </button>
+            </div>
+        </div>
+    </nav>
 </div></textarea>
                             <textarea class="editor-textarea" id="pagination-css" style="display: none;">/* 페이지네이션 커스터마이징 */
+.pagination-shell {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--spacing-md);
+    width: 100%;
+    padding: var(--spacing-md);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius);
+    background: var(--bg-primary);
+}
+
+.pagination-summary {
+    display: flex;
+    flex-direction: column;
+    gap: 0.125rem;
+    min-width: 0;
+    color: var(--text-secondary);
+    font-size: var(--font-size-sm);
+}
+
+.pagination-summary strong {
+    color: var(--text-primary);
+    font-weight: var(--font-bold);
+}
+
+.pagination-controls {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    flex-wrap: wrap;
+    gap: var(--spacing-xs);
+    min-width: 0;
+}
+
+.pagination {
+    display: inline-flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: var(--spacing-xs);
+}
+
+.pagination-btn {
+    min-width: 2.25rem;
+    height: var(--control-height-md);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--spacing-xs);
+    padding: 0 var(--spacing-sm);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius);
+    background: var(--bg-primary);
+    color: var(--text-primary);
+    font-size: var(--font-size-sm);
+    cursor: pointer;
+    transition: all 0.2s;
+    white-space: nowrap;
+}
+
+.pagination-btn:hover:not(:disabled) {
+    background: var(--bg-tertiary);
+    border-color: var(--primary);
+    color: var(--primary);
+}
+
+.pagination-btn.active {
+    background: var(--primary);
+    color: white;
+    border-color: var(--primary);
+    font-weight: var(--font-bold);
+}
+
+.pagination-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.pagination-btn.icon-only {
+    width: var(--control-height-md);
+    min-width: var(--control-height-md);
+    padding: 0;
+}
+
+.pagination-btn svg {
+    width: 1rem;
+    height: 1rem;
+}
+
+.pagination-ellipsis {
+    min-width: 1.5rem;
+    color: var(--text-tertiary);
+    text-align: center;
+    user-select: none;
+}
+
+.pagination-page-size {
+    height: var(--control-height-md);
+    padding: 0 2rem 0 var(--spacing-sm);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius);
+    background: var(--bg-primary);
+    color: var(--text-primary);
+    font-size: var(--font-size-sm);
+}
+
+.pagination-jump {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--spacing-xs);
+    color: var(--text-secondary);
+    font-size: var(--font-size-sm);
+    white-space: nowrap;
+}
+
+.pagination-jump input {
+    width: 4rem;
+    height: var(--control-height-md);
+    padding: 0 var(--spacing-sm);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius);
+    background: var(--bg-primary);
+    color: var(--text-primary);
+    font-size: var(--font-size-sm);
+    text-align: center;
+}
+
+.pagination-compact .pagination-shell {
+    padding: var(--spacing-sm);
+}
+
+.pagination-compact .pagination-summary {
+    display: none;
+}
+
 .pagination-compact .pagination-btn {
     min-width: 2rem;
-    height: 1.5rem;
+    height: var(--control-height-sm);
     font-size: var(--font-size-xs);
 }
 
-.pagination-rounded .pagination-btn {
-    border-radius: 50%;
-    width: 2.5rem;
-    height: 2.5rem;
-    padding: 0;
+.pagination-simple .pagination-shell {
+    justify-content: center;
+}
+
+.pagination-simple .pagination-summary,
+.pagination-simple .pagination-page-size,
+.pagination-simple .pagination-jump {
+    display: none;
+}
+
+@media (max-width: 720px) {
+    .pagination-shell {
+        align-items: stretch;
+        flex-direction: column;
+    }
+
+    .pagination-controls {
+        justify-content: flex-start;
+    }
+
+    .pagination-page-size,
+    .pagination-jump {
+        width: 100%;
+    }
+
+    .pagination-jump input {
+        flex: 1;
+        width: auto;
+    }
 }</textarea>
                         </div>
                     </div>

@@ -3,7 +3,7 @@
 import Link from 'next/link'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { useTranslations } from 'next-intl'
-import { useSearchParams, useRouter, usePathname } from 'next/navigation'
+import { usePathname, useSearchParams } from 'next/navigation'
 import { type RatePlanPageSearchCondition, useRatePlansPaginated } from '@/hooks/useRatePlans'
 import { type RatePlan } from '@/lib/types/rateplan'
 import { Receipt, Plus } from 'lucide-react'
@@ -16,7 +16,6 @@ type ViewMode = 'grid' | 'table'
 export default function RatePlansPage() {
   const t = useTranslations('accommodation.rateplans')
   const commonT = useTranslations('accommodation.common')
-  const router = useRouter()
   const pathname = usePathname()
   const searchParams = useSearchParams()
 
@@ -38,6 +37,7 @@ export default function RatePlansPage() {
   const {
     data,
     isLoading,
+    isFetching,
     error
   } = useRatePlansPaginated(filters, true)
 
@@ -46,11 +46,11 @@ export default function RatePlansPage() {
 
   // URL 파라미터 업데이트
   const updateURL = useCallback((page: number, size: number) => {
-    const params = new URLSearchParams(searchParams.toString())
+    const params = new URLSearchParams(window.location.search)
     params.set('page', page.toString())
     params.set('size', size.toString())
-    router.push(`${pathname}?${params.toString()}`)
-  }, [router, pathname, searchParams])
+    window.history.pushState(null, '', `${pathname}?${params.toString()}`)
+  }, [pathname])
 
   const handlePageChange = useCallback((page: number) => {
     setCurrentPage(page)
@@ -76,6 +76,22 @@ export default function RatePlansPage() {
     }
   }, [searchParams])
 
+  useEffect(() => {
+    const syncStateFromURL = () => {
+      const params = new URLSearchParams(window.location.search)
+      const page = Number(params.get('page') ?? 1)
+      const size = Number(params.get('size') ?? 10)
+
+      setCurrentPage(Number.isFinite(page) && page > 0 ? page : 1)
+      setPageSize(Number.isFinite(size) && size > 0 ? size : 10)
+    }
+
+    window.addEventListener('popstate', syncStateFromURL)
+    return () => window.removeEventListener('popstate', syncStateFromURL)
+  }, [])
+
+  const showInitialLoading = isLoading && !data
+
   return (
     <div>
       {/* Header */}
@@ -99,7 +115,7 @@ export default function RatePlansPage() {
       </div>
 
       {/* Content */}
-      {isLoading ? (
+      {showInitialLoading ? (
         <div className="flex items-center justify-center py-2xl">
           <div className="text-text-secondary">{commonT('loading')}</div>
         </div>
@@ -121,24 +137,33 @@ export default function RatePlansPage() {
       ) : (
         <>
           {viewMode === 'grid' ? (
-            <div className="grid grid-cols-1 gap-lg md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 mb-lg">
+            <div
+              className={`grid grid-cols-1 gap-lg md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 mb-lg transition-opacity ${
+                isFetching ? 'opacity-70' : 'opacity-100'
+              }`}
+            >
               {ratePlans.map((ratePlan) => (
                 <RatePlanCardView key={ratePlan.id} ratePlan={ratePlan} />
               ))}
             </div>
           ) : (
-            <RatePlanTableView ratePlans={ratePlans} className="mb-lg" />
+            <RatePlanTableView
+              ratePlans={ratePlans}
+              className={`mb-lg transition-opacity ${isFetching ? 'opacity-70' : 'opacity-100'}`}
+            />
           )}
 
           {/* Pagination */}
           {pagination && (
             <Pagination
+              variant="simple"
               currentPage={pagination.currentPage}
               totalPages={pagination.totalPages}
               totalElements={pagination.totalElements}
               pageSize={pagination.pageSize}
               onPageChange={handlePageChange}
               onPageSizeChange={handlePageSizeChange}
+              className="mt-md"
             />
           )}
         </>

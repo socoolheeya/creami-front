@@ -1,4 +1,10 @@
-import { useInfiniteQuery, useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
+import {
+  keepPreviousData,
+  useInfiniteQuery,
+  useQuery,
+  useMutation,
+  useQueryClient
+} from '@tanstack/react-query'
 import { api } from '@/lib/api/client'
 import {
   type MealPlan,
@@ -277,6 +283,7 @@ export function useRatePlans(filters?: RatePlanSearchCondition, enabled = true) 
       return getRatePlansFromResponse(response).map(normalizeRatePlan)
     },
     enabled,
+    placeholderData: keepPreviousData,
     staleTime: 30_000
   })
 }
@@ -374,6 +381,7 @@ export function useRatePlansPaginated(filters?: RatePlanPageSearchCondition, ena
       }
     },
     enabled,
+    placeholderData: keepPreviousData,
     staleTime: 30_000
   })
 }

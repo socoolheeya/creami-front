@@ -6,6 +6,8 @@ export interface PaginationProps {
     onPageChange: (page: number) => void;
     onPageSizeChange: (size: number) => void;
     pageSizeOptions?: number[];
+    variant?: 'default' | 'simple';
+    className?: string;
 }
-export declare function Pagination({ currentPage, totalPages, totalElements, pageSize, onPageChange, onPageSizeChange, pageSizeOptions }: PaginationProps): import("react/jsx-runtime").JSX.Element;
+export declare function Pagination({ currentPage, totalPages, totalElements, pageSize, onPageChange, onPageSizeChange, pageSizeOptions, variant, className }: PaginationProps): import("react/jsx-runtime").JSX.Element;
 //# sourceMappingURL=Pagination.d.ts.map

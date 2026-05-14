@@ -11,6 +11,8 @@ export interface PaginationProps {
   onPageChange: (page: number) => void
   onPageSizeChange: (size: number) => void
   pageSizeOptions?: number[]
+  variant?: 'default' | 'simple'
+  className?: string
 }
 
 export function Pagination({
@@ -20,10 +22,14 @@ export function Pagination({
   pageSize,
   onPageChange,
   onPageSizeChange,
-  pageSizeOptions = [10, 25, 50, 100]
+  pageSizeOptions = [10, 25, 50, 100],
+  variant = 'default',
+  className = ''
 }: PaginationProps) {
   const startItem = totalElements === 0 ? 0 : (currentPage - 1) * pageSize + 1
   const endItem = Math.min(currentPage * pageSize, totalElements)
+  const hasPreviousPage = currentPage > 1
+  const hasNextPage = currentPage < totalPages
 
   // 표시할 페이지 번호 계산
   const getPageNumbers = () => {
@@ -67,8 +73,77 @@ export function Pagination({
     return pages
   }
 
+  if (variant === 'simple') {
+    return (
+      <nav
+        className={`flex w-full justify-center ${className}`}
+        aria-label="페이지 이동"
+      >
+        <div className="inline-flex max-w-full flex-wrap items-center justify-center gap-xs rounded border border-border bg-bg-primary p-sm shadow-sm">
+          <Button
+            variant="secondary"
+            size="sm"
+            onClick={() => onPageChange(currentPage - 1)}
+            disabled={!hasPreviousPage}
+            aria-label="이전 페이지"
+            className="border border-border bg-bg-primary px-control-px-sm hover:border-primary hover:text-primary disabled:hover:border-border disabled:hover:text-text-tertiary"
+          >
+            <ChevronLeft className="h-icon-md w-icon-md" />
+            이전
+          </Button>
+
+          {getPageNumbers().map((page, index) => {
+            if (page === '...') {
+              return (
+                <span
+                  key={`ellipsis-${index}`}
+                  className="flex h-control-sm min-w-control-sm items-center justify-center px-xs text-base text-text-tertiary"
+                  aria-hidden="true"
+                >
+                  ...
+                </span>
+              )
+            }
+
+            const pageNumber = page as number
+            const isActive = pageNumber === currentPage
+
+            return (
+              <Button
+                key={pageNumber}
+                variant={isActive ? 'primary' : 'secondary'}
+                size="sm"
+                onClick={() => onPageChange(pageNumber)}
+                aria-current={isActive ? 'page' : undefined}
+                className={`min-w-control-sm border border-border px-control-px-sm ${
+                  isActive
+                    ? 'border-primary bg-primary text-white hover:bg-primary-hover'
+                    : 'bg-bg-primary hover:border-primary hover:text-primary'
+                }`}
+              >
+                {pageNumber}
+              </Button>
+            )
+          })}
+
+          <Button
+            variant="secondary"
+            size="sm"
+            onClick={() => onPageChange(currentPage + 1)}
+            disabled={!hasNextPage}
+            aria-label="다음 페이지"
+            className="border border-border bg-bg-primary px-control-px-sm hover:border-primary hover:text-primary disabled:hover:border-border disabled:hover:text-text-tertiary"
+          >
+            다음
+            <ChevronRight className="h-icon-md w-icon-md" />
+          </Button>
+        </div>
+      </nav>
+    )
+  }
+
   return (
-    <div className="flex items-center justify-between gap-spacing-md">
+    <div className={`flex items-center justify-between gap-spacing-md ${className}`}>
       <div className="flex items-center gap-spacing-sm text-text-size-sm">
         <span className="text-var-text-secondary">
           {totalElements.toLocaleString()}개 중 {startItem.toLocaleString()}-{endItem.toLocaleString()}번째 표시 중
@@ -97,7 +172,7 @@ export function Pagination({
           variant="secondary"
           size="sm"
           onClick={() => onPageChange(currentPage - 1)}
-          disabled={currentPage === 1}
+          disabled={!hasPreviousPage}
           aria-label="이전 페이지"
           className="px-spacing-xs"
         >
@@ -143,7 +218,7 @@ export function Pagination({
           variant="secondary"
           size="sm"
           onClick={() => onPageChange(currentPage + 1)}
-          disabled={currentPage === totalPages}
+          disabled={!hasNextPage}
           aria-label="다음 페이지"
           className="px-spacing-xs"
         >
