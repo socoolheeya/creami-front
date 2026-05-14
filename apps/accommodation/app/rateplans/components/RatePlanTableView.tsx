@@ -25,6 +25,7 @@ import {
 
 interface RatePlanTableViewProps {
   ratePlans: RatePlan[]
+  className?: string
 }
 
 type SortField = 'name' | 'status' | 'benefitName' | 'ratePlanType' | 'priceType' | 'mealPlan'
@@ -49,7 +50,7 @@ const statusTone: Record<RatePlanStatus, { backgroundColor: string; color: strin
   }
 }
 
-export function RatePlanTableView({ ratePlans }: RatePlanTableViewProps) {
+export function RatePlanTableView({ ratePlans, className }: RatePlanTableViewProps) {
   const t = useTranslations('accommodation.rateplans')
   const commonT = useTranslations('accommodation.common')
   const [sortField, setSortField] = useState<SortField>('name')
@@ -139,7 +140,7 @@ export function RatePlanTableView({ ratePlans }: RatePlanTableViewProps) {
   )
 
   return (
-    <Card hover={false}>
+    <Card hover={false} className={className}>
       <Table>
         <TableHeader>
           <tr>

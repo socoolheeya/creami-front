@@ -1,80 +1,80 @@
 'use client'
 
 import Link from 'next/link'
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import { useTranslations } from 'next-intl'
-import { type RatePlanSearchCondition, useInfiniteRatePlans } from '@/hooks/useRatePlans'
+import { useSearchParams, useRouter, usePathname } from 'next/navigation'
+import { type RatePlanPageSearchCondition, useRatePlansPaginated } from '@/hooks/useRatePlans'
 import { type RatePlan } from '@/lib/types/rateplan'
 import { Receipt, Plus } from 'lucide-react'
 import { RatePlanTableView } from './components/RatePlanTableView'
 import { RatePlanCardView } from './components/RatePlanCardView'
-import { ViewToggle, Button, Card } from '@creami/ui'
+import { ViewToggle, Button, Card, Pagination } from '@creami/ui'
 
 type ViewMode = 'grid' | 'table'
 
 export default function RatePlansPage() {
   const t = useTranslations('accommodation.rateplans')
   const commonT = useTranslations('accommodation.common')
+  const router = useRouter()
+  const pathname = usePathname()
+  const searchParams = useSearchParams()
+
   const [viewMode, setViewMode] = useState<ViewMode>('table')
-  const searchParams = useMemo<RatePlanSearchCondition>(() => ({
-    size: 10
-  }), [])
-  const loadMoreRef = useRef<HTMLDivElement>(null)
+  const [currentPage, setCurrentPage] = useState(() => {
+    const page = searchParams.get('page')
+    return page ? parseInt(page) : 1
+  })
+  const [pageSize, setPageSize] = useState(() => {
+    const size = searchParams.get('size')
+    return size ? parseInt(size) : 10
+  })
+
+  const filters = useMemo<RatePlanPageSearchCondition>(() => ({
+    page: currentPage,
+    size: pageSize
+  }), [currentPage, pageSize])
+
   const {
     data,
     isLoading,
-    error,
-    fetchNextPage,
-    hasNextPage,
-    isFetchingNextPage
-  } = useInfiniteRatePlans(searchParams, true)
-  const ratePlans = useMemo(
-    () => {
-      const ratePlanMap = new Map<string, RatePlan>()
+    error
+  } = useRatePlansPaginated(filters, true)
 
-      data?.pages
-        .flatMap((page) => page.ratePlans)
-        .forEach((ratePlan, index) => {
-          const ratePlanKey = ratePlan.id || `${ratePlan.name}-${index}`
+  const ratePlans = data?.ratePlans || []
+  const pagination = data?.pagination
 
-          if (!ratePlanMap.has(ratePlanKey)) {
-            ratePlanMap.set(ratePlanKey, ratePlan)
-          }
-        })
+  // URL 파라미터 업데이트
+  const updateURL = useCallback((page: number, size: number) => {
+    const params = new URLSearchParams(searchParams.toString())
+    params.set('page', page.toString())
+    params.set('size', size.toString())
+    router.push(`${pathname}?${params.toString()}`)
+  }, [router, pathname, searchParams])
 
-      return Array.from(ratePlanMap.values())
-    },
-    [data]
-  )
+  const handlePageChange = useCallback((page: number) => {
+    setCurrentPage(page)
+    updateURL(page, pageSize)
+  }, [pageSize, updateURL])
 
+  const handlePageSizeChange = useCallback((size: number) => {
+    setPageSize(size)
+    setCurrentPage(1) // 페이지 크기 변경 시 첫 페이지로 이동
+    updateURL(1, size)
+  }, [updateURL])
+
+  // URL 파라미터와 상태 동기화
   useEffect(() => {
-    if (!hasNextPage || isFetchingNextPage) {
-      return
+    const page = searchParams.get('page')
+    const size = searchParams.get('size')
+
+    if (page && parseInt(page) !== currentPage) {
+      setCurrentPage(parseInt(page))
     }
-
-    const target = loadMoreRef.current
-
-    if (!target) {
-      return
+    if (size && parseInt(size) !== pageSize) {
+      setPageSize(parseInt(size))
     }
-
-    const observer = new IntersectionObserver(
-      (entries) => {
-        const entry = entries[0]
-
-        if (entry.isIntersecting) {
-          fetchNextPage()
-        }
-      },
-      { rootMargin: '320px' }
-    )
-
-    observer.observe(target)
-
-    return () => {
-      observer.disconnect()
-    }
-  }, [fetchNextPage, hasNextPage, isFetchingNextPage])
+  }, [searchParams])
 
   return (
     <div>
@@ -118,23 +118,29 @@ export default function RatePlansPage() {
             {commonT('tryAnotherSearch')}
           </p>
         </Card>
-      ) : viewMode === 'grid' ? (
-        <>
-          <div className="grid grid-cols-1 gap-lg md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
-            {ratePlans.map((ratePlan) => (
-              <RatePlanCardView key={ratePlan.id} ratePlan={ratePlan} />
-            ))}
-          </div>
-          <div ref={loadMoreRef} className="flex justify-center py-lg text-base font-light text-text-tertiary">
-            {isFetchingNextPage ? t('loadingMore') : hasNextPage ? ' ' : t('endOfList')}
-          </div>
-        </>
       ) : (
         <>
-          <RatePlanTableView ratePlans={ratePlans} />
-          <div ref={loadMoreRef} className="flex justify-center py-lg text-base font-light text-text-tertiary">
-            {isFetchingNextPage ? t('loadingMore') : hasNextPage ? ' ' : t('endOfList')}
-          </div>
+          {viewMode === 'grid' ? (
+            <div className="grid grid-cols-1 gap-lg md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 mb-lg">
+              {ratePlans.map((ratePlan) => (
+                <RatePlanCardView key={ratePlan.id} ratePlan={ratePlan} />
+              ))}
+            </div>
+          ) : (
+            <RatePlanTableView ratePlans={ratePlans} className="mb-lg" />
+          )}
+
+          {/* Pagination */}
+          {pagination && (
+            <Pagination
+              currentPage={pagination.currentPage}
+              totalPages={pagination.totalPages}
+              totalElements={pagination.totalElements}
+              pageSize={pagination.pageSize}
+              onPageChange={handlePageChange}
+              onPageSizeChange={handlePageSizeChange}
+            />
+          )}
         </>
       )}
     </div>

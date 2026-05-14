@@ -24,6 +24,19 @@ export type RatePlanSearchCondition = {
   mealPlan?: string
 }
 
+export type RatePlanPageSearchCondition = {
+  accommodationId?: string
+  roomId?: string
+  name?: string
+  search?: string
+  page?: number
+  size?: number
+  status?: string
+  ratePlanType?: string
+  priceType?: string
+  mealPlan?: string
+}
+
 type ApiRatePlanDto = Partial<Omit<RatePlan, 'createdAt' | 'updatedAt'>> & {
   id?: string | number | null
   ratePlanId?: string | number | null
@@ -56,6 +69,29 @@ type GetRatePlansApiResponse = {
   hasNext?: boolean
   hasNextPage?: boolean
   last?: boolean
+}
+
+type GetRatePlansPaginatedApiResponse = {
+  ratePlans?: ApiRatePlanDto[]
+  content?: ApiRatePlanDto[]
+  data?: ApiRatePlanDto[]
+  items?: ApiRatePlanDto[]
+  results?: ApiRatePlanDto[]
+  totalElements?: number
+  totalPages?: number
+  total?: number
+  page?: number
+  currentPage?: number
+  size?: number
+  pageSize?: number
+  first?: boolean
+  last?: boolean
+  isFirst?: boolean
+  isLast?: boolean
+  hasNext?: boolean
+  hasPrevious?: boolean
+  number?: number
+  numberOfElements?: number
 }
 
 type RatePlanPageCursor = {
@@ -102,8 +138,10 @@ function normalizeDate(value: string | Date | null | undefined) {
 }
 
 function normalizeEnum<T extends string>(value: string | null | undefined, options: T[], fallback: T) {
-  const normalizedValue = value?.toLowerCase()
-  const matchedValue = options.find((option) => option === normalizedValue)
+  if (!value) return fallback
+
+  const normalizedValue = value.toLowerCase()
+  const matchedValue = options.find((option) => option.toLowerCase() === normalizedValue)
 
   return matchedValue ?? fallback
 }
@@ -119,6 +157,31 @@ function getRatePlansFromResponse(response: ApiRatePlanDto[] | GetRatePlansApiRe
     response.items ??
     response.results ??
     []
+}
+
+function getRatePlansFromPaginatedResponse(
+  response: GetRatePlansPaginatedApiResponse
+): ApiRatePlanDto[] {
+  return response.ratePlans ??
+    response.content ??
+    response.data ??
+    response.items ??
+    response.results ??
+    []
+}
+
+function getPaginationInfo(response: GetRatePlansPaginatedApiResponse) {
+  return {
+    totalElements: response.totalElements ?? response.total ?? 0,
+    totalPages: response.totalPages ?? 0,
+    currentPage: response.currentPage ?? response.page ?? response.number ?? 0,
+    pageSize: response.pageSize ?? response.size ?? 10,
+    isFirst: response.isFirst ?? response.first ?? false,
+    isLast: response.isLast ?? response.last ?? false,
+    hasNext: response.hasNext ?? false,
+    hasPrevious: response.hasPrevious ?? false,
+    numberOfElements: response.numberOfElements ?? 0
+  }
 }
 
 function normalizeRatePlan(ratePlan: ApiRatePlanDto): RatePlan {
@@ -275,6 +338,42 @@ export function useInfiniteRatePlans(filters?: RatePlanSearchCondition, queryEna
       return isDuplicatedPage ? undefined : lastPage.nextCursor
     },
     enabled: queryEnabled,
+    staleTime: 30_000
+  })
+}
+
+// GET /rate-plans/search (Paginated) - 페이지네이션 방식 요금제 목록 조회
+export function useRatePlansPaginated(filters?: RatePlanPageSearchCondition, enabled = true) {
+  const page = filters?.page ?? 1
+  const size = filters?.size ?? 10
+
+  return useQuery({
+    queryKey: [...ratePlanKeys.list(filters), 'paginated', page, size] as const,
+    queryFn: async ({ signal }) => {
+      const response = await api.get<GetRatePlansPaginatedApiResponse>(
+        '/rate-plans/search',
+        {
+          params: removeEmptyFilters({
+            ...filters,
+            page: page - 1, // 백엔드는 0부터 시작
+            size
+          }),
+          signal
+        }
+      )
+
+      const ratePlans = getRatePlansFromPaginatedResponse(response).map(normalizeRatePlan)
+      const paginationInfo = getPaginationInfo(response)
+
+      return {
+        ratePlans,
+        pagination: {
+          ...paginationInfo,
+          currentPage: paginationInfo.currentPage + 1, // 프론트엔드는 1부터 시작
+        }
+      }
+    },
+    enabled,
     staleTime: 30_000
   })
 }

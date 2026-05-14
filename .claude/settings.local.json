@@ -1,7 +1,13 @@
 {
   "permissions": {
     "allow": [
-      "Bash(pnpm --version:*)"
+      "Bash(pnpm --version:*)",
+      "Skill(superpowers:brainstorming)",
+      "Bash(npm run type-check:*)",
+      "Bash(npm run build:*)",
+      "Bash(npm run dev:*)",
+      "WebFetch(domain:getdesign.md)",
+      "Bash(open:*)"
     ],
     "deny": [],
     "ask": []

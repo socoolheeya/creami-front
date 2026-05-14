@@ -62,6 +62,9 @@ export type { CardProps } from './Card'
 export { Table, TableHeader, TableBody, TableRow, TableCell, TableHead } from './Table'
 export type { TableProps, TableHeaderProps, TableBodyProps, TableRowProps, TableCellProps, TableHeadProps } from './Table'
 
+export { Pagination } from './Pagination'
+export type { PaginationProps } from './Pagination'
+
 export { Sidebar, SidebarMenu, SidebarMenuItem } from './Sidebar'
 export type { SidebarProps, SidebarMenuProps, SidebarMenuItemProps } from './Sidebar'
 
