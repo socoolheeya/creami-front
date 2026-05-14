@@ -59,8 +59,26 @@ export type {
 export { Card } from './Card'
 export type { CardProps } from './Card'
 
-export { Table, TableHeader, TableBody, TableRow, TableCell, TableHead } from './Table'
-export type { TableProps, TableHeaderProps, TableBodyProps, TableRowProps, TableCellProps, TableHeadProps } from './Table'
+export {
+  Table,
+  TableHeader,
+  TableBody,
+  TableRow,
+  TableCell,
+  TableHead,
+  TableFilterRow,
+  TableFilterCell
+} from './Table'
+export type {
+  TableProps,
+  TableHeaderProps,
+  TableBodyProps,
+  TableRowProps,
+  TableCellProps,
+  TableHeadProps,
+  TableFilterRowProps,
+  TableFilterCellProps
+} from './Table'
 
 export { Pagination } from './Pagination'
 export type { PaginationProps } from './Pagination'

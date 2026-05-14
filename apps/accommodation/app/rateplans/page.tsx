@@ -182,16 +182,39 @@ export default function RatePlansPage() {
       </div>
 
       {/* Content */}
-      {showInitialLoading ? (
-        <div className="flex items-center justify-center py-2xl">
-          <div className="text-text-secondary">{commonT('loading')}</div>
-        </div>
-      ) : error ? (
+      {error ? (
         <Card className="flex flex-col items-center justify-center border-error py-2xl text-center" hover={false}>
           <p className="text-error">{commonT('loadFailed')}</p>
           <p className="text-base text-text-secondary">{error.message}</p>
         </Card>
-      ) : viewMode === 'grid' && ratePlans.length === 0 ? (
+      ) : viewMode === 'table' ? (
+        <>
+          <RatePlanTableView
+            ratePlans={ratePlans}
+            filters={tableFilters}
+            onFiltersChange={handleTableFiltersChange}
+            isFetching={isFetching || showInitialLoading}
+            className={`mb-lg transition-opacity ${isFetching ? 'opacity-70' : 'opacity-100'}`}
+          />
+
+          {pagination && (
+            <Pagination
+              variant="simple"
+              currentPage={pagination.currentPage}
+              totalPages={pagination.totalPages}
+              totalElements={pagination.totalElements}
+              pageSize={pagination.pageSize}
+              onPageChange={handlePageChange}
+              onPageSizeChange={handlePageSizeChange}
+              className="mt-md"
+            />
+          )}
+        </>
+      ) : showInitialLoading ? (
+        <div className="flex items-center justify-center py-2xl">
+          <div className="text-text-secondary">{commonT('loading')}</div>
+        </div>
+      ) : ratePlans.length === 0 ? (
         <Card className="flex flex-col items-center justify-center border-dashed py-2xl text-center" hover={false}>
           <Receipt className="h-2xl w-2xl mb-md text-text-tertiary" />
           <h3 className="text-lg mb-xs font-bold text-text-primary">
@@ -215,15 +238,7 @@ export default function RatePlansPage() {
                 <RatePlanCardView key={ratePlan.id} ratePlan={ratePlan} />
               ))}
             </div>
-          ) : (
-            <RatePlanTableView
-              ratePlans={ratePlans}
-              filters={tableFilters}
-              onFiltersChange={handleTableFiltersChange}
-              isFetching={isFetching}
-              className={`mb-lg transition-opacity ${isFetching ? 'opacity-70' : 'opacity-100'}`}
-            />
-          )}
+          ) : null}
 
           {/* Pagination */}
           {pagination && (

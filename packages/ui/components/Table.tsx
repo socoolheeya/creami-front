@@ -8,6 +8,8 @@ export interface TableProps {
 
 export interface TableHeaderProps {
   children: React.ReactNode
+  filterRow?: React.ReactNode
+  filtersEnabled?: boolean
   className?: string
 }
 
@@ -27,12 +29,29 @@ export interface TableCellProps extends React.TdHTMLAttributes<HTMLTableCellElem
   children: React.ReactNode
   className?: string
   align?: 'left' | 'center' | 'right'
+  truncate?: boolean
+  titleText?: string
 }
 
 export interface TableHeadProps extends React.ThHTMLAttributes<HTMLTableHeaderCellElement> {
   children: React.ReactNode
   className?: string
   align?: 'left' | 'center' | 'right'
+  truncate?: boolean
+  titleText?: string
+}
+
+export interface TableFilterRowProps {
+  children: React.ReactNode
+  className?: string
+}
+
+export interface TableFilterCellProps extends React.ThHTMLAttributes<HTMLTableHeaderCellElement> {
+  children: React.ReactNode
+  className?: string
+  align?: 'left' | 'center' | 'right'
+  truncate?: boolean
+  titleText?: string
 }
 
 export function Table({ children, className = '', overflow = 'auto' }: TableProps) {
@@ -47,10 +66,16 @@ export function Table({ children, className = '', overflow = 'auto' }: TableProp
   )
 }
 
-export function TableHeader({ children, className = '' }: TableHeaderProps) {
+export function TableHeader({
+  children,
+  filterRow,
+  filtersEnabled = true,
+  className = ''
+}: TableHeaderProps) {
   return (
     <thead className={`bg-bg-tertiary border-b-2 border-border ${className}`}>
       {children}
+      {filtersEnabled && filterRow}
     </thead>
   )
 }
@@ -82,12 +107,20 @@ export function TableCell({
   children,
   className = '',
   align = 'left',
+  truncate = false,
+  titleText,
   ...props
 }: TableCellProps) {
   const alignClass = align === 'center' ? 'text-center' : align === 'right' ? 'text-right' : 'text-left'
+  const truncateClass = truncate ? 'max-w-none truncate' : ''
+  const resolvedTitle = titleText ?? (truncate && typeof children === 'string' ? children : undefined)
 
   return (
-    <td className={`px-md py-xs text-base text-text-primary border-b border-border ${alignClass} ${className}`} {...props}>
+    <td
+      className={`px-md py-xs text-base text-text-primary border-b border-border ${alignClass} ${truncateClass} ${className}`}
+      title={resolvedTitle}
+      {...props}
+    >
       {children}
     </td>
   )
@@ -97,12 +130,54 @@ export function TableHead({
   children,
   className = '',
   align = 'left',
+  truncate = false,
+  titleText,
   ...props
 }: TableHeadProps) {
   const alignClass = align === 'center' ? 'text-center' : align === 'right' ? 'text-right' : 'text-left'
+  const truncateClass = truncate ? 'max-w-none truncate' : ''
+  const resolvedTitle = titleText ?? (truncate && typeof children === 'string' ? children : undefined)
 
   return (
-    <th className={`px-md py-xs text-base font-bold text-text-primary ${alignClass} ${className}`} {...props}>
+    <th
+      className={`px-md py-xs text-base font-bold text-text-primary ${alignClass} ${truncateClass} ${className}`}
+      title={resolvedTitle}
+      {...props}
+    >
+      {children}
+    </th>
+  )
+}
+
+export function TableFilterRow({
+  children,
+  className = ''
+}: TableFilterRowProps) {
+  return (
+    <tr className={`bg-bg-primary ${className}`}>
+      {children}
+    </tr>
+  )
+}
+
+export function TableFilterCell({
+  children,
+  className = '',
+  align = 'left',
+  truncate = false,
+  titleText,
+  ...props
+}: TableFilterCellProps) {
+  const alignClass = align === 'center' ? 'text-center' : align === 'right' ? 'text-right' : 'text-left'
+  const truncateClass = truncate ? 'max-w-none truncate' : ''
+  const resolvedTitle = titleText ?? (truncate && typeof children === 'string' ? children : undefined)
+
+  return (
+    <th
+      className={`px-md py-xs text-base font-medium text-text-primary ${alignClass} ${truncateClass} ${className}`}
+      title={resolvedTitle}
+      {...props}
+    >
       {children}
     </th>
   )

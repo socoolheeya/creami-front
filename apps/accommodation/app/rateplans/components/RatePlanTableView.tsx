@@ -11,6 +11,8 @@ import {
   Table,
   TableBody,
   TableCell,
+  TableFilterCell,
+  TableFilterRow,
   TableHead,
   TableHeader,
   TableRow
@@ -118,9 +120,79 @@ export function RatePlanTableView({
   return (
     <Card hover={false} className={className}>
       <Table>
-        <TableHeader>
+        <TableHeader
+          filterRow={
+            <TableFilterRow>
+              <TableFilterCell className="w-table-col-id-9 min-w-table-col-id-9">
+                <Input
+                  value={filters.ratePlanId}
+                  onChange={(event) => updateFilter('ratePlanId', event.target.value)}
+                  placeholder="ID"
+                  size="small"
+                />
+              </TableFilterCell>
+              <TableFilterCell>
+                <Input
+                  value={filters.name}
+                  onChange={(event) => updateFilter('name', event.target.value)}
+                  placeholder={t('fields.name')}
+                  size="small"
+                />
+              </TableFilterCell>
+              <TableFilterCell>
+                <Input
+                  value={filters.enName}
+                  onChange={(event) => updateFilter('enName', event.target.value)}
+                  placeholder={t('fields.enName')}
+                  size="small"
+                />
+              </TableFilterCell>
+              <TableFilterCell>
+                <Select
+                  value={filters.status}
+                  onChange={(event) =>
+                    updateFilter('status', event.target.value as RatePlanStatus | 'all')
+                  }
+                  size="small"
+                >
+                  <option value="all">{commonT('all')}</option>
+                  {(['draft', 'active', 'inactive', 'archived'] as RatePlanStatus[]).map((value) => (
+                    <option key={value} value={value}>
+                      {t(`statuses.${value}`)}
+                    </option>
+                  ))}
+                </Select>
+              </TableFilterCell>
+              <TableFilterCell>
+                <Input
+                  value={filters.benefitName}
+                  onChange={(event) => updateFilter('benefitName', event.target.value)}
+                  placeholder={t('fields.benefitName')}
+                  size="small"
+                />
+              </TableFilterCell>
+              <TableFilterCell>
+                <Select
+                  value={filters.ratePlanType}
+                  onChange={(event) =>
+                    updateFilter('ratePlanType', event.target.value as RatePlanType | 'all')
+                  }
+                  size="small"
+                >
+                  <option value="all">{commonT('all')}</option>
+                  {(['standalone', 'package', 'business', 'opaque', 'b2b'] as RatePlanType[]).map((value) => (
+                    <option key={value} value={value}>
+                      {t(`types.${value}`)}
+                    </option>
+                  ))}
+                </Select>
+              </TableFilterCell>
+              <TableFilterCell>{''}</TableFilterCell>
+            </TableFilterRow>
+          }
+        >
           <tr>
-            <TableHead className="w-rateplan-col-id min-w-rateplan-col-id">
+            <TableHead className="w-table-col-id-9 min-w-table-col-id-9" truncate>
               {commonT('id')}
             </TableHead>
             {renderSortableHead('name', t('fields.name'))}
@@ -134,91 +206,27 @@ export function RatePlanTableView({
             )}
             {renderSortableHead('priceType', t('fields.priceType'))}
           </tr>
-          <tr className="bg-bg-primary">
-            <TableHead className="w-rateplan-col-id min-w-rateplan-col-id">
-              <Input
-                value={filters.ratePlanId}
-                onChange={(event) => updateFilter('ratePlanId', event.target.value)}
-                placeholder="ID"
-                size="small"
-              />
-            </TableHead>
-            <TableHead>
-              <Input
-                value={filters.name}
-                onChange={(event) => updateFilter('name', event.target.value)}
-                placeholder={t('fields.name')}
-                size="small"
-              />
-            </TableHead>
-            <TableHead>
-              <Input
-                value={filters.enName}
-                onChange={(event) => updateFilter('enName', event.target.value)}
-                placeholder={t('fields.enName')}
-                size="small"
-              />
-            </TableHead>
-            <TableHead>
-              <Select
-                value={filters.status}
-                onChange={(event) =>
-                  updateFilter('status', event.target.value as RatePlanStatus | 'all')
-                }
-                size="small"
-              >
-                <option value="all">{commonT('all')}</option>
-                {(['draft', 'active', 'inactive', 'archived'] as RatePlanStatus[]).map((value) => (
-                  <option key={value} value={value}>
-                    {t(`statuses.${value}`)}
-                  </option>
-                ))}
-              </Select>
-            </TableHead>
-            <TableHead>
-              <Input
-                value={filters.benefitName}
-                onChange={(event) => updateFilter('benefitName', event.target.value)}
-                placeholder={t('fields.benefitName')}
-                size="small"
-              />
-            </TableHead>
-            <TableHead>
-              <Select
-                value={filters.ratePlanType}
-                onChange={(event) =>
-                  updateFilter('ratePlanType', event.target.value as RatePlanType | 'all')
-                }
-                size="small"
-              >
-                <option value="all">{commonT('all')}</option>
-                {(['standalone', 'package', 'business', 'opaque', 'b2b'] as RatePlanType[]).map((value) => (
-                  <option key={value} value={value}>
-                    {t(`types.${value}`)}
-                  </option>
-                ))}
-              </Select>
-            </TableHead>
-            <TableHead>
-              {''}
-            </TableHead>
-          </tr>
         </TableHeader>
         <TableBody>
           {sortedData.length > 0 ? (
             sortedData.map((ratePlan) => (
               <TableRow key={ratePlan.id}>
-                <TableCell className="w-rateplan-col-id min-w-rateplan-col-id max-w-rateplan-col-id font-light text-text-tertiary">
+                <TableCell
+                  className="w-table-col-id-9 min-w-table-col-id-9 max-w-table-col-id-9 font-light text-text-tertiary"
+                  truncate
+                >
                   {ratePlan.id}
                 </TableCell>
-                <TableCell>
+                <TableCell titleText={ratePlan.name} truncate>
                   <Link href={`/rateplans/${ratePlan.id}`} className="no-underline">
-                    <span className="block font-bold text-text-primary hover:text-primary">
+                    <span className="block truncate font-bold text-text-primary hover:text-primary">
                       {ratePlan.name}
                     </span>
                   </Link>
                 </TableCell>
-                <TableCell>{ratePlan.enName || '-'}</TableCell>
+                <TableCell titleText={ratePlan.enName || '-'} truncate>
+                  {ratePlan.enName || '-'}
+                </TableCell>
                 <TableCell>
                   <span
                     className={`inline-flex h-control-sm items-center rounded px-control-px-sm py-none text-base font-bold ${statusToneClass[ratePlan.status]}`}
@@ -226,13 +234,21 @@ export function RatePlanTableView({
                     {t(`statuses.${ratePlan.status}`)}
                   </span>
                 </TableCell>
-                <TableCell className="font-medium text-primary">
+                <TableCell className="font-medium text-primary" titleText={ratePlan.benefitName || '-'} truncate>
                   {ratePlan.benefitName || '-'}
                 </TableCell>
-                <TableCell className="font-medium text-text-secondary">
+                <TableCell
+                  className="font-medium text-text-secondary"
+                  titleText={t(`types.${ratePlan.ratePlanType}`)}
+                  truncate
+                >
                   {t(`types.${ratePlan.ratePlanType}`)}
                 </TableCell>
-                <TableCell className="w-rateplan-col-price-type min-w-rateplan-col-price-type max-w-rateplan-col-price-type font-medium text-text-secondary">
+                <TableCell
+                  className="w-rateplan-col-price-type min-w-rateplan-col-price-type max-w-rateplan-col-price-type font-medium text-text-secondary"
+                  titleText={t(`priceTypes.${ratePlan.priceType}`)}
+                  truncate
+                >
                   {t(`priceTypes.${ratePlan.priceType}`)}
                 </TableCell>
               </TableRow>

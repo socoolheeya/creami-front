@@ -89,7 +89,7 @@ module.exports = {
       'modal-lg': 'var(--modal-width-lg)',
       'modal-max': 'var(--modal-max-height)',
       'modal-action': 'var(--modal-action-width)',
-      'rateplan-col-id': 'var(--rateplan-col-id-width)',
+      'table-col-id-9': 'var(--table-col-id-9-width)',
       'rateplan-col-type': 'var(--rateplan-col-type-width)',
       'rateplan-col-price-type': 'var(--rateplan-col-price-type-width)',
       0: '0',
