@@ -286,7 +286,7 @@
         "roomId": "객실 ID",
         "name": "요금제명",
         "nameForm": "요금제 이름",
-        "enName": "영문 이름",
+        "enName": "요금제 영문명",
         "benefitName": "혜택명",
         "benefitDescription": "혜택 설명",
         "type": "유형",

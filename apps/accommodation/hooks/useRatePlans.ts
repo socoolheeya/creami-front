@@ -19,6 +19,8 @@ export type RatePlanSearchCondition = {
   accommodationId?: string
   roomId?: string
   name?: string
+  enName?: string
+  benefitName?: string
   search?: string
   enabled?: boolean
   cursorCreatedAt?: string
@@ -31,9 +33,12 @@ export type RatePlanSearchCondition = {
 }
 
 export type RatePlanPageSearchCondition = {
+  ratePlanId?: string
   accommodationId?: string
   roomId?: string
   name?: string
+  enName?: string
+  benefitName?: string
   search?: string
   page?: number
   size?: number

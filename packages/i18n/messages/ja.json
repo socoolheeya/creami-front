@@ -286,7 +286,7 @@
         "roomId": "客室ID",
         "name": "料金プラン名",
         "nameForm": "料金プラン名",
-        "enName": "英語名",
+        "enName": "料金プラン英語名",
         "benefitName": "特典名",
         "benefitDescription": "特典説明",
         "type": "タイプ",

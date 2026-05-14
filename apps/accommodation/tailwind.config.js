@@ -38,6 +38,10 @@ module.exports = {
         DEFAULT: 'var(--success)',
         bg: 'var(--success-bg)',
       },
+      warning: {
+        DEFAULT: 'var(--warning)',
+        bg: 'var(--warning-bg)',
+      },
       error: {
         DEFAULT: 'var(--error)',
         bg: 'var(--error-bg)',
@@ -85,6 +89,9 @@ module.exports = {
       'modal-lg': 'var(--modal-width-lg)',
       'modal-max': 'var(--modal-max-height)',
       'modal-action': 'var(--modal-action-width)',
+      'rateplan-col-id': 'var(--rateplan-col-id-width)',
+      'rateplan-col-type': 'var(--rateplan-col-type-width)',
+      'rateplan-col-price-type': 'var(--rateplan-col-price-type-width)',
       0: '0',
       auto: 'auto',
     },

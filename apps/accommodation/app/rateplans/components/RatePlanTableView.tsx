@@ -16,8 +16,6 @@ import {
   TableRow
 } from '@creami/ui'
 import {
-  type MealPlan,
-  type PriceType,
   type RatePlan,
   type RatePlanStatus,
   type RatePlanType
@@ -25,70 +23,45 @@ import {
 
 interface RatePlanTableViewProps {
   ratePlans: RatePlan[]
+  filters: RatePlanTableFilters
+  onFiltersChange: (filters: RatePlanTableFilters) => void
+  isFetching?: boolean
   className?: string
 }
 
-type SortField = 'name' | 'status' | 'benefitName' | 'ratePlanType' | 'priceType' | 'mealPlan'
-type SortOrder = 'asc' | 'desc'
-
-const statusTone: Record<RatePlanStatus, { backgroundColor: string; color: string }> = {
-  active: {
-    backgroundColor: 'var(--primary-bg)',
-    color: 'var(--primary)'
-  },
-  draft: {
-    backgroundColor: 'var(--bg-tertiary)',
-    color: 'var(--text-secondary)'
-  },
-  inactive: {
-    backgroundColor: 'var(--warning-bg)',
-    color: 'var(--warning)'
-  },
-  archived: {
-    backgroundColor: 'var(--error-bg)',
-    color: 'var(--error)'
-  }
+export type RatePlanTableFilters = {
+  ratePlanId: string
+  name: string
+  enName: string
+  status: RatePlanStatus | 'all'
+  benefitName: string
+  ratePlanType: RatePlanType | 'all'
 }
 
-export function RatePlanTableView({ ratePlans, className }: RatePlanTableViewProps) {
+type SortField = 'name' | 'enName' | 'status' | 'benefitName' | 'ratePlanType' | 'priceType'
+type SortOrder = 'asc' | 'desc'
+
+const statusToneClass: Record<RatePlanStatus, string> = {
+  active: 'bg-primary-bg text-primary',
+  draft: 'bg-bg-tertiary text-text-secondary',
+  inactive: 'bg-warning-bg text-warning',
+  archived: 'bg-error-bg text-error'
+}
+
+export function RatePlanTableView({
+  ratePlans,
+  filters,
+  onFiltersChange,
+  isFetching = false,
+  className
+}: RatePlanTableViewProps) {
   const t = useTranslations('accommodation.rateplans')
   const commonT = useTranslations('accommodation.common')
   const [sortField, setSortField] = useState<SortField>('name')
   const [sortOrder, setSortOrder] = useState<SortOrder>('asc')
-  const [idSearch, setIdSearch] = useState('')
-  const [nameSearch, setNameSearch] = useState('')
-  const [statusFilter, setStatusFilter] = useState<RatePlanStatus | 'all'>('all')
-  const [benefitSearch, setBenefitSearch] = useState('')
-  const [typeFilter, setTypeFilter] = useState<RatePlanType | 'all'>('all')
-  const [priceTypeFilter, setPriceTypeFilter] = useState<PriceType | 'all'>('all')
-  const [mealPlanFilter, setMealPlanFilter] = useState<MealPlan | 'all'>('all')
 
-  const filteredAndSortedData = useMemo(() => {
-    const normalizedId = idSearch.trim().toLowerCase()
-    const normalizedName = nameSearch.trim().toLowerCase()
-    const normalizedBenefit = benefitSearch.trim().toLowerCase()
-
-    const result = ratePlans.filter((ratePlan) => {
-      const matchesId = !normalizedId || ratePlan.id.toLowerCase().includes(normalizedId)
-      const matchesName = !normalizedName || ratePlan.name.toLowerCase().includes(normalizedName)
-      const matchesStatus = statusFilter === 'all' || ratePlan.status === statusFilter
-      const matchesBenefit =
-        !normalizedBenefit || ratePlan.benefitName.toLowerCase().includes(normalizedBenefit)
-      const matchesType = typeFilter === 'all' || ratePlan.ratePlanType === typeFilter
-      const matchesPriceType =
-        priceTypeFilter === 'all' || ratePlan.priceType === priceTypeFilter
-      const matchesMealPlan = mealPlanFilter === 'all' || ratePlan.mealPlan === mealPlanFilter
-
-      return (
-        matchesId &&
-        matchesName &&
-        matchesStatus &&
-        matchesBenefit &&
-        matchesType &&
-        matchesPriceType &&
-        matchesMealPlan
-      )
-    })
+  const sortedData = useMemo(() => {
+    const result = [...ratePlans]
 
     result.sort((firstRatePlan, secondRatePlan) => {
       const compareValue = String(firstRatePlan[sortField] ?? '').localeCompare(
@@ -99,18 +72,17 @@ export function RatePlanTableView({ ratePlans, className }: RatePlanTableViewPro
     })
 
     return result
-  }, [
-    benefitSearch,
-    idSearch,
-    mealPlanFilter,
-    nameSearch,
-    priceTypeFilter,
-    ratePlans,
-    sortField,
-    sortOrder,
-    statusFilter,
-    typeFilter
-  ])
+  }, [ratePlans, sortField, sortOrder])
+
+  const updateFilter = <Key extends keyof RatePlanTableFilters>(
+    key: Key,
+    value: RatePlanTableFilters[Key]
+  ) => {
+    onFiltersChange({
+      ...filters,
+      [key]: value
+    })
+  }
 
   const handleSort = (field: SortField) => {
     if (sortField === field) {
@@ -122,8 +94,12 @@ export function RatePlanTableView({ ratePlans, className }: RatePlanTableViewPro
     setSortOrder('asc')
   }
 
-  const renderSortableHead = (field: SortField, label: ReactNode) => (
-    <TableHead>
+  const renderSortableHead = (
+    field: SortField,
+    label: ReactNode,
+    className?: string
+  ) => (
+    <TableHead className={className}>
       <button
         type="button"
         onClick={() => handleSort(field)}
@@ -144,36 +120,50 @@ export function RatePlanTableView({ ratePlans, className }: RatePlanTableViewPro
       <Table>
         <TableHeader>
           <tr>
-            <TableHead>{commonT('id')}</TableHead>
+            <TableHead className="w-rateplan-col-id min-w-rateplan-col-id">
+              {commonT('id')}
+            </TableHead>
             {renderSortableHead('name', t('fields.name'))}
+            {renderSortableHead('enName', t('fields.enName'))}
             {renderSortableHead('status', t('fields.status'))}
             {renderSortableHead('benefitName', t('fields.benefitName'))}
-            {renderSortableHead('ratePlanType', t('fields.type'))}
+            {renderSortableHead(
+              'ratePlanType',
+              t('fields.type'),
+              'w-rateplan-col-type min-w-rateplan-col-type max-w-rateplan-col-type'
+            )}
             {renderSortableHead('priceType', t('fields.priceType'))}
-            {renderSortableHead('mealPlan', t('fields.mealPlan'))}
           </tr>
           <tr className="bg-bg-primary">
-            <TableHead>
+            <TableHead className="w-rateplan-col-id min-w-rateplan-col-id">
               <Input
-                value={idSearch}
-                onChange={(event) => setIdSearch(event.target.value)}
+                value={filters.ratePlanId}
+                onChange={(event) => updateFilter('ratePlanId', event.target.value)}
                 placeholder="ID"
                 size="small"
               />
             </TableHead>
             <TableHead>
               <Input
-                value={nameSearch}
-                onChange={(event) => setNameSearch(event.target.value)}
+                value={filters.name}
+                onChange={(event) => updateFilter('name', event.target.value)}
                 placeholder={t('fields.name')}
                 size="small"
               />
             </TableHead>
             <TableHead>
+              <Input
+                value={filters.enName}
+                onChange={(event) => updateFilter('enName', event.target.value)}
+                placeholder={t('fields.enName')}
+                size="small"
+              />
+            </TableHead>
+            <TableHead>
               <Select
-                value={statusFilter}
+                value={filters.status}
                 onChange={(event) =>
-                  setStatusFilter(event.target.value as RatePlanStatus | 'all')
+                  updateFilter('status', event.target.value as RatePlanStatus | 'all')
                 }
                 size="small"
               >
@@ -187,17 +177,17 @@ export function RatePlanTableView({ ratePlans, className }: RatePlanTableViewPro
             </TableHead>
             <TableHead>
               <Input
-                value={benefitSearch}
-                onChange={(event) => setBenefitSearch(event.target.value)}
+                value={filters.benefitName}
+                onChange={(event) => updateFilter('benefitName', event.target.value)}
                 placeholder={t('fields.benefitName')}
                 size="small"
               />
             </TableHead>
             <TableHead>
               <Select
-                value={typeFilter}
+                value={filters.ratePlanType}
                 onChange={(event) =>
-                  setTypeFilter(event.target.value as RatePlanType | 'all')
+                  updateFilter('ratePlanType', event.target.value as RatePlanType | 'all')
                 }
                 size="small"
               >
@@ -210,79 +200,50 @@ export function RatePlanTableView({ ratePlans, className }: RatePlanTableViewPro
               </Select>
             </TableHead>
             <TableHead>
-              <Select
-                value={priceTypeFilter}
-                onChange={(event) =>
-                  setPriceTypeFilter(event.target.value as PriceType | 'all')
-                }
-                size="small"
-              >
-                <option value="all">{commonT('all')}</option>
-                {(['net_rate', 'sell_rate_no_commission', 'commission_included', 'net_and_sell'] as PriceType[]).map((value) => (
-                  <option key={value} value={value}>
-                    {t(`priceTypes.${value}`)}
-                  </option>
-                ))}
-              </Select>
-            </TableHead>
-            <TableHead>
-              <Select
-                value={mealPlanFilter}
-                onChange={(event) =>
-                  setMealPlanFilter(event.target.value as MealPlan | 'all')
-                }
-                size="small"
-              >
-                <option value="all">{commonT('all')}</option>
-                {(['none', 'breakfast', 'lunch', 'dinner', 'all_inclusive', 'breakfast_and_lunch', 'lunch_and_dinner', 'bed_and_breakfast', 'buffet_breakfast'] as MealPlan[]).map((value) => (
-                  <option key={value} value={value}>
-                    {t(`mealPlans.${value}`)}
-                  </option>
-                ))}
-              </Select>
+              {''}
             </TableHead>
           </tr>
         </TableHeader>
         <TableBody>
-          {filteredAndSortedData.map((ratePlan) => (
-            <TableRow key={ratePlan.id}>
-              <TableCell className="font-light text-text-tertiary">
-                {ratePlan.id}
-              </TableCell>
-              <TableCell>
-                <Link href={`/rateplans/${ratePlan.id}`} className="no-underline">
-                  <span className="block font-bold text-text-primary hover:text-primary">
-                    {ratePlan.name}
-                  </span>
-                  {ratePlan.enName && (
-                    <span className="block text-base font-light text-text-tertiary">
-                      {ratePlan.enName}
+          {sortedData.length > 0 ? (
+            sortedData.map((ratePlan) => (
+              <TableRow key={ratePlan.id}>
+                <TableCell className="w-rateplan-col-id min-w-rateplan-col-id max-w-rateplan-col-id font-light text-text-tertiary">
+                  {ratePlan.id}
+                </TableCell>
+                <TableCell>
+                  <Link href={`/rateplans/${ratePlan.id}`} className="no-underline">
+                    <span className="block font-bold text-text-primary hover:text-primary">
+                      {ratePlan.name}
                     </span>
-                  )}
-                </Link>
-              </TableCell>
-              <TableCell>
-                <span
-                  className="inline-flex h-control-sm items-center rounded px-control-px-sm py-none text-base font-bold"
-                  style={statusTone[ratePlan.status]}
-                >
-                  {t(`statuses.${ratePlan.status}`)}
-                </span>
-              </TableCell>
-              <TableCell className="font-medium text-primary">
-                {ratePlan.benefitName || '-'}
-              </TableCell>
-              <TableCell className="font-medium text-text-secondary">
-                {t(`types.${ratePlan.ratePlanType}`)}
-              </TableCell>
-              <TableCell className="font-medium text-text-secondary">
-                {t(`priceTypes.${ratePlan.priceType}`)}
-              </TableCell>
-              <TableCell className="font-medium text-text-secondary">
-                {t(`mealPlans.${ratePlan.mealPlan}`)}
+                  </Link>
+                </TableCell>
+                <TableCell>{ratePlan.enName || '-'}</TableCell>
+                <TableCell>
+                  <span
+                    className={`inline-flex h-control-sm items-center rounded px-control-px-sm py-none text-base font-bold ${statusToneClass[ratePlan.status]}`}
+                  >
+                    {t(`statuses.${ratePlan.status}`)}
+                  </span>
+                </TableCell>
+                <TableCell className="font-medium text-primary">
+                  {ratePlan.benefitName || '-'}
+                </TableCell>
+                <TableCell className="font-medium text-text-secondary">
+                  {t(`types.${ratePlan.ratePlanType}`)}
+                </TableCell>
+                <TableCell className="w-rateplan-col-price-type min-w-rateplan-col-price-type max-w-rateplan-col-price-type font-medium text-text-secondary">
+                  {t(`priceTypes.${ratePlan.priceType}`)}
+                </TableCell>
+              </TableRow>
+            ))
+          ) : (
+            <TableRow>
+              <TableCell colSpan={7} className="py-xl text-center text-base font-light text-text-secondary">
+                {isFetching ? commonT('loading') : commonT('noSearchResults')}
               </TableCell>
             </TableRow>
-          ))}
+          )}
         </TableBody>
       </Table>
     </Card>

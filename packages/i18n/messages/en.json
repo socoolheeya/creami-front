@@ -286,7 +286,7 @@
         "roomId": "Room ID",
         "name": "Rate Plan Name",
         "nameForm": "Rate Plan Name",
-        "enName": "English Name",
+        "enName": "Rate Plan English Name",
         "benefitName": "Benefit Name",
         "benefitDescription": "Benefit Description",
         "type": "Type",

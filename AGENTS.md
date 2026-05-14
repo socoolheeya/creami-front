@@ -39,6 +39,14 @@ Icon
 # RULE 09
 - packages/ui/components 에 공통 컴포넌트가 우선순위가 최우선이다.
 
+# RULE 10
+- 공통 컴포넌트 정책 
+  - 테이블
+    - 테이블의 thead 필터 사용을 디폴트로 하고 disabled 할 수 있는 옵션을 제공한다.
+    - 컬럼 사이즈는 var 변수로 다양한 사이즈를 제공할 수 있도록 한다.
+    - ID의 케이스에서 숫자는 9자리라고 가정하고 그에 맞는 사이즈를 계산하여 var 토큰 변수로 제공한다.
+    - 무한 스크롤은 사용하지 않으며 페이징으로 개발한다. 
+
 
 This version has breaking changes — APIs, conventions, and file structure may all differ from your training data. Read the relevant guide in `node_modules/next/dist/docs/` before writing any code. Heed deprecation notices.
 <!-- END:nextjs-agent-rules -->
