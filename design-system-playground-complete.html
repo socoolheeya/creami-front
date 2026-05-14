@@ -857,15 +857,51 @@
         }
 
         /* Pagination */
-        .pagination {
+        .pagination-shell {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: var(--spacing-md);
+            width: 100%;
+            padding: var(--spacing-md);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius);
+            background: var(--bg-primary);
+        }
+
+        .pagination-summary {
+            display: flex;
+            flex-direction: column;
+            gap: 0.125rem;
+            min-width: 0;
+            color: var(--text-secondary);
+            font-size: var(--font-size-sm);
+        }
+
+        .pagination-summary strong {
+            color: var(--text-primary);
+            font-weight: var(--font-bold);
+        }
+
+        .pagination-controls {
             display: flex;
             align-items: center;
             gap: var(--spacing-xs);
+            flex-wrap: wrap;
+            justify-content: flex-end;
+            min-width: 0;
+        }
+
+        .pagination {
+            display: inline-flex;
+            align-items: center;
+            gap: var(--spacing-xs);
+            flex-wrap: wrap;
         }
 
         .pagination-btn {
-            min-width: 2.5rem;
-            height: 2rem;
+            min-width: 2.25rem;
+            height: var(--control-height-md);
             display: inline-flex;
             align-items: center;
             justify-content: center;
@@ -877,21 +913,119 @@
             font-size: var(--font-size-sm);
             cursor: pointer;
             transition: all 0.2s;
+            white-space: nowrap;
         }
 
         .pagination-btn:hover:not(:disabled) {
             background: var(--bg-tertiary);
+            border-color: var(--primary);
+            color: var(--primary);
         }
 
         .pagination-btn.active {
             background: var(--primary);
             color: white;
             border-color: var(--primary);
+            font-weight: var(--font-bold);
         }
 
         .pagination-btn:disabled {
             opacity: 0.5;
             cursor: not-allowed;
+        }
+
+        .pagination-btn.icon-only {
+            width: var(--control-height-md);
+            min-width: var(--control-height-md);
+            padding: 0;
+        }
+
+        .pagination-btn svg {
+            width: 1rem;
+            height: 1rem;
+        }
+
+        .pagination-ellipsis {
+            min-width: 1.5rem;
+            color: var(--text-tertiary);
+            text-align: center;
+            user-select: none;
+        }
+
+        .pagination-page-size {
+            height: var(--control-height-md);
+            padding: 0 2rem 0 var(--spacing-sm);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius);
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            font-size: var(--font-size-sm);
+        }
+
+        .pagination-jump {
+            display: inline-flex;
+            align-items: center;
+            gap: var(--spacing-xs);
+            color: var(--text-secondary);
+            font-size: var(--font-size-sm);
+            white-space: nowrap;
+        }
+
+        .pagination-jump input {
+            width: 4rem;
+            height: var(--control-height-md);
+            padding: 0 var(--spacing-sm);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius);
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            font-size: var(--font-size-sm);
+            text-align: center;
+        }
+
+        .pagination-compact .pagination-shell {
+            padding: var(--spacing-sm);
+        }
+
+        .pagination-compact .pagination-summary {
+            display: none;
+        }
+
+        .pagination-compact .pagination-btn {
+            min-width: 2rem;
+            height: var(--control-height-sm);
+            font-size: var(--font-size-xs);
+        }
+
+        .pagination-simple .pagination-shell {
+            justify-content: center;
+        }
+
+        .pagination-simple .pagination-summary,
+        .pagination-simple .pagination-page-size,
+        .pagination-simple .pagination-jump {
+            display: none;
+        }
+
+        @media (max-width: 720px) {
+            .pagination-shell {
+                align-items: stretch;
+                flex-direction: column;
+            }
+
+            .pagination-controls {
+                justify-content: flex-start;
+            }
+
+            .pagination-page-size,
+            .pagination-jump {
+                width: 100%;
+            }
+
+            .pagination-jump input {
+                flex: 1;
+                width: auto;
+            }
         }
 
         /* Modal */
@@ -3108,8 +3242,8 @@ function removeTag(button) {
                             <div class="playground-title">미리보기</div>
                             <div class="playground-controls">
                                 <button class="playground-btn" onclick="togglePreviewTheme('switch')">
-                                    <i data-lucide="moon" id="switch-theme-icon"></i>
-                                    <span id="switch-theme-text">다크</span>
+                                    <i data-lucide="sun"></i>
+                                    테마 전환
                                 </button>
                                 <button class="playground-btn" onclick="copyCode('switch')">
                                     <i data-lucide="copy"></i>
@@ -3206,8 +3340,8 @@ function removeTag(button) {
                             <div class="playground-title">미리보기</div>
                             <div class="playground-controls">
                                 <button class="playground-btn" onclick="togglePreviewTheme('cards')">
-                                    <i data-lucide="moon" id="cards-theme-icon"></i>
-                                    <span id="cards-theme-text">다크</span>
+                                    <i data-lucide="sun"></i>
+                                    테마 전환
                                 </button>
                                 <button class="playground-btn" onclick="copyCode('cards')">
                                     <i data-lucide="copy"></i>
@@ -3312,8 +3446,8 @@ function removeTag(button) {
                             <div class="playground-title">미리보기</div>
                             <div class="playground-controls">
                                 <button class="playground-btn" onclick="togglePreviewTheme('tables')">
-                                    <i data-lucide="moon" id="tables-theme-icon"></i>
-                                    <span id="tables-theme-text">다크</span>
+                                    <i data-lucide="sun"></i>
+                                    테마 전환
                                 </button>
                                 <button class="playground-btn" onclick="copyCode('tables')">
                                     <i data-lucide="copy"></i>
@@ -3565,8 +3699,8 @@ function toggleSidebar(button) {
                             <div class="playground-title">미리보기</div>
                             <div class="playground-controls">
                                 <button class="playground-btn" onclick="togglePreviewTheme('pagination')">
-                                    <i data-lucide="moon" id="pagination-theme-icon"></i>
-                                    <span id="pagination-theme-text">다크</span>
+                                    <i data-lucide="sun"></i>
+                                    테마 전환
                                 </button>
                                 <button class="playground-btn" onclick="copyCode('pagination')">
                                     <i data-lucide="copy"></i>
@@ -3658,8 +3792,8 @@ function toggleSidebar(button) {
                             <div class="playground-title">미리보기</div>
                             <div class="playground-controls">
                                 <button class="playground-btn" onclick="togglePreviewTheme('alerts')">
-                                    <i data-lucide="moon" id="alerts-theme-icon"></i>
-                                    <span id="alerts-theme-text">다크</span>
+                                    <i data-lucide="sun"></i>
+                                    테마 전환
                                 </button>
                                 <button class="playground-btn" onclick="copyCode('alerts')">
                                     <i data-lucide="copy"></i>
@@ -4160,8 +4294,8 @@ document.addEventListener('click', (e) => {
                             <div class="playground-title">미리보기</div>
                             <div class="playground-controls">
                                 <button class="playground-btn" onclick="togglePreviewTheme('modal')">
-                                    <i data-lucide="moon" id="modal-theme-icon"></i>
-                                    <span id="modal-theme-text">다크</span>
+                                    <i data-lucide="sun"></i>
+                                    테마 전환
                                 </button>
                                 <button class="playground-btn" onclick="copyCode('modal')">
                                     <i data-lucide="copy"></i>
@@ -4625,8 +4759,8 @@ function toggleView(button) {
                             <div class="playground-title">미리보기</div>
                             <div class="playground-controls">
                                 <button class="playground-btn" onclick="togglePreviewTheme('view-toggle')">
-                                    <i data-lucide="moon" id="view-toggle-theme-icon"></i>
-                                    <span id="view-toggle-theme-text">다크</span>
+                                    <i data-lucide="sun"></i>
+                                    테마 전환
                                 </button>
                                 <button class="playground-btn" onclick="copyCode('view-toggle')">
                                     <i data-lucide="copy"></i>
@@ -5488,21 +5622,11 @@ function hexToRgb(hex) {
         // Apply a theme to one preview
         function setPreviewTheme(component, newTheme) {
             const preview = document.getElementById(`${component}-preview`);
-            const icon = document.getElementById(`${component}-theme-icon`);
-            const text = document.getElementById(`${component}-theme-text`);
 
             if (!preview) return;
 
             preview.dataset.previewTheme = newTheme;
             applyPreviewThemeTokens(preview, newTheme);
-
-            if (newTheme === 'dark') {
-                if (icon) icon.dataset.lucide = 'moon';
-                if (text) text.textContent = '다크';
-            } else {
-                if (icon) icon.dataset.lucide = 'sun';
-                if (text) text.textContent = '라이트';
-            }
 
             lucide.createIcons();
             updatePreview(component);

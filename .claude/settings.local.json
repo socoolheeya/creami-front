@@ -7,7 +7,14 @@
       "Bash(npm run build:*)",
       "Bash(npm run dev:*)",
       "WebFetch(domain:getdesign.md)",
-      "Bash(open:*)"
+      "Bash(open:*)",
+      "WebFetch(domain:github.com)",
+      "Bash(claude plugin marketplace add EveryInc/compound-engineering-plugin)",
+      "Bash(claude plugin install compound-engineering)",
+      "Bash(git clone:*)",
+      "Bash(./setup:*)",
+      "Bash(export PATH=\"$HOME/.bun/bin:$PATH\")",
+      "Bash(bun:*)"
     ],
     "deny": [],
     "ask": []

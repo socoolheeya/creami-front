@@ -16,6 +16,10 @@ export function RoomCard({ room }: RoomCardProps) {
   const commonT = useTranslations('accommodation.common')
   const primaryImage = room.images.find(img => img.isPrimary) || room.images[0]
   const [imageError, setImageError] = useState(false)
+  const standardOccupancy =
+    room.standardOccupancy ?? room.standardOccupancyAdult + room.standardOccupancyChild
+  const maxOccupancy =
+    room.maxOccupancy ?? (room.maxOccupancyAdult ?? 0) + (room.maxOccupancyChild ?? 0)
   const statusColor =
     room.status === 'active'
       ? 'var(--primary)'
@@ -113,8 +117,8 @@ export function RoomCard({ room }: RoomCardProps) {
             <div className="flex items-center gap-1">
               <Users className="w-4 h-4" />
               <span>
-                {commonT('guest', { count: room.standardOccupancy })}-
-                {commonT('guest', { count: room.maxOccupancy })}
+                {commonT('guest', { count: standardOccupancy })}-
+                {commonT('guest', { count: maxOccupancy })}
               </span>
             </div>
           </div>

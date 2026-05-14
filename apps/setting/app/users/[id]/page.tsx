@@ -1,6 +1,6 @@
 'use client'
 
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { Button, Input, Select, notification } from '@creami/ui'
 import {
   ArrowLeft,
@@ -15,51 +15,85 @@ import Link from 'next/link'
 import { useParams } from 'next/navigation'
 import { useTranslations } from 'next-intl'
 import {
-  accommodationAccessOptions,
-  initialUsers,
-  type SettingUser,
-  type UserStatus
-} from '@/lib/data/users'
+  changeMemberStatus,
+  formatMemberDate,
+  getMember,
+  getMemberRoleSummary,
+  toMemberApiStatus,
+  toMemberUiStatus,
+  updateMember,
+  type Member,
+  type MemberUiStatus
+} from '@/lib/api/members'
+import {
+  accommodationAccessOptions
+} from '@/lib/data/members'
 
-type UserForm = Pick<SettingUser, 'name' | 'email' | 'phone' | 'role' | 'team' | 'status'>
-
-function formatAuditDate() {
-  return new Date().toISOString().slice(0, 16).replace('T', ' ')
+type MemberForm = {
+  name: string
+  email: string
+  phone: string
+  role: string
+  team: string
+  status: MemberUiStatus
 }
 
-function createForm(user: SettingUser): UserForm {
+function createForm(member: Member): MemberForm {
   return {
-    name: user.name,
-    email: user.email,
-    phone: user.phone,
-    role: user.role,
-    team: user.team,
-    status: user.status
+    name: member.name,
+    email: member.email,
+    phone: member.phoneNumber ?? '',
+    role: getMemberRoleSummary(member),
+    team: '-',
+    status: toMemberUiStatus(member.status)
   }
 }
 
 export default function UserDetailPage() {
   const params = useParams<{ id: string }>()
   const t = useTranslations()
-  const user = initialUsers.find((item) => item.id === params.id)
-  const [form, setForm] = useState<UserForm>(() =>
-    user
-      ? createForm(user)
-      : {
-          name: '',
-          email: '',
-          phone: '',
-          role: 'Operator',
-          team: '',
-          status: 'active'
-        }
-  )
+  const [member, setMember] = useState<Member | null>(null)
+  const [form, setForm] = useState<MemberForm>({
+    name: '',
+    email: '',
+    phone: '',
+    role: '-',
+    team: '-',
+    status: 'active'
+  })
+  const [isLoading, setIsLoading] = useState(true)
+  const [errorMessage, setErrorMessage] = useState<string | null>(null)
+  const [isSaving, setIsSaving] = useState(false)
   const [accessibleAccommodationIds, setAccessibleAccommodationIds] = useState<string[]>(
-    user?.accessibleAccommodationIds ?? []
+    []
   )
   const [query, setQuery] = useState('')
-  const [updatedAt, setUpdatedAt] = useState(user?.updatedAt ?? '')
-  const [updatedById, setUpdatedById] = useState(user?.updatedById ?? '')
+
+  useEffect(() => {
+    let isMounted = true
+
+    setIsLoading(true)
+    getMember(params.id)
+      .then((response) => {
+        if (!isMounted) return
+        setMember(response)
+        setForm(createForm(response))
+        setErrorMessage(null)
+      })
+      .catch((error: unknown) => {
+        if (!isMounted) return
+        setErrorMessage(error instanceof Error ? error.message : 'Member not found.')
+      })
+      .finally(() => {
+        if (isMounted) {
+          setIsLoading(false)
+        }
+      })
+
+    return () => {
+      isMounted = false
+    }
+  }, [params.id])
 
   const accessibleAccommodations = useMemo(
     () =>
@@ -84,7 +118,7 @@ export default function UserDetailPage() {
     )
   }, [accessibleAccommodationIds, query])
 
-  const canSave = form.name.trim().length > 0 && form.email.trim().length > 0
+  const canSave = form.name.trim().length > 0
 
   const handleSelectAccommodation = (accommodationId: string) => {
     setAccessibleAccommodationIds((currentIds) =>
@@ -101,17 +135,41 @@ export default function UserDetailPage() {
     )
   }
 
-  const handleSave = () => {
-    setUpdatedById(user?.id ?? '')
-    setUpdatedAt(formatAuditDate())
-    notification.success({
-      message: '수정이 완료되었습니다.',
-      placement: 'top-right',
-      direction: 'right'
-    })
+  const handleSave = async () => {
+    if (!member) return
+
+    setIsSaving(true)
+
+    try {
+      const updatedMember = await updateMember(member.id, {
+        name: form.name.trim(),
+        phoneNumber: form.phone.trim() || null
+      })
+      const nextStatus = toMemberApiStatus(form.status)
+      const statusSyncedMember =
+        nextStatus === updatedMember.status
+          ? updatedMember
+          : await changeMemberStatus(updatedMember.id, nextStatus)
+
+      setMember(statusSyncedMember)
+      setForm(createForm(statusSyncedMember))
+      notification.success({
+        message: '수정이 완료되었습니다.',
+        placement: 'top-right',
+        direction: 'right'
+      })
+    } catch (error) {
+      notification.error({
+        message: error instanceof Error ? error.message : '저장에 실패했습니다.',
+        placement: 'top-right',
+        direction: 'right'
+      })
+    } finally {
+      setIsSaving(false)
+    }
   }
 
-  if (!user) {
+  if (isLoading) {
     return (
       <div>
         <Link
@@ -123,7 +181,26 @@ export default function UserDetailPage() {
         </Link>
         <section className="rounded border border-border bg-bg-primary p-lg shadow">
           <h1 className="text-xl font-bold text-text-primary">
-            {t('setting.users.detail.notFound')}
+            Loading member...
+          </h1>
+        </section>
+      </div>
+    )
+  }
+
+  if (!member) {
+    return (
+      <div>
+        <Link
+          href="/users"
+          className="mb-lg inline-flex items-center gap-sm text-base font-medium text-text-secondary no-underline hover:text-primary"
+        >
+          <ArrowLeft className="h-icon-md w-icon-md" />
+          {t('setting.users.detail.backToList')}
+        </Link>
+        <section className="rounded border border-border bg-bg-primary p-lg shadow">
+          <h1 className="text-xl font-bold text-text-primary">
+            {errorMessage ?? t('setting.users.detail.notFound')}
           </h1>
         </section>
       </div>
@@ -152,7 +229,7 @@ export default function UserDetailPage() {
           </p>
         </div>
 
-        <Button type="button" disabled={!canSave} onClick={handleSave}>
+        <Button type="button" disabled={!canSave || isSaving} onClick={handleSave}>
           <Save className="h-icon-md w-icon-md" />
           {t('common.save')}
         </Button>
@@ -174,7 +251,7 @@ export default function UserDetailPage() {
             <div className="grid gap-md md:grid-cols-2">
               <label className="grid gap-sm text-base font-medium text-text-primary">
                 {t('setting.users.columns.userId')}
-                <Input value={user.id} readOnly />
+                <Input value={member.id} readOnly />
               </label>
 
               <label className="grid gap-sm text-base font-medium text-text-primary">
@@ -194,9 +271,7 @@ export default function UserDetailPage() {
                 <Input
                   type="email"
                   value={form.email}
-                  onChange={(event) =>
-                    setForm((current) => ({ ...current, email: event.target.value }))
-                  }
+                  readOnly
                 />
               </label>
 
@@ -217,13 +292,9 @@ export default function UserDetailPage() {
                 {t('setting.users.columns.role')}
                 <Select
                   value={form.role}
-                  onChange={(event) =>
-                    setForm((current) => ({ ...current, role: event.target.value }))
-                  }
+                  disabled
                 >
-                  <option value="Owner">Owner</option>
-                  <option value="Admin">Admin</option>
-                  <option value="Operator">Operator</option>
+                  <option value={form.role}>{form.role}</option>
                 </Select>
               </label>
 
@@ -234,13 +305,15 @@ export default function UserDetailPage() {
                   onChange={(event) =>
                     setForm((current) => ({
                       ...current,
-                      status: event.target.value as UserStatus
+                      status: event.target.value as MemberUiStatus
                     }))
                   }
                 >
                   <option value="active">{t('setting.status.active')}</option>
                   <option value="inactive">{t('setting.status.inactive')}</option>
-                  <option value="invited">{t('setting.status.invited')}</option>
+                  {member.status === 'PENDING' && (
+                    <option value="invited">{t('setting.status.invited')}</option>
+                  )}
                 </Select>
               </label>
             </div>
@@ -249,9 +322,7 @@ export default function UserDetailPage() {
               {t('setting.users.columns.team')}
               <Input
                 value={form.team}
-                onChange={(event) =>
-                  setForm((current) => ({ ...current, team: event.target.value }))
-                }
+                readOnly
               />
             </label>
           </form>
@@ -262,13 +333,15 @@ export default function UserDetailPage() {
                 <dt className="w-modal-action shrink-0 font-light text-text-tertiary">
                   {t('setting.users.detail.createdById')}
                 </dt>
-                <dd className="font-medium text-text-primary">{user.createdById}</dd>
+                <dd className="font-medium text-text-primary">-</dd>
               </div>
               <div className="flex gap-md">
                 <dt className="w-modal-action shrink-0 font-light text-text-tertiary">
                   {t('setting.users.detail.createdAt')}
                 </dt>
-                <dd className="font-medium text-text-primary">{user.createdAt}</dd>
+                <dd className="font-medium text-text-primary">
+                  {formatMemberDate(member.createdAt)}
+                </dd>
               </div>
             </div>
             <div className="grid gap-sm md:grid-cols-2">
@@ -276,13 +349,15 @@ export default function UserDetailPage() {
                 <dt className="w-modal-action shrink-0 font-light text-text-tertiary">
                   {t('setting.users.detail.updatedById')}
                 </dt>
-                <dd className="font-medium text-text-primary">{updatedById}</dd>
+                <dd className="font-medium text-text-primary">-</dd>
               </div>
               <div className="flex gap-md">
                 <dt className="w-modal-action shrink-0 font-light text-text-tertiary">
                   {t('setting.users.detail.updatedAt')}
                 </dt>
-                <dd className="font-medium text-text-primary">{updatedAt}</dd>
+                <dd className="font-medium text-text-primary">
+                  {formatMemberDate(member.updatedAt)}
+                </dd>
               </div>
             </div>
           </dl>

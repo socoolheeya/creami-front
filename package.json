@@ -4,6 +4,11 @@
   "private": true,
   "scripts": {
     "dev:all": "npm run dev:home & npm run dev:accommodation & npm run dev:ari & npm run dev:discount & npm run dev:booking & npm run dev:invoice & npm run dev:setting & wait",
+    "stop:all": "./scripts/stop-all.sh",
+    "stop": "./scripts/stop-all.sh",
+    "kill:all": "./scripts/stop-all.sh",
+    "stop:node": "node scripts/stop-all.js",
+    "kill": "node scripts/stop-all.js",
     "dev:home": "pnpm --filter home dev",
     "dev:accommodation": "pnpm --filter accommodation exec next dev -p 3001",
     "dev:ari": "pnpm --filter ari exec next dev -p 3002",

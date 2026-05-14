@@ -329,17 +329,20 @@ function normalizeRoomDescription(description: unknown) {
       item.description ??
       item.koreanDescription ??
       item.koDescription ??
-      item.roomDescription,
+      item.roomDescription ??
+      undefined,
     enDescription:
       item.enDescription ??
       item.englishDescription ??
-      item.enRoomDescription,
+      item.enRoomDescription ??
+      undefined,
     cmsDescription:
       item.cmsDescription ??
       item.cmsRoomDescription ??
-      item.cmsDescriptionText,
-    amenities: item.amenities,
-    accessibilityFeatures: item.accessibilityFeatures
+      item.cmsDescriptionText ??
+      undefined,
+    amenities: item.amenities ?? undefined,
+    accessibilityFeatures: item.accessibilityFeatures ?? undefined
   }
 }
 
@@ -357,8 +360,8 @@ function normalizeRoomDetail(
     ...room,
     ...normalizedDescription,
     ...normalizedOccupancy,
-    baseMinLos: room.baseMinLos ?? room.basMinLos,
-    baseMaxLos: room.baseMaxLos,
+    baseMinLos: normalizeOptionalNumber(room.baseMinLos ?? room.basMinLos),
+    baseMaxLos: normalizeOptionalNumber(room.baseMaxLos),
     images: images ?? room.images,
     roomImages: images ?? room.roomImages,
     bedConfiguration: Array.isArray(beds) ? normalizeBedConfiguration(beds) : room.bedConfiguration

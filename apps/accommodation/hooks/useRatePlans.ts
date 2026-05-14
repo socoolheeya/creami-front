@@ -119,7 +119,7 @@ const mealPlans: MealPlan[] = [
 ]
 const ratePlanStatuses: RatePlanStatus[] = ['draft', 'active', 'inactive', 'archived']
 
-function removeEmptyFilters(filters?: RatePlanSearchCondition) {
+function removeEmptyFilters(filters?: RatePlanSearchCondition | RatePlanPageSearchCondition) {
   if (!filters) {
     return undefined
   }

@@ -3,11 +3,44 @@
 import { Button } from '@creami/ui'
 import { Mail, Plus, UserCheck, Users } from 'lucide-react'
 import Link from 'next/link'
+import { useEffect, useState } from 'react'
 import { useTranslations } from 'next-intl'
-import { initialUsers } from '@/lib/data/users'
+import {
+  getMemberRoleSummary,
+  getMembers,
+  toMemberUiStatus,
+  type Member
+} from '@/lib/api/members'
 
 export default function UsersPage() {
   const t = useTranslations()
+  const [members, setMembers] = useState<Member[]>([])
+  const [isLoading, setIsLoading] = useState(true)
+  const [errorMessage, setErrorMessage] = useState<string | null>(null)
+
+  useEffect(() => {
+    let isMounted = true
+
+    getMembers()
+      .then((response) => {
+        if (!isMounted) return
+        setMembers(response.content)
+        setErrorMessage(null)
+      })
+      .catch((error: unknown) => {
+        if (!isMounted) return
+        setErrorMessage(error instanceof Error ? error.message : 'Failed to load members.')
+      })
+      .finally(() => {
+        if (isMounted) {
+          setIsLoading(false)
+        }
+      })
+
+    return () => {
+      isMounted = false
+    }
+  }, [])
 
   return (
     <div>
@@ -43,33 +76,48 @@ export default function UsersPage() {
           <span>{t('setting.users.columns.team')}</span>
           <span>{t('setting.users.columns.status')}</span>
         </div>
-        {initialUsers.map((user) => (
+        {isLoading && (
+          <div className="px-lg py-md text-base font-light text-text-secondary">
+            Loading members...
+          </div>
+        )}
+        {!isLoading && errorMessage && (
+          <div className="px-lg py-md text-base font-light text-error">
+            {errorMessage}
+          </div>
+        )}
+        {!isLoading && !errorMessage && members.length === 0 && (
+          <div className="px-lg py-md text-base font-light text-text-secondary">
+            No members found.
+          </div>
+        )}
+        {!isLoading && !errorMessage && members.map((member) => (
           <Link
-            key={user.id}
-            href={`/users/${user.id}`}
+            key={member.id}
+            href={`/users/${member.id}`}
             className="grid grid-cols-[minmax(0,0.8fr)_minmax(0,1.1fr)_minmax(0,1.4fr)_minmax(0,1fr)_minmax(0,1fr)_minmax(0,1fr)] gap-md border-b border-border px-lg py-md no-underline transition-colors last:border-b-0 hover:bg-bg-secondary"
           >
             <span className="whitespace-nowrap text-base font-light text-text-tertiary">
-              {user.id}
+              {member.id}
             </span>
             <div className="min-w-0">
               <p className="truncate text-base font-bold text-text-primary">
-                {user.name}
+                {member.name}
               </p>
             </div>
             <div className="flex min-w-0 items-center gap-sm text-base font-light text-text-secondary">
               <Mail className="h-icon-md w-icon-md shrink-0 text-text-tertiary" />
-              <span className="truncate">{user.email}</span>
+              <span className="truncate">{member.email}</span>
             </div>
             <span className="text-base font-medium text-text-primary">
-              {user.role}
+              {getMemberRoleSummary(member)}
             </span>
             <span className="text-base font-light text-text-secondary">
-              {user.team}
+              -
             </span>
             <span className="inline-flex h-control-sm w-fit items-center gap-xs rounded bg-primary-bg px-control-px-sm py-none text-base font-bold text-primary">
               <UserCheck className="h-md w-md" />
-              {t(`setting.status.${user.status}`)}
+              {t(`setting.status.${toMemberUiStatus(member.status)}`)}
             </span>
           </Link>
         ))}
