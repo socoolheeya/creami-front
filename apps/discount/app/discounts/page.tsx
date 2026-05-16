@@ -4,7 +4,7 @@ import { Edit, Plus, Save, Tag, X } from 'lucide-react'
 import type { FormEvent } from 'react'
 import { useEffect, useState } from 'react'
 import { useTranslations } from 'next-intl'
-import { Button, Input, Select, ViewToggle } from '@creami/ui'
+import { Button, DatePicker, Input, Select, ViewToggle } from '@creami/ui'
 import { createDiscount, fetchDiscounts, updateDiscount } from '@/lib/api/discount'
 import { Discount, DiscountBusinessType, DiscountFormData, DiscountStatus, DiscountType } from '@/lib/types/discount'
 import { DiscountCard } from './components/DiscountCard'
@@ -258,23 +258,22 @@ export default function DiscountsPage() {
             />
           </label>
 
-          <label className="flex flex-col gap-xs text-base font-medium text-text-secondary">
-            {t('discount.discounts.form.startDate')}
-            <Input
-              type="date"
-              value={form.startDate}
-              onChange={(event) => setForm((current) => ({ ...current, startDate: event.target.value }))}
-            />
-          </label>
+          <DatePicker
+            label={t('discount.discounts.form.startDate')}
+            value={form.startDate}
+            onChange={(date) => setForm((current) => ({ ...current, startDate: date }))}
+            size="medium"
+            clearable
+          />
 
-          <label className="flex flex-col gap-xs text-base font-medium text-text-secondary">
-            {t('discount.discounts.form.endDate')}
-            <Input
-              type="date"
-              value={form.endDate}
-              onChange={(event) => setForm((current) => ({ ...current, endDate: event.target.value }))}
-            />
-          </label>
+          <DatePicker
+            label={t('discount.discounts.form.endDate')}
+            value={form.endDate}
+            onChange={(date) => setForm((current) => ({ ...current, endDate: date }))}
+            align="right"
+            size="medium"
+            clearable
+          />
 
           <label className="flex flex-col gap-xs text-base font-medium text-text-secondary">
             {t('discount.discounts.form.status')}
