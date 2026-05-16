@@ -10,10 +10,19 @@ interface AccommodationSelectorProps {
   accommodations: Accommodation[]
   selectedId: string | null
   onSelect: (accommodationId: string | null) => void
+  onSearch: (query: string) => void
   compact?: boolean
+  loading?: boolean
 }
 
-export function AccommodationSelector({ accommodations, selectedId, onSelect, compact = false }: AccommodationSelectorProps) {
+export function AccommodationSelector({
+  accommodations,
+  selectedId,
+  onSelect,
+  onSearch,
+  compact = false,
+  loading = false,
+}: AccommodationSelectorProps) {
   const t = useTranslations()
   const [searchQuery, setSearchQuery] = useState('')
   const accommodationListId = useId()
@@ -36,6 +45,7 @@ export function AccommodationSelector({ accommodations, selectedId, onSelect, co
     const value = event.target.value
     const normalizedValue = value.trim().toLowerCase()
     setSearchQuery(value)
+    onSearch(value)
 
     const matchedAccommodation = accommodations.find(acc =>
       acc.id.toLowerCase() === normalizedValue ||
@@ -98,6 +108,7 @@ export function AccommodationSelector({ accommodations, selectedId, onSelect, co
             value={searchQuery}
             onChange={handleSearchChange}
             onKeyDown={handleSearchKeyDown}
+            disabled={loading}
             className="h-control-md w-full rounded pr-control-px-md text-base"
             style={{
               backgroundColor: 'var(--bg-secondary)',
@@ -143,7 +154,15 @@ export function AccommodationSelector({ accommodations, selectedId, onSelect, co
         </div>
       )}
 
-      {searchQuery && !selectedAccommodation && filteredAccommodations.length === 0 && (
+      {loading && (
+        <div className="text-center py-xl">
+          <p style={{ color: 'var(--text-secondary)', fontWeight: 'var(--font-light)' }}>
+            {t('discount.mappings.searching')}
+          </p>
+        </div>
+      )}
+
+      {!loading && searchQuery && !selectedAccommodation && filteredAccommodations.length === 0 && (
         <div className="text-center py-xl">
           <p style={{ color: 'var(--text-secondary)', fontWeight: 'var(--font-light)' }}>
             {t('discount.common.noSearchResults')}

@@ -85,6 +85,8 @@
       "loadError": "連携画面データを読み込めませんでした。",
       "ratePlanLoadError": "料金プラン一覧を読み込めませんでした。",
       "mappingLoadError": "割引連携を読み込めませんでした。",
+      "discountLoadError": "割引検索結果を読み込めませんでした。",
+      "searching": "検索中です。",
       "saveSuccess": "連携が保存されました。",
       "saveError": "連携の保存に失敗しました。",
       "beforeTitle": "連携前の割引",

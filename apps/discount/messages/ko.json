@@ -85,6 +85,8 @@
       "loadError": "매핑 화면 데이터를 불러오지 못했습니다.",
       "ratePlanLoadError": "요금제 목록을 불러오지 못했습니다.",
       "mappingLoadError": "할인 매핑을 불러오지 못했습니다.",
+      "discountLoadError": "할인 검색 결과를 불러오지 못했습니다.",
+      "searching": "검색 중입니다.",
       "saveSuccess": "매핑이 저장되었습니다!",
       "saveError": "매핑 저장에 실패했습니다.",
       "beforeTitle": "매핑 전 할인",

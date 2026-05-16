@@ -173,10 +173,15 @@ export async function fetchDiscounts(params: { search?: string; activeOnly?: boo
   return response.discounts.map(toDiscount)
 }
 
-export async function fetchAccommodations(): Promise<Accommodation[]> {
+export async function fetchAccommodations(params: { search?: string } = {}): Promise<Accommodation[]> {
+  const searchParams = new URLSearchParams({ size: '100' })
+  if (params.search?.trim()) {
+    searchParams.set('name', params.search.trim())
+  }
+
   const response = await request<BackendPropertiesResponse>(
     ACCOMMODATION_API_BASE_URL,
-    '/properties/search?size=100'
+    `/properties/search?${searchParams.toString()}`
   )
 
   return response.properties.map(toAccommodation).filter((item): item is Accommodation => item !== null)
@@ -185,10 +190,19 @@ export async function fetchAccommodations(): Promise<Accommodation[]> {
 export async function fetchRatePlans(
   accommodationId: string,
   accommodation: Accommodation | null,
+  params: { search?: string } = {},
 ): Promise<RatePlan[]> {
+  const searchParams = new URLSearchParams({
+    propertyId: accommodationId,
+    size: '100',
+  })
+  if (params.search?.trim()) {
+    searchParams.set('name', params.search.trim())
+  }
+
   const response = await request<BackendRatePlansResponse>(
     ACCOMMODATION_API_BASE_URL,
-    `/rate-plans/search?propertyId=${encodeURIComponent(accommodationId)}&size=100`
+    `/rate-plans/search?${searchParams.toString()}`
   )
 
   return response.ratePlans.map((ratePlan) => toRatePlan(ratePlan, accommodation))

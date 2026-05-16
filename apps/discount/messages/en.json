@@ -85,6 +85,8 @@
       "loadError": "Failed to load mapping data.",
       "ratePlanLoadError": "Failed to load rate plans.",
       "mappingLoadError": "Failed to load discount mappings.",
+      "discountLoadError": "Failed to load discount search results.",
+      "searching": "Searching.",
       "saveSuccess": "Mapping has been saved.",
       "saveError": "Failed to save mappings.",
       "beforeTitle": "Available Discounts",

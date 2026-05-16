@@ -4,12 +4,11 @@ import { Tag, Plus } from 'lucide-react'
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
 import { useTranslations } from 'next-intl'
-import { Button, Input } from '@creami/ui'
+import { Button, Input, ViewToggle } from '@creami/ui'
 import { fetchDiscounts } from '@/lib/api/discount'
 import { Discount } from '@/lib/types/discount'
 import { DiscountCard } from './components/DiscountCard'
 import { DiscountTable } from './components/DiscountTable'
-import { ViewToggle } from './components/ViewToggle'
 
 type ViewMode = 'grid' | 'table'
 

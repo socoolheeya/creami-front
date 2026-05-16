@@ -10,8 +10,10 @@ interface RatePlanSelectorProps {
   ratePlans: RatePlan[]
   selectedIds: string[]
   onSelectionChange: (selectedIds: string[]) => void
+  onSearch: (query: string) => void
   compact?: boolean
   disabled?: boolean
+  loading?: boolean
   onApply?: () => void
 }
 
@@ -19,8 +21,10 @@ export function RatePlanSelector({
   ratePlans,
   selectedIds,
   onSelectionChange,
+  onSearch,
   compact = false,
   disabled = false,
+  loading = false,
   onApply
 }: RatePlanSelectorProps) {
   const t = useTranslations()
@@ -60,7 +64,9 @@ export function RatePlanSelector({
   }
 
   const handleSearchChange = (event: ChangeEvent<HTMLInputElement>) => {
-    setSearchQuery(event.target.value)
+    const value = event.target.value
+    setSearchQuery(value)
+    onSearch(value)
   }
 
   return (
@@ -111,7 +117,7 @@ export function RatePlanSelector({
           type="text"
           value={searchQuery}
           onChange={handleSearchChange}
-          disabled={disabled}
+          disabled={disabled || loading}
           placeholder={disabled ? t('discount.mappings.ratePlan.disabledPlaceholder') : t('discount.mappings.ratePlan.placeholder')}
           className="h-control-md w-full rounded pr-control-px-md text-base"
           style={{
@@ -156,7 +162,13 @@ export function RatePlanSelector({
         })}
       </div>
 
-      {!disabled && searchQuery && filteredRatePlans.length === 0 && (
+      {loading && (
+        <div className="py-md text-center text-base font-light text-text-secondary">
+          {t('discount.mappings.searching')}
+        </div>
+      )}
+
+      {!disabled && !loading && searchQuery && filteredRatePlans.length === 0 && (
         <div className="py-md text-center text-base font-light text-text-secondary">
           {t('discount.common.noSearchResults')}
         </div>
