@@ -25,9 +25,9 @@ export function BlockCard({ block }: BlockCardProps) {
       case 'active':
         return 'var(--primary)'
       case 'released':
-        return '#60a5fa'
+        return 'var(--info)'
       case 'cancelled':
-        return '#ef4444'
+        return 'var(--error)'
       case 'expired':
         return 'var(--text-tertiary)'
       default:
@@ -45,18 +45,18 @@ export function BlockCard({ block }: BlockCardProps) {
   return (
     <Link href={`/inventories/${block.id}`}>
       <div
-        className="rounded-lg overflow-hidden transition-all hover:shadow-lg cursor-pointer p-5"
+        className="rounded overflow-hidden transition-all hover:shadow-lg cursor-pointer p-lg"
         style={{
           backgroundColor: 'var(--bg-primary)',
           borderRadius: 'var(--radius)',
           boxShadow: 'var(--shadow)',
-          border: '1px solid var(--border-color)'
+          border: 'var(--border)'
         }}
       >
         {/* Header with Status Badge */}
-        <div className="flex items-start justify-between mb-3">
+        <div className="flex items-start justify-between mb-md">
           <div
-            className="inline-block px-2 py-0.5 rounded text-xs"
+            className="inline-block px-sm py-xs rounded text-xs"
             style={{
               backgroundColor: 'var(--bg-tertiary)',
               color: 'var(--text-secondary)',
@@ -67,10 +67,10 @@ export function BlockCard({ block }: BlockCardProps) {
           </div>
 
           <div
-            className="px-2 py-1 rounded text-xs"
+            className="px-sm py-xs rounded text-xs"
             style={{
               backgroundColor: getStatusColor(block.status),
-              color: '#ffffff',
+              color: 'var(--text-on-primary)',
               fontWeight: 'var(--font-medium)'
             }}
           >
@@ -79,10 +79,10 @@ export function BlockCard({ block }: BlockCardProps) {
         </div>
 
         {/* Block Code */}
-        <div className="flex items-center gap-2 mb-2">
-          <Tag className="w-4 h-4" style={{ color: 'var(--text-tertiary)' }} />
+        <div className="flex items-center gap-sm mb-sm">
+          <Tag className="w-md h-md" style={{ color: 'var(--text-tertiary)' }} />
           <span
-            className="text-sm"
+            className="text-base"
             style={{
               color: 'var(--text-secondary)',
               fontWeight: 'var(--font-medium)'
@@ -94,7 +94,7 @@ export function BlockCard({ block }: BlockCardProps) {
 
         {/* Name */}
         <h3
-          className="text-lg mb-2 truncate"
+          className="text-lg mb-sm truncate"
           style={{
             fontWeight: 'var(--font-bold)',
             color: 'var(--text-primary)'
@@ -105,10 +105,10 @@ export function BlockCard({ block }: BlockCardProps) {
 
         {/* Organization */}
         {block.organization && (
-          <div className="flex items-center gap-2 mb-3">
-            <Building className="w-4 h-4" style={{ color: 'var(--text-tertiary)' }} />
+          <div className="flex items-center gap-sm mb-md">
+            <Building className="w-md h-md" style={{ color: 'var(--text-tertiary)' }} />
             <p
-              className="text-sm truncate"
+              className="text-base truncate"
               style={{
                 color: 'var(--text-secondary)',
                 fontWeight: 'var(--font-light)'
@@ -121,15 +121,15 @@ export function BlockCard({ block }: BlockCardProps) {
 
         {/* Room Stats */}
         <div
-          className="mb-3 p-3 rounded-lg"
+          className="mb-md p-md rounded"
           style={{
             backgroundColor: 'var(--bg-secondary)',
             borderRadius: 'var(--radius-sm)'
           }}
         >
-          <div className="flex justify-between items-center mb-2">
+          <div className="flex justify-between items-center mb-sm">
             <span
-              className="text-sm"
+              className="text-base"
               style={{
                 color: 'var(--text-secondary)',
                 fontWeight: 'var(--font-light)'
@@ -150,7 +150,7 @@ export function BlockCard({ block }: BlockCardProps) {
 
           {/* Progress Bar */}
           <div
-            className="w-full h-2 rounded-full overflow-hidden"
+            className="w-full h-xs rounded overflow-hidden"
             style={{
               backgroundColor: 'var(--bg-tertiary)'
             }}
@@ -165,7 +165,7 @@ export function BlockCard({ block }: BlockCardProps) {
           </div>
 
           <div
-            className="flex justify-between mt-2 text-xs"
+            className="flex justify-between mt-sm text-xs"
             style={{
               color: 'var(--text-tertiary)',
               fontWeight: 'var(--font-light)'
@@ -177,10 +177,10 @@ export function BlockCard({ block }: BlockCardProps) {
         </div>
 
         {/* Date Range */}
-        <div className="flex items-center gap-2 mb-3">
-          <Calendar className="w-4 h-4 flex-shrink-0" style={{ color: 'var(--text-tertiary)' }} />
+        <div className="flex items-center gap-sm mb-md">
+          <Calendar className="w-md h-md flex-shrink-0" style={{ color: 'var(--text-tertiary)' }} />
           <p
-            className="text-sm"
+            className="text-base"
             style={{
               color: 'var(--text-secondary)',
               fontWeight: 'var(--font-light)'
@@ -192,8 +192,8 @@ export function BlockCard({ block }: BlockCardProps) {
 
         {/* Contact */}
         {block.contactName && (
-          <div className="flex items-center gap-2 text-sm" style={{ color: 'var(--text-secondary)' }}>
-            <User className="w-4 h-4" style={{ color: 'var(--text-tertiary)' }} />
+          <div className="flex items-center gap-sm text-base" style={{ color: 'var(--text-secondary)' }}>
+            <User className="w-md h-md" style={{ color: 'var(--text-tertiary)' }} />
             <span>{block.contactName}</span>
           </div>
         )}
@@ -201,9 +201,9 @@ export function BlockCard({ block }: BlockCardProps) {
         {/* Release Date */}
         {block.releaseDate && (
           <div
-            className="mt-3 pt-3"
+            className="mt-md pt-md"
             style={{
-              borderTop: '1px solid var(--border-color)'
+              borderTop: 'var(--border)'
             }}
           >
             <span

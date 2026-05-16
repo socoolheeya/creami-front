@@ -99,7 +99,7 @@ export function FilterBar({
           background: var(--bg-secondary);
           border-radius: var(--radius-lg);
           padding: var(--spacing-md);
-          border: 1px solid var(--border-color);
+          border: var(--border);
           margin-bottom: var(--spacing-md);
         }
 
@@ -123,7 +123,7 @@ export function FilterBar({
           font-size: var(--font-size-xs);
           font-weight: 500;
           background: var(--bg-primary);
-          border: 1px solid var(--border-color);
+          border: var(--border);
           color: var(--text-secondary);
           cursor: pointer;
           transition: all 0.2s;
@@ -146,7 +146,7 @@ export function FilterBar({
           background: var(--bg-primary);
           padding: var(--spacing-xs);
           border-radius: var(--radius-lg);
-          border: 1px solid var(--border-color);
+          border: var(--border);
         }
 
         .view-btn {
@@ -173,8 +173,8 @@ export function FilterBar({
         }
 
         :global(.view-btn .view-icon) {
-          width: 16px;
-          height: 16px;
+          width: var(--icon-size-md);
+          height: var(--icon-size-md);
         }
 
         .filter-bottom {
@@ -193,17 +193,17 @@ export function FilterBar({
           left: var(--spacing-sm);
           top: 50%;
           transform: translateY(-50%);
-          width: 14px;
-          height: 14px;
+          width: var(--font-size-base);
+          height: var(--font-size-base);
           color: var(--text-tertiary);
         }
 
         .search-input {
           width: 100%;
-          padding: var(--spacing-xs) var(--spacing-sm) var(--spacing-xs) 36px;
+          padding: var(--spacing-xs) var(--spacing-sm) var(--spacing-xs) var(--control-search-padding);
           border-radius: var(--radius-lg);
           background: var(--bg-primary);
-          border: 1px solid var(--border-color);
+          border: var(--border);
           color: var(--text-primary);
           font-size: var(--font-size-sm);
         }

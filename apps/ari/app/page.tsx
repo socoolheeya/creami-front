@@ -7,9 +7,9 @@ export default function Dashboard() {
   const t = useTranslations()
   const stats = [
     { icon: Package, label: t('ari.dashboard.stats.inventory'), value: '95%', color: 'var(--primary)' },
-    { icon: DollarSign, label: t('ari.dashboard.stats.averagePrice'), value: '₩150,000', color: '#4ade80' },
-    { icon: Calendar, label: t('ari.dashboard.stats.availableDays'), value: t('ari.common.days', { count: 28 }), color: '#60a5fa' },
-    { icon: BarChart3, label: t('ari.dashboard.stats.occupancy'), value: '78%', color: '#f59e0b' },
+    { icon: DollarSign, label: t('ari.dashboard.stats.averagePrice'), value: '₩150,000', color: 'var(--success)' },
+    { icon: Calendar, label: t('ari.dashboard.stats.availableDays'), value: t('ari.common.days', { count: 28 }), color: 'var(--info)' },
+    { icon: BarChart3, label: t('ari.dashboard.stats.occupancy'), value: '78%', color: 'var(--warning)' },
   ];
 
   return (

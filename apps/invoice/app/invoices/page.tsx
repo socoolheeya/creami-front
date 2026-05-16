@@ -191,7 +191,7 @@ export default function InvoicesPage() {
 
       <div className="mb-md flex flex-wrap items-center justify-between gap-md">
         <div className="flex min-w-0 flex-1 flex-wrap items-center gap-sm">
-          <div className="min-w-[16rem] flex-1">
+          <div className="min-w-filter-min flex-1">
             <Input
               value={query}
               onChange={(event) => setQuery(event.target.value)}
@@ -199,7 +199,7 @@ export default function InvoicesPage() {
               showSearchIcon
             />
           </div>
-          <div className="w-[14rem]">
+          <div className="w-filter-select">
             <Select value={status} onChange={(event) => setStatus(event.target.value as StatusFilter)}>
               <option value="all">{t('filters.allStatuses')}</option>
               {invoiceStatuses.map((item) => (

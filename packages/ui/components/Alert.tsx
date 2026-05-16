@@ -42,7 +42,8 @@ export function Alert({
       className={`flex items-start gap-sm rounded p-md text-base ${className}`}
       style={{
         backgroundColor: backgroundMap[variant],
-        border: `1px solid ${colorMap[variant]}`,
+        border: 'var(--border)',
+        borderColor: colorMap[variant],
         borderRadius: 'var(--radius)',
         color: 'var(--text-primary)'
       }}

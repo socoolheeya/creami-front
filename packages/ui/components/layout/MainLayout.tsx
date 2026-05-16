@@ -48,7 +48,7 @@ function MainLayoutContent({
       />
       {sidebar}
       <main
-        className="mt-[var(--header-height)] min-h-[calc(100vh-var(--header-height))] transition-[margin-left] duration-300 ease-in-out"
+        className="mt-header min-h-content-min transition-[margin-left] duration-300 ease-in-out"
         style={{
           marginLeft: isCollapsed ? 'var(--sidebar-collapsed)' : 'var(--sidebar-width)',
           padding: 'var(--content-padding)'

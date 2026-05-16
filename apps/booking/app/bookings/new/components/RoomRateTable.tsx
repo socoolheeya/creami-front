@@ -19,7 +19,7 @@ export function RoomRateTable({ roomRates, selectedRoomRate, onSelect }: RoomRat
           <tr
             style={{
               backgroundColor: 'var(--bg-tertiary)',
-              borderBottom: '1px solid var(--border-color)'
+              borderBottom: 'var(--border)'
             }}
           >
             <th
@@ -89,8 +89,8 @@ export function RoomRateTable({ roomRates, selectedRoomRate, onSelect }: RoomRat
                 key={`${roomRate.roomId}-${roomRate.ratePlanId}`}
                 style={{
                   backgroundColor: isSelected ? 'var(--primary-bg)' : 'var(--bg-primary)',
-                  borderBottom: index === roomRates.length - 1 ? 'none' : '1px solid var(--border-color)',
-                  borderLeft: isSelected ? '1px solid var(--primary)' : '1px solid transparent',
+                  borderBottom: index === roomRates.length - 1 ? 'none' : 'var(--border)',
+                  borderLeft: isSelected ? 'var(--border-primary)' : 'var(--border-transparent)',
                   cursor: 'pointer',
                   transition: 'all 0.2s'
                 }}

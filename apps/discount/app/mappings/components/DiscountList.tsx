@@ -46,7 +46,7 @@ export function DiscountList({
         className="flex flex-col items-center justify-center py-2xl rounded"
         style={{
           backgroundColor: 'var(--bg-primary)',
-          border: '2px dashed var(--border-color)'
+          border: 'var(--border-dashed-strong)'
         }}
       >
         <Tag className="h-2xl w-2xl mb-md" style={{ color: 'var(--text-tertiary)' }} />
@@ -62,7 +62,7 @@ export function DiscountList({
 
   if (layout === 'catalog') {
     return (
-      <div className="rounded bg-bg-primary" style={{ border: '1px solid var(--border-color)' }}>
+      <div className="rounded bg-bg-primary" style={{ border: 'var(--border)' }}>
         <div className="flex items-center justify-between gap-md border-b border-border px-md py-sm">
           <p className="text-base font-light text-text-secondary">
             {t('discount.common.shownOfTotal', {
@@ -81,7 +81,7 @@ export function DiscountList({
           )}
         </div>
 
-        <div className="max-h-[calc(var(--spacing-3xl)*9)] overflow-y-auto">
+        <div className="max-h-results-list overflow-y-auto">
           {discounts.map((discount) => {
             const discountValueLabel = getDiscountValueLabel(discount, t, locale)
             const periodLabel = getPeriodLabel(discount, locale)
@@ -152,7 +152,7 @@ export function DiscountList({
             className="w-full p-md rounded text-left transition-all hover:shadow-md"
             style={{
               backgroundColor: 'var(--bg-primary)',
-              border: '1px solid var(--border-color)',
+              border: 'var(--border)',
               boxShadow: 'var(--shadow)'
             }}
           >

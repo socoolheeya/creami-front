@@ -137,7 +137,8 @@ export default function LoginPage() {
               disabled
               style={{
                 backgroundColor: provider.background,
-                border: `1px solid ${provider.border}`,
+                border: 'var(--border)',
+                borderColor: provider.border,
                 color: provider.color
               }}
             >

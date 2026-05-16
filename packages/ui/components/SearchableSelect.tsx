@@ -87,7 +87,7 @@ export function SearchableSelect({
       {open && (
         <div
           className="absolute z-50 mt-xs flex w-full flex-col gap-sm rounded border border-border bg-bg-primary p-sm shadow-lg"
-          style={{ maxHeight: '20rem' }}
+          style={{ maxHeight: 'var(--policy-list-height)' }}
         >
           <Input
             value={query}
@@ -97,7 +97,7 @@ export function SearchableSelect({
             autoFocus
           />
 
-          <div className="overflow-y-auto" style={{ maxHeight: '14rem' }}>
+          <div className="overflow-y-auto" style={{ maxHeight: 'var(--results-list-height)' }}>
             {filteredOptions.length > 0 ? (
               filteredOptions.map((option) => (
                 <button

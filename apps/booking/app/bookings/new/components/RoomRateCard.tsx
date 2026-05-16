@@ -16,7 +16,7 @@ export function RoomRateCard({ roomRate, isSelected, onSelect }: RoomRateCardPro
       className="p-md rounded transition-all cursor-pointer"
       style={{
         backgroundColor: isSelected ? 'var(--primary-bg)' : 'var(--bg-primary)',
-        border: `1px solid ${isSelected ? 'var(--primary)' : 'var(--border-color)'}`,
+        border: isSelected ? 'var(--border-primary)' : 'var(--border)',
         position: 'relative'
       }}
     >
@@ -25,7 +25,7 @@ export function RoomRateCard({ roomRate, isSelected, onSelect }: RoomRateCardPro
           className="absolute right-sm top-sm flex h-control-mini w-control-mini items-center justify-center rounded"
           style={{
             backgroundColor: 'var(--primary)',
-            color: '#ffffff'
+            color: 'var(--text-on-primary)'
           }}
         >
           <Check className="w-icon-mini h-icon-mini" />

@@ -242,7 +242,7 @@ export default function SuppliersPage() {
       {isModalOpen && (
         <div
           className="fixed inset-0 z-50 flex items-center justify-center p-lg"
-          style={{ backgroundColor: 'rgba(0, 0, 0, 0.5)' }}
+          style={{ backgroundColor: 'var(--overlay-bg)' }}
           onClick={resetForm}
         >
           <div

@@ -117,19 +117,23 @@ export function RatePlanSelector({
           type="text"
           value={searchQuery}
           onChange={handleSearchChange}
-          disabled={disabled || loading}
+          disabled={disabled}
+          aria-busy={loading}
           placeholder={disabled ? t('discount.mappings.ratePlan.disabledPlaceholder') : t('discount.mappings.ratePlan.placeholder')}
           className="h-control-md w-full rounded pr-control-px-md text-base"
           style={{
             backgroundColor: disabled ? 'var(--bg-tertiary)' : 'var(--bg-secondary)',
-            border: '1px solid var(--border-color)',
+            border: 'var(--border)',
             color: 'var(--text-primary)',
             paddingLeft: 'var(--control-search-padding)'
           }}
         />
       </div>
 
-      <div className="flex flex-wrap gap-sm">
+      <div
+        className="flex max-h-results-list flex-wrap gap-sm overflow-y-auto pr-xs"
+        aria-busy={loading}
+      >
         {filteredRatePlans.map((ratePlan) => {
           const isSelected = selectedIds.includes(ratePlan.id)
 
@@ -142,7 +146,7 @@ export function RatePlanSelector({
               className="rounded px-md py-sm text-left transition-colors"
               style={{
                 backgroundColor: isSelected ? 'var(--primary)' : 'var(--bg-secondary)',
-                border: `1px solid ${isSelected ? 'var(--primary)' : 'var(--border-color)'}`,
+                border: isSelected ? 'var(--border-primary)' : 'var(--border)',
                 color: isSelected ? 'var(--text-on-primary)' : 'var(--text-primary)'
               }}
               aria-pressed={isSelected}

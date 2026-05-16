@@ -23,12 +23,12 @@ export function WizardNavigation({
   const isLastStep = currentStep === totalSteps
 
   return (
-    <div className="flex items-center justify-between pt-6 border-t" style={{ borderColor: 'var(--border-color)' }}>
+    <div className="flex items-center justify-between pt-lg border-t" style={{ borderColor: 'var(--border-color)' }}>
       {/* Previous Button */}
       {!isFirstStep && (
         <button
           onClick={onPrevious}
-          className="flex items-center gap-2 px-4 py-2 rounded-lg transition-colors"
+          className="flex items-center gap-sm px-md py-sm rounded transition-colors"
           style={{
             backgroundColor: 'var(--bg-tertiary)',
             color: 'var(--text-primary)',
@@ -49,10 +49,10 @@ export function WizardNavigation({
         <button
           onClick={onSubmit}
           disabled={!canProceed || isSubmitting}
-          className="flex items-center gap-2 px-6 py-2 rounded-lg transition-colors"
+          className="flex items-center gap-sm px-lg py-sm rounded transition-colors"
           style={{
             backgroundColor: canProceed && !isSubmitting ? 'var(--primary)' : 'var(--bg-tertiary)',
-            color: canProceed && !isSubmitting ? '#ffffff' : 'var(--text-tertiary)',
+            color: canProceed && !isSubmitting ? 'var(--text-on-primary)' : 'var(--text-tertiary)',
             borderRadius: 'var(--radius-sm)',
             fontWeight: 'var(--font-bold)',
             cursor: canProceed && !isSubmitting ? 'pointer' : 'not-allowed',
@@ -75,10 +75,10 @@ export function WizardNavigation({
         <button
           onClick={onNext}
           disabled={!canProceed}
-          className="flex items-center gap-2 px-4 py-2 rounded-lg transition-colors"
+          className="flex items-center gap-sm px-md py-sm rounded transition-colors"
           style={{
             backgroundColor: canProceed ? 'var(--primary)' : 'var(--bg-tertiary)',
-            color: canProceed ? '#ffffff' : 'var(--text-tertiary)',
+            color: canProceed ? 'var(--text-on-primary)' : 'var(--text-tertiary)',
             borderRadius: 'var(--radius-sm)',
             fontWeight: 'var(--font-medium)',
             cursor: canProceed ? 'pointer' : 'not-allowed',

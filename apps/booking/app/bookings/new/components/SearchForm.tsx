@@ -98,9 +98,9 @@ export function SearchForm({ onSearch, isLoading }: SearchFormProps) {
       className="p-lg rounded h-fit"
       style={{
         backgroundColor: 'var(--bg-primary)',
-        border: '1px solid var(--border-color)',
+        border: 'var(--border)',
         position: 'sticky',
-        top: '80px'
+        top: 'var(--sticky-search-top)'
       }}
     >
       <h2 className="text-xl mb-lg" style={{ fontWeight: 'var(--font-bold)', color: 'var(--text-primary)' }}>
@@ -124,7 +124,7 @@ export function SearchForm({ onSearch, isLoading }: SearchFormProps) {
               className="w-full h-control-md px-control-px-md py-none rounded text-base leading-none"
               style={{
                 backgroundColor: 'var(--bg-secondary)',
-                border: '1px solid var(--border-color)',
+                border: 'var(--border)',
                 color: 'var(--text-primary)',
                 borderRadius: 'var(--radius)',
                 paddingRight: 'var(--control-search-padding)',
@@ -143,9 +143,9 @@ export function SearchForm({ onSearch, isLoading }: SearchFormProps) {
               className="absolute w-full mt-xs rounded overflow-hidden z-10"
               style={{
                 backgroundColor: 'var(--bg-primary)',
-                border: '1px solid var(--border-color)',
+                border: 'var(--border)',
                 boxShadow: 'var(--shadow)',
-                maxHeight: '15rem',
+                maxHeight: 'var(--search-result-height)',
                 overflowY: 'auto'
               }}
             >
@@ -157,7 +157,7 @@ export function SearchForm({ onSearch, isLoading }: SearchFormProps) {
                     className="px-md py-sm cursor-pointer transition-colors"
                     style={{
                       color: 'var(--text-primary)',
-                      borderBottom: '1px solid var(--border-color)'
+                      borderBottom: 'var(--border)'
                     }}
                     onMouseEnter={(e) => {
                       e.currentTarget.style.backgroundColor = 'var(--bg-secondary)'

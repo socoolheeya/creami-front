@@ -1,7 +1,21 @@
 export type DiscountType = 'percentage' | 'fixed' // 퍼센트 할인 또는 정액 할인
 export type DiscountTarget = 'all' | 'accommodation' | 'room' | 'rateplan' // 할인 적용 대상
 export type DiscountStatus = 'active' | 'scheduled' | 'expired' | 'disabled' // 할인 상태
-export type DiscountBusinessType = 'EARLYBIRD' | 'BASE_DISCOUNT' | 'LAST_MINUTES' | 'WELCOME' | 'VIP' | 'WEEKEND' | 'LONG_STAY' | 'SEASONAL' | 'TEST'
+export type DiscountAudienceType = 'PUBLIC' | 'MOBILE_ONLY' | 'MEMBER_ONLY'
+export type DiscountBusinessType =
+  | 'BASIC'
+  | 'EARLY_BIRD'
+  | 'LAST_MINUTE'
+  | 'LONG_STAY'
+  | 'FREE_NIGHTS'
+  | 'EARLYBIRD'
+  | 'BASE_DISCOUNT'
+  | 'LAST_MINUTES'
+  | 'WELCOME'
+  | 'VIP'
+  | 'WEEKEND'
+  | 'SEASONAL'
+  | 'TEST'
 
 export interface Discount {
   id: string
@@ -47,6 +61,7 @@ export interface DiscountFormData {
   name?: string
   code?: string
   description?: string
+  discountType?: DiscountBusinessType
   type?: DiscountType
   value?: number
   target?: DiscountTarget
@@ -58,6 +73,8 @@ export interface DiscountFormData {
   startDate?: Date
   endDate?: Date
   isPublic?: boolean
+  audienceType?: DiscountAudienceType
+  status?: DiscountStatus
 }
 
 // 할인 타입 라벨

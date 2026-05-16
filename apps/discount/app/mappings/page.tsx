@@ -20,8 +20,21 @@ import { RatePlanSelector } from './components/RatePlanSelector'
 import { DiscountList } from './components/DiscountList'
 
 const AVAILABLE_DISCOUNT_PAGE_SIZE = 50
+const SEARCH_DEBOUNCE_MS = 400
 
-const normalizeDiscountSearchTerm = (value: string) => value.trim().toLowerCase()
+function useDebouncedValue(value: string, delayMs: number) {
+  const [debouncedValue, setDebouncedValue] = useState(value)
+
+  useEffect(() => {
+    const timeoutId = window.setTimeout(() => {
+      setDebouncedValue(value)
+    }, delayMs)
+
+    return () => window.clearTimeout(timeoutId)
+  }, [delayMs, value])
+
+  return debouncedValue
+}
 
 export default function MappingsPage() {
   const t = useTranslations()
@@ -31,8 +44,10 @@ export default function MappingsPage() {
   const [mappings, setMappings] = useState<DiscountRatePlanMapping[]>([])
   const [accommodations, setAccommodations] = useState<Accommodation[]>([])
   const [ratePlans, setRatePlans] = useState<RatePlan[]>([])
-  const [discounts, setDiscounts] = useState<Discount[]>([])
+  const [allDiscounts, setAllDiscounts] = useState<Discount[]>([])
+  const [availableDiscounts, setAvailableDiscounts] = useState<Discount[]>([])
   const [isLoading, setIsLoading] = useState(true)
+  const [isAccommodationLoading, setIsAccommodationLoading] = useState(false)
   const [isRatePlanLoading, setIsRatePlanLoading] = useState(false)
   const [isMappingLoading, setIsMappingLoading] = useState(false)
   const [isSaving, setIsSaving] = useState(false)
@@ -42,6 +57,9 @@ export default function MappingsPage() {
   const [availableDiscountQuery, setAvailableDiscountQuery] = useState('')
   const [availableDiscountLimit, setAvailableDiscountLimit] = useState(AVAILABLE_DISCOUNT_PAGE_SIZE)
   const [selectorOpen, setSelectorOpen] = useState(true)
+  const debouncedAccommodationQuery = useDebouncedValue(accommodationQuery, SEARCH_DEBOUNCE_MS)
+  const debouncedRatePlanQuery = useDebouncedValue(ratePlanQuery, SEARCH_DEBOUNCE_MS)
+  const debouncedAvailableDiscountQuery = useDebouncedValue(availableDiscountQuery, SEARCH_DEBOUNCE_MS)
 
   const selectedAccommodation = useMemo(() => {
     if (!selectedAccommodationId) return null
@@ -57,19 +75,16 @@ export default function MappingsPage() {
   useEffect(() => {
     let ignore = false
 
-    const loadInitialData = async () => {
+    const loadDiscounts = async () => {
       setIsLoading(true)
       setErrorMessage('')
 
       try {
-        const [accommodationResponse, discountResponse] = await Promise.all([
-          fetchAccommodations({ search: accommodationQuery }),
-          fetchDiscounts({ activeOnly: true }),
-        ])
+        const discountResponse = await fetchDiscounts({ activeOnly: true })
 
         if (!ignore) {
-          setAccommodations(accommodationResponse)
-          setDiscounts(discountResponse)
+          setAllDiscounts(discountResponse)
+          setAvailableDiscounts(discountResponse)
         }
       } catch {
         if (!ignore) {
@@ -82,13 +97,42 @@ export default function MappingsPage() {
       }
     }
 
-    const timeoutId = window.setTimeout(loadInitialData, 250)
+    loadDiscounts()
 
     return () => {
       ignore = true
-      window.clearTimeout(timeoutId)
     }
-  }, [accommodationQuery, t])
+  }, [t])
+
+  useEffect(() => {
+    let ignore = false
+
+    const loadAccommodations = async () => {
+      setIsAccommodationLoading(true)
+      setErrorMessage('')
+
+      try {
+        const response = await fetchAccommodations({ search: debouncedAccommodationQuery })
+        if (!ignore) {
+          setAccommodations(response)
+        }
+      } catch {
+        if (!ignore) {
+          setErrorMessage(t('discount.mappings.loadError'))
+        }
+      } finally {
+        if (!ignore) {
+          setIsAccommodationLoading(false)
+        }
+      }
+    }
+
+    loadAccommodations()
+
+    return () => {
+      ignore = true
+    }
+  }, [debouncedAccommodationQuery, t])
 
   useEffect(() => {
     let ignore = false
@@ -103,7 +147,7 @@ export default function MappingsPage() {
       setErrorMessage('')
 
       try {
-        const response = await fetchRatePlans(selectedAccommodationId, selectedAccommodation, { search: ratePlanQuery })
+        const response = await fetchRatePlans(selectedAccommodationId, selectedAccommodation, { search: debouncedRatePlanQuery })
         if (!ignore) {
           setRatePlans(response)
         }
@@ -119,13 +163,12 @@ export default function MappingsPage() {
       }
     }
 
-    const timeoutId = window.setTimeout(loadRatePlans, 250)
+    loadRatePlans()
 
     return () => {
       ignore = true
-      window.clearTimeout(timeoutId)
     }
-  }, [ratePlanQuery, selectedAccommodation, selectedAccommodationId, t])
+  }, [debouncedRatePlanQuery, selectedAccommodation, selectedAccommodationId, t])
 
   useEffect(() => {
     let ignore = false
@@ -138,10 +181,16 @@ export default function MappingsPage() {
       try {
         const response = await fetchDiscounts({
           activeOnly: true,
-          search: availableDiscountQuery,
+          search: debouncedAvailableDiscountQuery,
         })
         if (!ignore) {
-          setDiscounts(response)
+          setAvailableDiscounts(response)
+          setAllDiscounts(prev => {
+            const knownIds = new Set(prev.map(discount => discount.id))
+            const nextDiscounts = response.filter(discount => !knownIds.has(discount.id))
+
+            return nextDiscounts.length > 0 ? [...prev, ...nextDiscounts] : prev
+          })
         }
       } catch {
         if (!ignore) {
@@ -150,13 +199,12 @@ export default function MappingsPage() {
       }
     }
 
-    const timeoutId = window.setTimeout(searchDiscounts, 250)
+    searchDiscounts()
 
     return () => {
       ignore = true
-      window.clearTimeout(timeoutId)
     }
-  }, [availableDiscountQuery, selectedRatePlanIds.length, t])
+  }, [debouncedAvailableDiscountQuery, selectedRatePlanIds.length, t])
 
   useEffect(() => {
     let ignore = false
@@ -234,16 +282,10 @@ export default function MappingsPage() {
     return new Set(allMappedIds)
   }, [selectedRatePlanIds, mappings])
 
-  const eligibleDiscounts = discounts
-
-  const normalizedAvailableDiscountQuery = normalizeDiscountSearchTerm(availableDiscountQuery)
-
-  // 매핑 전 할인 목록 (매핑되지 않은 활성/유효 할인)
-  const unmappedDiscounts = useMemo(() => eligibleDiscounts.filter(discount => {
-    const matchesMapping = !mappedDiscountIds.has(discount.id)
-    if (!normalizedAvailableDiscountQuery) return matchesMapping
-    return matchesMapping
-  }), [eligibleDiscounts, mappedDiscountIds, normalizedAvailableDiscountQuery])
+  // 매핑 전 할인 목록. 검색 결과 자체는 API 응답으로 받는다.
+  const unmappedDiscounts = useMemo(() => availableDiscounts.filter(discount => {
+    return !mappedDiscountIds.has(discount.id)
+  }), [availableDiscounts, mappedDiscountIds])
 
   const visibleUnmappedDiscounts = useMemo(() => {
     return unmappedDiscounts.slice(0, availableDiscountLimit)
@@ -251,8 +293,8 @@ export default function MappingsPage() {
 
   // 매핑 후 할인 목록 (매핑된 활성/유효 할인)
   const mappedDiscounts = useMemo(() => {
-    return eligibleDiscounts.filter(d => mappedDiscountIds.has(d.id))
-  }, [eligibleDiscounts, mappedDiscountIds])
+    return allDiscounts.filter(d => mappedDiscountIds.has(d.id))
+  }, [allDiscounts, mappedDiscountIds])
 
   const handleAvailableDiscountQueryChange = (value: string) => {
     setAvailableDiscountQuery(value)
@@ -267,19 +309,32 @@ export default function MappingsPage() {
     }
 
     setMappings(prev => {
-      return prev.map(mapping => {
-        if (selectedRatePlanIds.includes(mapping.ratePlanId)) {
-          // 이미 매핑되어 있지 않으면 추가
-          if (!mapping.discountIds.includes(discountId)) {
-            return {
-              ...mapping,
-              discountIds: [...mapping.discountIds, discountId]
-            }
-          }
+      const currentMappings = new Map(prev.map(mapping => [mapping.ratePlanId, mapping]))
+
+      selectedRatePlanIds.forEach(ratePlanId => {
+        const currentMapping = currentMappings.get(ratePlanId) ?? { ratePlanId, discountIds: [] }
+
+        if (!currentMapping.discountIds.includes(discountId)) {
+          currentMappings.set(ratePlanId, {
+            ...currentMapping,
+            discountIds: [...currentMapping.discountIds, discountId]
+          })
         }
-        return mapping
       })
+
+      return Array.from(currentMappings.values())
     })
+
+    const mappedDiscount = availableDiscounts.find(discount => discount.id === discountId)
+    if (mappedDiscount) {
+      setAllDiscounts(prev => {
+        if (prev.some(discount => discount.id === mappedDiscount.id)) {
+          return prev
+        }
+
+        return [...prev, mappedDiscount]
+      })
+    }
   }
 
   // 할인을 매핑 전으로 이동
@@ -290,15 +345,20 @@ export default function MappingsPage() {
     }
 
     setMappings(prev => {
-      return prev.map(mapping => {
-        if (selectedRatePlanIds.includes(mapping.ratePlanId)) {
-          return {
-            ...mapping,
-            discountIds: mapping.discountIds.filter(id => id !== discountId)
-          }
+      const currentMappings = new Map(prev.map(mapping => [mapping.ratePlanId, mapping]))
+
+      selectedRatePlanIds.forEach(ratePlanId => {
+        const currentMapping = currentMappings.get(ratePlanId)
+
+        if (currentMapping) {
+          currentMappings.set(ratePlanId, {
+            ...currentMapping,
+            discountIds: currentMapping.discountIds.filter(id => id !== discountId)
+          })
         }
-        return mapping
       })
+
+      return Array.from(currentMappings.values())
     })
   }
 
@@ -399,7 +459,7 @@ export default function MappingsPage() {
               onSelect={handleAccommodationChange}
               onSearch={setAccommodationQuery}
               compact={selectedAccommodationId !== null}
-              loading={isLoading}
+              loading={isAccommodationLoading}
             />
           </div>
           <div>
@@ -410,7 +470,7 @@ export default function MappingsPage() {
               onSelectionChange={handleRatePlanSelectionChange}
               onSearch={setRatePlanQuery}
               compact={isMappingReady}
-              disabled={!selectedAccommodationId || isRatePlanLoading}
+              disabled={!selectedAccommodationId}
               loading={isRatePlanLoading}
               onApply={handleApplySelection}
             />
@@ -423,7 +483,7 @@ export default function MappingsPage() {
           className="mb-md rounded px-md py-sm text-base font-medium"
           style={{
             backgroundColor: 'var(--bg-primary)',
-            border: '1px solid var(--border-color)',
+            border: 'var(--border)',
             color: errorMessage ? 'var(--danger)' : 'var(--text-secondary)',
           }}
         >
@@ -437,7 +497,7 @@ export default function MappingsPage() {
           className="flex flex-col items-center justify-center rounded py-3xl"
           style={{
             backgroundColor: 'var(--bg-primary)',
-            border: '2px dashed var(--border-color)'
+            border: 'var(--border-dashed-strong)'
           }}
         >
           <Link2 className="h-3xl w-3xl mb-md text-text-tertiary" />
@@ -453,7 +513,7 @@ export default function MappingsPage() {
           className="flex flex-col items-center justify-center rounded py-3xl"
           style={{
             backgroundColor: 'var(--bg-primary)',
-            border: '2px dashed var(--border-color)'
+            border: 'var(--border-dashed-strong)'
           }}
         >
           <Link2 className="h-3xl w-3xl mb-md text-text-tertiary" />
@@ -491,7 +551,7 @@ export default function MappingsPage() {
                 className="h-control-md w-full rounded pr-control-px-md text-base"
                 style={{
                   backgroundColor: 'var(--bg-primary)',
-                  border: '1px solid var(--border-color)',
+                  border: 'var(--border)',
                   color: 'var(--text-primary)',
                   paddingLeft: 'var(--control-search-padding)'
                 }}

@@ -262,7 +262,7 @@ export default function InventoriesPage() {
           backgroundColor: 'var(--bg-primary)',
           borderRadius: 'var(--radius)',
           boxShadow: 'var(--shadow)',
-          border: '1px solid var(--border-color)'
+          border: 'var(--border)'
         }}
       >
         {/* Panel Header */}
@@ -270,7 +270,7 @@ export default function InventoriesPage() {
           className="flex cursor-pointer items-center justify-between p-lg"
           onClick={toggleCollapse}
           style={{
-            borderBottom: isCollapsed ? 'none' : '1px solid var(--border-color)'
+            borderBottom: isCollapsed ? 'none' : 'var(--border)'
           }}
         >
           <div className="flex-1">
@@ -287,8 +287,8 @@ export default function InventoriesPage() {
                 </div>
                 {selectedRooms.length > 0 && (
                   <div className="flex items-center gap-sm">
-                    <DoorOpen className="h-md w-md" style={{ color: '#4ade80' }} />
-                    <span style={{ color: '#4ade80', fontWeight: 'var(--font-medium)' }}>
+                    <DoorOpen className="h-md w-md" style={{ color: 'var(--success)' }} />
+                    <span style={{ color: 'var(--success)', fontWeight: 'var(--font-medium)' }}>
                       {selectedRooms.map(r => r.name).join(', ')}
                     </span>
                   </div>
@@ -341,8 +341,8 @@ export default function InventoriesPage() {
                   className="mt-sm overflow-hidden rounded"
                   style={{
                     backgroundColor: 'var(--bg-primary)',
-                    border: '1px solid var(--border-color)',
-                    maxHeight: '200px',
+                    border: 'var(--border)',
+                    maxHeight: 'var(--compact-list-height)',
                     overflowY: 'auto'
                   }}
                 >
@@ -353,8 +353,8 @@ export default function InventoriesPage() {
                       className="cursor-pointer px-md py-sm transition-colors"
                       style={{
                         backgroundColor: selectedPropertyId === property.id ? 'var(--primary-bg)' : 'transparent',
-                        borderLeft: selectedPropertyId === property.id ? '3px solid var(--primary)' : '3px solid transparent',
-                        borderBottom: '1px solid var(--border-color)'
+                        borderLeft: selectedPropertyId === property.id ? 'var(--border-primary-strong)' : 'var(--border-transparent-strong)',
+                        borderBottom: 'var(--border)'
                       }}
                       onMouseEnter={(e) => {
                         if (selectedPropertyId !== property.id) {
@@ -404,7 +404,7 @@ export default function InventoriesPage() {
                         className="flex items-center gap-sm rounded px-sm py-xs text-base"
                         style={{
                           backgroundColor: 'var(--primary)',
-                          color: '#ffffff',
+                          color: 'var(--text-on-primary)',
                           borderRadius: 'var(--radius)'
                         }}
                       >
@@ -552,7 +552,7 @@ export default function InventoriesPage() {
           style={{
             backgroundColor: 'var(--bg-primary)',
             borderRadius: 'var(--radius)',
-            border: '2px dashed var(--border-color)'
+            border: 'var(--border-dashed-strong)'
           }}
         >
           <Package className="h-3xl w-3xl" style={{ color: 'var(--text-tertiary)' }} />

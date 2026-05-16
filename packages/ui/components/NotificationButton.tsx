@@ -24,7 +24,7 @@ export function NotificationButton() {
       >
         <Bell className="h-lg w-lg" />
         {hasUnread && (
-          <span className="absolute right-[6px] top-[6px] h-[8px] w-[8px] rounded-full bg-primary" />
+          <span className="absolute right-notification-indicator-offset top-notification-indicator-offset h-notification-indicator w-notification-indicator rounded bg-primary" />
         )}
       </Button>
 
@@ -35,11 +35,11 @@ export function NotificationButton() {
             onClick={() => setIsOpen(false)}
             aria-hidden="true"
           />
-          <div className="absolute right-0 top-full z-50 mt-xs w-[320px] rounded bg-bg-secondary border border-border shadow-lg">
+          <div className="absolute right-0 top-full z-50 mt-xs w-notification-menu rounded bg-bg-secondary border border-border shadow-lg">
             <div className="px-md py-sm border-b border-border">
               <h3 className="font-bold text-text-primary">{t('notification.title')}</h3>
             </div>
-            <div className="max-h-[400px] overflow-y-auto">
+            <div className="max-h-notification-menu-max overflow-y-auto">
               <div className="px-md py-md text-center text-text-secondary">
                 {t('notification.empty')}
               </div>

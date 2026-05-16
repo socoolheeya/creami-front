@@ -94,7 +94,7 @@ export function AppSwitcher({ apps, currentAppId }: AppSwitcherProps) {
       >
         <div className="min-h-0 overflow-hidden">
           <div
-            className={`max-h-[var(--app-switcher-dropdown-height)] overflow-y-auto rounded border border-border bg-bg-primary p-md shadow-md transition-transform duration-300 ease-in-out ${
+            className={`max-h-app-switcher-dropdown overflow-y-auto rounded border border-border bg-bg-primary p-md shadow-md transition-transform duration-300 ease-in-out ${
               isOpen ? 'translate-y-none' : '-translate-y-sm'
             }`}
           >

@@ -422,9 +422,9 @@ export default function RatesPage() {
             className="absolute z-50 mt-xs w-full rounded shadow-lg"
             style={{
               backgroundColor: 'var(--bg-primary)',
-              border: '1px solid var(--border-color)',
+              border: 'var(--border)',
               borderRadius: 'var(--radius)',
-              maxHeight: '320px',
+              maxHeight: 'var(--selector-list-height)',
               overflow: 'hidden',
               display: 'flex',
               flexDirection: 'column'
@@ -433,7 +433,7 @@ export default function RatesPage() {
             <div
               className="flex items-center justify-between px-md py-sm"
               style={{
-                borderBottom: '1px solid var(--border-color)',
+                borderBottom: 'var(--border)',
                 backgroundColor: 'var(--bg-secondary)'
               }}
             >
@@ -460,7 +460,7 @@ export default function RatesPage() {
               </div>
             </div>
 
-            <div className="px-md py-sm" style={{ borderBottom: '1px solid var(--border-color)' }}>
+            <div className="px-md py-sm" style={{ borderBottom: 'var(--border)' }}>
               <Input
                 value={roomSearchQuery}
                 onChange={(event) => setRoomSearchQuery(event.target.value)}
@@ -481,7 +481,7 @@ export default function RatesPage() {
                     key={room.id}
                     className="flex cursor-pointer items-center px-md py-sm hover:bg-opacity-50"
                     style={{
-                      borderBottom: '1px solid var(--border-color)'
+                      borderBottom: 'var(--border)'
                     }}
                     onMouseEnter={(event) => {
                       event.currentTarget.style.backgroundColor = 'var(--bg-tertiary)'
@@ -496,8 +496,8 @@ export default function RatesPage() {
                       onChange={() => handleToggleRoomInDropdown(room.id)}
                       className="mr-sm"
                       style={{
-                        width: '18px',
-                        height: '18px',
+                        width: 'var(--icon-size-md)',
+                        height: 'var(--icon-size-md)',
                         cursor: 'pointer',
                         accentColor: 'var(--primary)'
                       }}
@@ -517,7 +517,7 @@ export default function RatesPage() {
             <div
               className="flex gap-sm px-md py-sm"
               style={{
-                borderTop: '1px solid var(--border-color)',
+                borderTop: 'var(--border)',
                 backgroundColor: 'var(--bg-secondary)'
               }}
             >
@@ -548,7 +548,7 @@ export default function RatesPage() {
               className="flex items-center gap-sm rounded px-sm py-xs"
               style={{
                 backgroundColor: 'var(--primary)',
-                color: '#ffffff',
+                color: 'var(--text-on-primary)',
                 borderRadius: 'var(--radius)',
                 fontWeight: 'var(--font-medium)'
               }}
@@ -649,9 +649,9 @@ export default function RatesPage() {
             className="absolute z-50 mt-xs w-full rounded shadow-lg"
             style={{
               backgroundColor: 'var(--bg-primary)',
-              border: '1px solid var(--border-color)',
+              border: 'var(--border)',
               borderRadius: 'var(--radius)',
-              maxHeight: '320px',
+              maxHeight: 'var(--selector-list-height)',
               overflow: 'hidden',
               display: 'flex',
               flexDirection: 'column'
@@ -660,7 +660,7 @@ export default function RatesPage() {
             <div
               className="flex items-center justify-between px-md py-sm"
               style={{
-                borderBottom: '1px solid var(--border-color)',
+                borderBottom: 'var(--border)',
                 backgroundColor: 'var(--bg-secondary)'
               }}
             >
@@ -687,7 +687,7 @@ export default function RatesPage() {
               </div>
             </div>
 
-            <div className="px-md py-sm" style={{ borderBottom: '1px solid var(--border-color)' }}>
+            <div className="px-md py-sm" style={{ borderBottom: 'var(--border)' }}>
               <Input
                 value={packageSearchQuery}
                 onChange={(event) => setPackageSearchQuery(event.target.value)}
@@ -708,7 +708,7 @@ export default function RatesPage() {
                     key={pkg.id}
                     className="flex cursor-pointer items-center px-md py-sm hover:bg-opacity-50"
                     style={{
-                      borderBottom: '1px solid var(--border-color)'
+                      borderBottom: 'var(--border)'
                     }}
                     onMouseEnter={(event) => {
                       event.currentTarget.style.backgroundColor = 'var(--bg-tertiary)'
@@ -723,8 +723,8 @@ export default function RatesPage() {
                       onChange={() => handleTogglePackageInDropdown(pkg.id)}
                       className="mr-sm"
                       style={{
-                        width: '18px',
-                        height: '18px',
+                        width: 'var(--icon-size-md)',
+                        height: 'var(--icon-size-md)',
                         cursor: 'pointer',
                         accentColor: 'var(--primary)'
                       }}
@@ -744,7 +744,7 @@ export default function RatesPage() {
             <div
               className="flex gap-sm px-md py-sm"
               style={{
-                borderTop: '1px solid var(--border-color)',
+                borderTop: 'var(--border)',
                 backgroundColor: 'var(--bg-secondary)'
               }}
             >
@@ -775,7 +775,7 @@ export default function RatesPage() {
               className="flex items-center gap-sm rounded px-sm py-xs"
               style={{
                 backgroundColor: 'var(--primary)',
-                color: '#ffffff',
+                color: 'var(--text-on-primary)',
                 borderRadius: 'var(--radius)',
                 fontWeight: 'var(--font-medium)'
               }}
@@ -828,7 +828,7 @@ export default function RatesPage() {
           backgroundColor: 'var(--bg-primary)',
           borderRadius: 'var(--radius)',
           boxShadow: 'var(--shadow)',
-          border: '1px solid var(--border-color)'
+          border: 'var(--border)'
         }}
       >
         {/* Panel Header */}
@@ -836,7 +836,7 @@ export default function RatesPage() {
           className="flex cursor-pointer items-center justify-between p-lg"
           onClick={toggleCollapse}
           style={{
-            borderBottom: isCollapsed ? 'none' : '1px solid var(--border-color)'
+            borderBottom: isCollapsed ? 'none' : 'var(--border)'
           }}
         >
           <div className="flex-1">
@@ -853,21 +853,21 @@ export default function RatesPage() {
               >
                 {/* Property */}
                 <div className="flex items-center gap-xs">
-                  <Building2 className="h-md w-md" style={{ color: '#3b82f6' }} />
+                  <Building2 className="h-md w-md" style={{ color: 'var(--info)' }} />
                   <span style={{ fontWeight: 'var(--font-medium)' }}>{selectedProperty.name}</span>
                 </div>
 
                 {/* Package */}
                 {criteriaType === 'package' && selectedPackage && (
                   <div className="flex items-center gap-xs">
-                    <Package2 className="h-md w-md" style={{ color: '#8b5cf6' }} />
+                    <Package2 className="h-md w-md" style={{ color: 'var(--primary)' }} />
                     <span>{selectedPackage.name}</span>
                   </div>
                 )}
 
                 {criteriaType === 'room' && selectedPackages.length > 0 && (
                   <div className="flex items-center gap-xs">
-                    <Package2 className="h-md w-md" style={{ color: '#8b5cf6' }} />
+                    <Package2 className="h-md w-md" style={{ color: 'var(--primary)' }} />
                     <span>{selectedPackages.map(pkg => pkg.name).join(', ')}</span>
                   </div>
                 )}
@@ -875,7 +875,7 @@ export default function RatesPage() {
                 {/* Rooms */}
                 {selectedRooms.length > 0 && (
                   <div className="flex items-center gap-xs">
-                    <Bed className="h-md w-md" style={{ color: '#10b981' }} />
+                    <Bed className="h-md w-md" style={{ color: 'var(--success)' }} />
                     <span>{selectedRooms.map(r => r.name).join(', ')}</span>
                   </div>
                 )}
@@ -1048,7 +1048,7 @@ export default function RatesPage() {
           style={{
             backgroundColor: 'var(--bg-primary)',
             borderRadius: 'var(--radius)',
-            border: '2px dashed var(--border-color)'
+            border: 'var(--border-dashed-strong)'
           }}
         >
           <DollarSign className="h-3xl w-3xl" style={{ color: 'var(--text-tertiary)' }} />

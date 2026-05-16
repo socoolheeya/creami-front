@@ -1,16 +1,16 @@
 'use client'
 
 import { Discount } from '@/lib/types/discount'
-import { Tag, Percent, DollarSign, Calendar } from 'lucide-react'
-import Link from 'next/link'
-import { Card } from '@creami/ui'
+import { Calendar, DollarSign, Edit, Percent, Tag } from 'lucide-react'
+import { Button, Card } from '@creami/ui'
 import { useLocale, useTranslations } from 'next-intl'
 
 interface DiscountCardProps {
   discount: Discount
+  onEdit: (discount: Discount) => void
 }
 
-export function DiscountCard({ discount }: DiscountCardProps) {
+export function DiscountCard({ discount, onEdit }: DiscountCardProps) {
   const t = useTranslations()
   const locale = useLocale()
   const statusColor =
@@ -20,16 +20,15 @@ export function DiscountCard({ discount }: DiscountCardProps) {
     'var(--neutral)'
 
   return (
-    <Link href={`/discounts/${discount.id}`}>
-      <Card className="overflow-hidden transition-all hover:shadow-lg" hover={false}>
-        {/* Header */}
-        <div
-          className="p-md"
-          style={{
-            backgroundColor: 'var(--bg-secondary)',
-            borderBottom: '1px solid var(--border-color)'
-          }}
-        >
+    <Card className="overflow-hidden transition-all hover:shadow-lg" hover={false}>
+      {/* Header */}
+      <div
+        className="p-md"
+        style={{
+          backgroundColor: 'var(--bg-secondary)',
+          borderBottom: 'var(--border)'
+        }}
+      >
           <div className="flex items-start justify-between mb-sm">
             <div className="flex-1">
               <h3
@@ -122,8 +121,14 @@ export function DiscountCard({ discount }: DiscountCardProps) {
               </span>
             </div>
           </div>
-        </div>
-      </Card>
-    </Link>
+
+          <div className="mt-md flex justify-end">
+            <Button type="button" variant="secondary" size="small" onClick={() => onEdit(discount)}>
+              <Edit className="h-icon-md w-icon-md" />
+              {t('discount.common.edit')}
+            </Button>
+          </div>
+      </div>
+    </Card>
   )
 }

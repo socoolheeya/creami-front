@@ -368,7 +368,7 @@ export default function RoomDetailPage({ params }: { params: Promise<{ id: strin
       {showDeleteModal && (
         <div
           className="fixed inset-0 z-50 flex items-center justify-center bg-transparent p-md"
-          style={{ backgroundColor: 'rgba(0, 0, 0, 0.5)' }}
+          style={{ backgroundColor: 'var(--overlay-bg)' }}
           onClick={() => setShowDeleteModal(false)}
         >
           <div

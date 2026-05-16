@@ -117,7 +117,7 @@ export function AccommodationSelector({ accommodations, selectedId, onSelect }: 
           background: var(--bg-secondary);
           border-radius: var(--radius-lg);
           padding: var(--spacing-lg);
-          border: 1px solid var(--border-color);
+          border: var(--border);
           margin-bottom: var(--spacing-md);
         }
 
@@ -139,8 +139,8 @@ export function AccommodationSelector({ accommodations, selectedId, onSelect }: 
         }
 
         :global(.selector-title .title-icon) {
-          width: 18px;
-          height: 18px;
+          width: var(--icon-size-md);
+          height: var(--icon-size-md);
           color: var(--primary);
         }
 
@@ -150,7 +150,7 @@ export function AccommodationSelector({ accommodations, selectedId, onSelect }: 
           font-size: var(--font-size-xs);
           font-weight: 500;
           background: var(--bg-primary);
-          border: 1px solid var(--border-color);
+          border: var(--border);
           color: var(--text-primary);
           cursor: pointer;
           transition: all 0.2s;
@@ -170,17 +170,17 @@ export function AccommodationSelector({ accommodations, selectedId, onSelect }: 
           left: var(--spacing-sm);
           top: 50%;
           transform: translateY(-50%);
-          width: 14px;
-          height: 14px;
+          width: var(--font-size-base);
+          height: var(--font-size-base);
           color: var(--text-tertiary);
         }
 
         .search-input {
           width: 100%;
-          padding: var(--spacing-xs) var(--spacing-sm) var(--spacing-xs) 36px;
+          padding: var(--spacing-xs) var(--spacing-sm) var(--spacing-xs) var(--control-search-padding);
           border-radius: var(--radius-md);
           background: var(--bg-primary);
-          border: 1px solid var(--border-color);
+          border: var(--border);
           color: var(--text-primary);
           font-size: var(--font-size-sm);
         }
@@ -216,15 +216,15 @@ export function AccommodationSelector({ accommodations, selectedId, onSelect }: 
 
         .selected-subtitle {
           font-size: var(--font-size-xs);
-          color: rgba(255, 255, 255, 0.8);
+          color: var(--text-on-primary-muted);
           margin: 0;
         }
 
         .accommodation-grid {
           display: grid;
-          grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+          grid-template-columns: repeat(auto-fill, minmax(var(--notification-menu-width), 1fr));
           gap: var(--spacing-sm);
-          max-height: 300px;
+          max-height: var(--selector-list-height);
           overflow-y: auto;
         }
 
@@ -234,14 +234,14 @@ export function AccommodationSelector({ accommodations, selectedId, onSelect }: 
           text-align: left;
           transition: all 0.2s;
           background: var(--bg-primary);
-          border: 2px solid var(--border-color);
+          border: var(--border-strong);
           cursor: pointer;
         }
 
         .accommodation-card:not(.selected):hover {
           border-color: var(--primary);
-          transform: translateY(-2px);
-          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+          transform: translateY(calc(-1 * var(--spacing-xs)));
+          box-shadow: var(--shadow-md);
         }
 
         .accommodation-card.selected {

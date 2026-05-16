@@ -828,7 +828,7 @@ export default function RatePlanForm({ initialData }: RatePlanFormProps) {
       <style jsx>{`
         .container {
           padding: var(--spacing-lg);
-          max-width: 1200px;
+          max-width: var(--page-form-max-width);
           margin: 0 auto;
         }
 
@@ -873,7 +873,7 @@ export default function RatePlanForm({ initialData }: RatePlanFormProps) {
 
         .form-section {
           background: var(--bg-secondary);
-          border: 1px solid var(--border-color);
+          border: var(--border);
           border-radius: var(--radius-lg);
           padding: var(--spacing-xl);
         }
@@ -923,7 +923,7 @@ export default function RatePlanForm({ initialData }: RatePlanFormProps) {
         .form-select,
         .form-textarea {
           padding: var(--spacing-sm) var(--spacing-md);
-          border: 1px solid var(--border-color);
+          border: var(--border);
           border-radius: var(--radius-md);
           font-size: var(--font-size-sm);
           color: var(--text-primary);
@@ -953,8 +953,8 @@ export default function RatePlanForm({ initialData }: RatePlanFormProps) {
         }
 
         .checkbox-label input[type='checkbox'] {
-          width: 18px;
-          height: 18px;
+          width: var(--icon-size-md);
+          height: var(--icon-size-md);
           cursor: pointer;
         }
 
@@ -976,7 +976,7 @@ export default function RatePlanForm({ initialData }: RatePlanFormProps) {
           color: var(--text-primary);
           margin: 0;
           padding-bottom: var(--spacing-xs);
-          border-bottom: 2px solid var(--border-color);
+          border-bottom: var(--border-strong);
         }
 
         .form-row {
@@ -992,7 +992,7 @@ export default function RatePlanForm({ initialData }: RatePlanFormProps) {
         }
 
         .policy-card {
-          border: 1px solid var(--border-color);
+          border: var(--border);
           border-radius: var(--radius-md);
           padding: var(--spacing-lg);
           background: var(--bg-primary);
@@ -1004,7 +1004,7 @@ export default function RatePlanForm({ initialData }: RatePlanFormProps) {
           align-items: center;
           margin-bottom: var(--spacing-md);
           padding-bottom: var(--spacing-md);
-          border-bottom: 1px solid var(--border-color);
+          border-bottom: var(--border);
         }
 
         .policy-title {
@@ -1032,15 +1032,15 @@ export default function RatePlanForm({ initialData }: RatePlanFormProps) {
         }
 
         .day-checkbox input[type='checkbox'] {
-          width: 16px;
-          height: 16px;
+          width: var(--icon-size-md);
+          height: var(--icon-size-md);
           cursor: pointer;
         }
 
         .penalties-section {
           margin-top: var(--spacing-lg);
           padding-top: var(--spacing-lg);
-          border-top: 1px solid var(--border-color);
+          border-top: var(--border);
         }
 
         .penalties-header {
@@ -1074,7 +1074,7 @@ export default function RatePlanForm({ initialData }: RatePlanFormProps) {
           gap: var(--spacing-md);
           padding: var(--spacing-xl);
           background: var(--bg-secondary);
-          border: 1px solid var(--border-color);
+          border: var(--border);
           border-radius: var(--radius-lg);
           position: sticky;
           bottom: var(--spacing-lg);
@@ -1107,7 +1107,7 @@ export default function RatePlanForm({ initialData }: RatePlanFormProps) {
         .btn-secondary {
           background: var(--bg-tertiary);
           color: var(--text-primary);
-          border: 1px solid var(--border-color);
+          border: var(--border);
         }
 
         .btn-secondary:hover {

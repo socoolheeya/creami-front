@@ -209,7 +209,7 @@ export default function BookingDetailPage() {
             style={{
               backgroundColor: 'var(--bg-primary)',
               borderRadius: 'var(--radius)',
-              border: '1px solid var(--border-color)',
+              border: 'var(--border)',
               boxShadow: 'var(--shadow)'
             }}
           >
@@ -332,7 +332,7 @@ export default function BookingDetailPage() {
             style={{
               backgroundColor: 'var(--bg-primary)',
               borderRadius: 'var(--radius)',
-              border: '1px solid var(--border-color)',
+              border: 'var(--border)',
               boxShadow: 'var(--shadow)'
             }}
           >
@@ -380,7 +380,7 @@ export default function BookingDetailPage() {
               </div>
 
               {/* 구분선 */}
-              <div style={{ height: '1px', backgroundColor: 'var(--border-color)' }} />
+              <div style={{ height: 'var(--divider-size)', backgroundColor: 'var(--border-color)' }} />
 
               {/* 실제 투숙 인원 */}
               <div>
@@ -426,7 +426,7 @@ export default function BookingDetailPage() {
             style={{
               backgroundColor: 'var(--bg-primary)',
               borderRadius: 'var(--radius)',
-              border: '1px solid var(--border-color)',
+              border: 'var(--border)',
               boxShadow: 'var(--shadow)'
             }}
           >
@@ -526,7 +526,7 @@ export default function BookingDetailPage() {
                 style={{
                   backgroundColor: 'var(--bg-tertiary)',
                   borderRadius: 'var(--radius)',
-                  borderLeft: '1px solid var(--primary)'
+                  borderLeft: 'var(--border-primary)'
                 }}
               >
                 <AlertCircle className="w-icon-md h-icon-md mt-xs flex-shrink-0" style={{ color: 'var(--primary)' }} />
@@ -550,7 +550,7 @@ export default function BookingDetailPage() {
             style={{
               backgroundColor: 'var(--bg-primary)',
               borderRadius: 'var(--radius)',
-              border: '1px solid var(--border-color)',
+              border: 'var(--border)',
               boxShadow: 'var(--shadow)'
             }}
           >
@@ -670,7 +670,7 @@ export default function BookingDetailPage() {
             <div
               className="my-lg"
               style={{
-                height: '1px',
+                height: 'var(--divider-size)',
                 backgroundColor: 'var(--border-color)'
               }}
             />

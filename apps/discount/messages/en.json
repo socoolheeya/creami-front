@@ -70,7 +70,40 @@
         "period": "Period",
         "usage": "Usage",
         "status": "Status",
+        "actions": "Actions",
         "all": "All"
+      },
+      "form": {
+        "createTitle": "Register Discount",
+        "editTitle": "Edit Discount",
+        "name": "Discount Name",
+        "namePlaceholder": "Example: Spring base discount",
+        "discountType": "Discount Policy",
+        "type": "Discount Method",
+        "value": "Discount Value",
+        "startDate": "Start Date",
+        "endDate": "End Date",
+        "status": "Status",
+        "audienceType": "Audience",
+        "create": "Register",
+        "update": "Save Changes",
+        "saving": "Saving",
+        "cancelEdit": "Cancel Edit",
+        "createSuccess": "Discount has been registered.",
+        "updateSuccess": "Discount has been updated.",
+        "saveError": "Failed to save discount.",
+        "validationError": "Enter a discount name and a discount value greater than 0.",
+        "discountTypes": {
+          "BASIC": "Base Discount",
+          "EARLY_BIRD": "Early Bird",
+          "LAST_MINUTE": "Last Minute",
+          "LONG_STAY": "Long Stay"
+        },
+        "audienceTypes": {
+          "PUBLIC": "All Customers",
+          "MEMBER_ONLY": "Members Only",
+          "MOBILE_ONLY": "Mobile Only"
+        }
       }
     },
     "mappings": {

@@ -32,11 +32,11 @@ export function RateTable({ rates }: RateTableProps) {
       case 'active':
         return 'var(--primary)'
       case 'scheduled':
-        return '#60a5fa'
+        return 'var(--info)'
       case 'inactive':
         return 'var(--text-tertiary)'
       case 'expired':
-        return '#ef4444'
+        return 'var(--error)'
       default:
         return 'var(--text-tertiary)'
     }
@@ -44,12 +44,12 @@ export function RateTable({ rates }: RateTableProps) {
 
   return (
     <div
-      className="rounded-lg overflow-hidden"
+      className="rounded overflow-hidden"
       style={{
         backgroundColor: 'var(--bg-primary)',
         borderRadius: 'var(--radius)',
         boxShadow: 'var(--shadow)',
-        border: '1px solid var(--border-color)'
+        border: 'var(--border)'
       }}
     >
       <div className="overflow-x-auto">
@@ -57,81 +57,81 @@ export function RateTable({ rates }: RateTableProps) {
           <thead>
             <tr style={{ backgroundColor: 'var(--bg-secondary)' }}>
               <th
-                className="px-4 py-3 text-left text-sm"
+                className="px-md py-md text-left text-base"
                 style={{
                   fontWeight: 'var(--font-bold)',
                   color: 'var(--text-primary)',
-                  borderBottom: '1px solid var(--border-color)'
+                  borderBottom: 'var(--border)'
                 }}
               >
                 {t('ari.rates.table.status')}
               </th>
               <th
-                className="px-4 py-3 text-left text-sm"
+                className="px-md py-md text-left text-base"
                 style={{
                   fontWeight: 'var(--font-bold)',
                   color: 'var(--text-primary)',
-                  borderBottom: '1px solid var(--border-color)'
+                  borderBottom: 'var(--border)'
                 }}
               >
                 {t('ari.rates.table.code')}
               </th>
               <th
-                className="px-4 py-3 text-left text-sm"
+                className="px-md py-md text-left text-base"
                 style={{
                   fontWeight: 'var(--font-bold)',
                   color: 'var(--text-primary)',
-                  borderBottom: '1px solid var(--border-color)'
+                  borderBottom: 'var(--border)'
                 }}
               >
                 {t('ari.rates.table.name')}
               </th>
               <th
-                className="px-4 py-3 text-left text-sm"
+                className="px-md py-md text-left text-base"
                 style={{
                   fontWeight: 'var(--font-bold)',
                   color: 'var(--text-primary)',
-                  borderBottom: '1px solid var(--border-color)'
+                  borderBottom: 'var(--border)'
                 }}
               >
                 {t('ari.rates.table.type')}
               </th>
               <th
-                className="px-4 py-3 text-left text-sm"
+                className="px-md py-md text-left text-base"
                 style={{
                   fontWeight: 'var(--font-bold)',
                   color: 'var(--text-primary)',
-                  borderBottom: '1px solid var(--border-color)'
+                  borderBottom: 'var(--border)'
                 }}
               >
                 {t('ari.rates.table.roomType')}
               </th>
               <th
-                className="px-4 py-3 text-right text-sm"
+                className="px-md py-md text-right text-base"
                 style={{
                   fontWeight: 'var(--font-bold)',
                   color: 'var(--text-primary)',
-                  borderBottom: '1px solid var(--border-color)'
+                  borderBottom: 'var(--border)'
                 }}
               >
                 {t('ari.rates.table.baseRate')}
               </th>
               <th
-                className="px-4 py-3 text-left text-sm"
+                className="px-md py-md text-left text-base"
                 style={{
                   fontWeight: 'var(--font-bold)',
                   color: 'var(--text-primary)',
-                  borderBottom: '1px solid var(--border-color)'
+                  borderBottom: 'var(--border)'
                 }}
               >
                 {t('ari.rates.table.period')}
               </th>
               <th
-                className="px-4 py-3 text-center text-sm"
+                className="px-md py-md text-center text-base"
                 style={{
                   fontWeight: 'var(--font-bold)',
                   color: 'var(--text-primary)',
-                  borderBottom: '1px solid var(--border-color)'
+                  borderBottom: 'var(--border)'
                 }}
               >
                 {t('ari.rates.table.manage')}
@@ -144,15 +144,15 @@ export function RateTable({ rates }: RateTableProps) {
                 key={rate.id}
                 className="hover:bg-opacity-50"
                 style={{
-                  borderBottom: '1px solid var(--border-color)'
+                  borderBottom: 'var(--border)'
                 }}
               >
-                <td className="px-4 py-3">
+                <td className="px-md py-md">
                   <span
-                    className="inline-block px-2 py-1 rounded text-xs"
+                    className="inline-block px-sm py-xs rounded text-xs"
                     style={{
                       backgroundColor: getStatusColor(rate.status),
-                      color: '#ffffff',
+                      color: 'var(--text-on-primary)',
                       fontWeight: 'var(--font-medium)'
                     }}
                   >
@@ -160,7 +160,7 @@ export function RateTable({ rates }: RateTableProps) {
                   </span>
                 </td>
                 <td
-                  className="px-4 py-3 text-sm"
+                  className="px-md py-md text-base"
                   style={{
                     color: 'var(--text-primary)',
                     fontWeight: 'var(--font-medium)'
@@ -169,7 +169,7 @@ export function RateTable({ rates }: RateTableProps) {
                   {rate.code}
                 </td>
                 <td
-                  className="px-4 py-3 text-sm"
+                  className="px-md py-md text-base"
                   style={{
                     color: 'var(--text-primary)',
                     fontWeight: 'var(--font-medium)'
@@ -178,7 +178,7 @@ export function RateTable({ rates }: RateTableProps) {
                   {rate.name}
                 </td>
                 <td
-                  className="px-4 py-3 text-sm"
+                  className="px-md py-md text-base"
                   style={{
                     color: 'var(--text-secondary)',
                     fontWeight: 'var(--font-light)'
@@ -187,7 +187,7 @@ export function RateTable({ rates }: RateTableProps) {
                   {t(`ari.rates.types.${rate.type}`)}
                 </td>
                 <td
-                  className="px-4 py-3 text-sm"
+                  className="px-md py-md text-base"
                   style={{
                     color: 'var(--text-secondary)',
                     fontWeight: 'var(--font-light)'
@@ -196,7 +196,7 @@ export function RateTable({ rates }: RateTableProps) {
                   {rate.roomTypeName || '-'}
                 </td>
                 <td
-                  className="px-4 py-3 text-sm text-right"
+                  className="px-md py-md text-base text-right"
                   style={{
                     color: 'var(--primary)',
                     fontWeight: 'var(--font-bold)'
@@ -205,7 +205,7 @@ export function RateTable({ rates }: RateTableProps) {
                   {formatCurrency(rate.baseRate, rate.currency)}
                 </td>
                 <td
-                  className="px-4 py-3 text-sm"
+                  className="px-md py-md text-base"
                   style={{
                     color: 'var(--text-secondary)',
                     fontWeight: 'var(--font-light)'
@@ -213,17 +213,17 @@ export function RateTable({ rates }: RateTableProps) {
                 >
                   {formatDate(rate.startDate)} ~ {formatDate(rate.endDate)}
                 </td>
-                <td className="px-4 py-3 text-center">
+                <td className="px-md py-md text-center">
                   <Link href={`/rates/${rate.id}`}>
                     <button
-                      className="inline-flex items-center justify-center p-2 rounded-lg transition-colors"
+                      className="inline-flex items-center justify-center p-sm rounded transition-colors"
                       style={{
                         backgroundColor: 'var(--bg-tertiary)',
                         color: 'var(--text-primary)'
                       }}
                       title={t('ari.common.edit')}
                     >
-                      <Edit className="w-4 h-4" />
+                      <Edit className="w-md h-md" />
                     </button>
                   </Link>
                 </td>

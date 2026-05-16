@@ -97,7 +97,7 @@ export default function NewBookingPage() {
               className="p-lg rounded"
               style={{
                 backgroundColor: 'var(--bg-primary)',
-                border: '1px solid var(--border-color)'
+                border: 'var(--border)'
               }}
             >
               <div className="mb-md">
@@ -114,7 +114,7 @@ export default function NewBookingPage() {
                   className="text-center py-3xl rounded"
                   style={{
                     backgroundColor: 'var(--bg-secondary)',
-                    border: '1px dashed var(--border-color)'
+                    border: 'var(--border-dashed)'
                   }}
                 >
                   <p style={{ color: 'var(--text-secondary)' }}>
@@ -137,7 +137,7 @@ export default function NewBookingPage() {
               className="text-center py-3xl rounded"
               style={{
                 backgroundColor: 'var(--bg-primary)',
-                border: '2px dashed var(--border-color)'
+                border: 'var(--border-dashed-strong)'
               }}
             >
               <CalendarCheck className="w-3xl h-3xl mx-auto mb-md" style={{ color: 'var(--text-tertiary)' }} />
@@ -153,7 +153,7 @@ export default function NewBookingPage() {
               className="text-center py-3xl rounded"
               style={{
                 backgroundColor: 'var(--bg-primary)',
-                border: '1px solid var(--border-color)'
+                border: 'var(--border)'
               }}
             >
               <p style={{ color: 'var(--text-secondary)' }}>검색 중...</p>

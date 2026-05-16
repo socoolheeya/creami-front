@@ -70,7 +70,40 @@
         "period": "기간",
         "usage": "사용 현황",
         "status": "상태",
+        "actions": "관리",
         "all": "전체"
+      },
+      "form": {
+        "createTitle": "할인 신규 등록",
+        "editTitle": "할인 수정",
+        "name": "할인명",
+        "namePlaceholder": "예: 봄맞이 기본 할인",
+        "discountType": "할인 정책",
+        "type": "할인 방식",
+        "value": "할인 값",
+        "startDate": "시작일",
+        "endDate": "종료일",
+        "status": "상태",
+        "audienceType": "대상 고객",
+        "create": "등록",
+        "update": "수정 저장",
+        "saving": "저장 중",
+        "cancelEdit": "수정 취소",
+        "createSuccess": "할인이 등록되었습니다.",
+        "updateSuccess": "할인이 수정되었습니다.",
+        "saveError": "할인 저장에 실패했습니다.",
+        "validationError": "할인명과 1 이상의 할인 값을 입력하세요.",
+        "discountTypes": {
+          "BASIC": "기본 할인",
+          "EARLY_BIRD": "얼리버드",
+          "LAST_MINUTE": "막바지 할인",
+          "LONG_STAY": "장기 숙박"
+        },
+        "audienceTypes": {
+          "PUBLIC": "전체 고객",
+          "MEMBER_ONLY": "회원 전용",
+          "MOBILE_ONLY": "모바일 전용"
+        }
       }
     },
     "mappings": {

@@ -178,7 +178,7 @@ export default function BookingsPage() {
         style={{
           backgroundColor: 'var(--bg-primary)',
           borderRadius: 'var(--radius)',
-          border: '1px solid var(--border-color)',
+          border: 'var(--border)',
           boxShadow: 'var(--shadow)'
         }}
       >

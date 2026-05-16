@@ -58,11 +58,11 @@ export function InventoryCalendar({ blocks, startDate, endDate, propertyName }: 
   }
 
   const getUtilizationColor = (percentage: number) => {
-    if (percentage >= 90) return '#ef4444' // Red
-    if (percentage >= 70) return '#f59e0b' // Orange
-    if (percentage >= 50) return '#eab308' // Yellow
-    if (percentage >= 30) return '#22c55e' // Green
-    return '#10b981' // Light green
+    if (percentage >= 90) return 'var(--error)' // Red
+    if (percentage >= 70) return 'var(--warning)' // Orange
+    if (percentage >= 50) return 'var(--warning)' // Yellow
+    if (percentage >= 30) return 'var(--success)' // Green
+    return 'var(--success)' // Light green
   }
 
   const handlePrevMonth = () => {
@@ -86,7 +86,7 @@ export function InventoryCalendar({ blocks, startDate, endDate, propertyName }: 
     // Empty cells for days before the first day of month
     for (let i = 0; i < firstDay; i++) {
       days.push(
-        <div key={`empty-${i}`} className="p-2" style={{ minHeight: '100px' }} />
+        <div key={`empty-${i}`} className="p-sm" style={{ minHeight: 'var(--calendar-day-min-height)' }} />
       )
     }
 
@@ -105,17 +105,17 @@ export function InventoryCalendar({ blocks, startDate, endDate, propertyName }: 
       days.push(
         <div
           key={day}
-          className="p-2 rounded-lg"
+          className="p-sm rounded"
           style={{
-            minHeight: '100px',
+            minHeight: 'var(--calendar-day-min-height)',
             backgroundColor: isInRange ? 'var(--bg-primary)' : 'var(--bg-secondary)',
-            border: isToday ? '2px solid var(--primary)' : '1px solid var(--border-color)',
+            border: isToday ? 'var(--border-primary-strong)' : 'var(--border)',
             borderRadius: 'var(--radius-sm)',
             opacity: isInRange ? 1 : 0.5
           }}
         >
           <div
-            className="text-sm mb-2"
+            className="text-base mb-sm"
             style={{
               fontWeight: isToday ? 'var(--font-bold)' : 'var(--font-medium)',
               color: isToday ? 'var(--primary)' : 'var(--text-primary)'
@@ -125,10 +125,10 @@ export function InventoryCalendar({ blocks, startDate, endDate, propertyName }: 
           </div>
 
           {inventory && inventory.totalRooms > 0 && (
-            <div className="space-y-1">
+            <div className="space-y-xs">
               {/* Utilization Bar */}
               <div
-                className="h-2 rounded-full overflow-hidden"
+                className="h-xs rounded overflow-hidden"
                 style={{
                   backgroundColor: 'var(--bg-tertiary)'
                 }}
@@ -165,7 +165,7 @@ export function InventoryCalendar({ blocks, startDate, endDate, propertyName }: 
               {/* Blocks count */}
               {inventory.blocks.length > 0 && (
                 <div
-                  className="text-xs mt-1 px-1 py-0.5 rounded"
+                  className="text-xs mt-xs px-xs py-xs rounded"
                   style={{
                     backgroundColor: 'var(--bg-tertiary)',
                     color: 'var(--text-tertiary)',
@@ -186,19 +186,19 @@ export function InventoryCalendar({ blocks, startDate, endDate, propertyName }: 
 
   return (
     <div
-      className="rounded-lg p-6"
+      className="rounded p-lg"
       style={{
         backgroundColor: 'var(--bg-primary)',
         borderRadius: 'var(--radius)',
         boxShadow: 'var(--shadow)',
-        border: '1px solid var(--border-color)'
+        border: 'var(--border)'
       }}
     >
       {/* Calendar Header */}
-      <div className="flex items-center justify-between mb-6">
+      <div className="flex items-center justify-between mb-lg">
         <button
           onClick={handlePrevMonth}
-          className="p-2 rounded-lg transition-colors"
+          className="p-sm rounded transition-colors"
           style={{
             backgroundColor: 'var(--bg-secondary)',
             color: 'var(--text-primary)',
@@ -223,7 +223,7 @@ export function InventoryCalendar({ blocks, startDate, endDate, propertyName }: 
 
         <button
           onClick={handleNextMonth}
-          className="p-2 rounded-lg transition-colors"
+          className="p-sm rounded transition-colors"
           style={{
             backgroundColor: 'var(--bg-secondary)',
             color: 'var(--text-primary)',
@@ -236,7 +236,7 @@ export function InventoryCalendar({ blocks, startDate, endDate, propertyName }: 
 
       {/* Property Info */}
       <div
-        className="mb-4 text-sm"
+        className="mb-md text-base"
         style={{
           color: 'var(--text-secondary)',
           fontWeight: 'var(--font-light)'
@@ -246,17 +246,17 @@ export function InventoryCalendar({ blocks, startDate, endDate, propertyName }: 
       </div>
 
       {/* Legend */}
-      <div className="mb-4 flex flex-wrap gap-3">
+      <div className="mb-md flex flex-wrap gap-md">
         {[
-          { label: t('ari.inventories.calendar.legend.low'), color: '#10b981' },
-          { label: t('ari.inventories.calendar.legend.normal'), color: '#22c55e' },
-          { label: t('ari.inventories.calendar.legend.warning'), color: '#eab308' },
-          { label: t('ari.inventories.calendar.legend.busy'), color: '#f59e0b' },
-          { label: t('ari.inventories.calendar.legend.full'), color: '#ef4444' }
+          { label: t('ari.inventories.calendar.legend.low'), color: 'var(--success)' },
+          { label: t('ari.inventories.calendar.legend.normal'), color: 'var(--success)' },
+          { label: t('ari.inventories.calendar.legend.warning'), color: 'var(--warning)' },
+          { label: t('ari.inventories.calendar.legend.busy'), color: 'var(--warning)' },
+          { label: t('ari.inventories.calendar.legend.full'), color: 'var(--error)' }
         ].map(({ label, color }) => (
-          <div key={label} className="flex items-center gap-2">
+          <div key={label} className="flex items-center gap-sm">
             <div
-              className="w-4 h-4 rounded"
+              className="w-md h-md rounded"
               style={{ backgroundColor: color }}
             />
             <span
@@ -273,7 +273,7 @@ export function InventoryCalendar({ blocks, startDate, endDate, propertyName }: 
       </div>
 
       {/* Day Headers */}
-      <div className="grid grid-cols-7 gap-2 mb-2">
+      <div className="grid grid-cols-7 gap-sm mb-sm">
         {[
           t('ari.common.weekdays.sun'),
           t('ari.common.weekdays.mon'),
@@ -285,9 +285,9 @@ export function InventoryCalendar({ blocks, startDate, endDate, propertyName }: 
         ].map((day, index) => (
           <div
             key={day}
-            className="text-center text-sm p-2"
+            className="text-center text-base p-sm"
             style={{
-              color: index === 0 ? '#ef4444' : index === 6 ? '#3b82f6' : 'var(--text-secondary)',
+              color: index === 0 ? 'var(--error)' : index === 6 ? 'var(--info)' : 'var(--text-secondary)',
               fontWeight: 'var(--font-bold)'
             }}
           >
@@ -297,7 +297,7 @@ export function InventoryCalendar({ blocks, startDate, endDate, propertyName }: 
       </div>
 
       {/* Calendar Grid */}
-      <div className="grid grid-cols-7 gap-2">
+      <div className="grid grid-cols-7 gap-sm">
         {renderCalendar()}
       </div>
     </div>

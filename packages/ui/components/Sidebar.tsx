@@ -28,8 +28,8 @@ export function Sidebar({
 }: SidebarProps) {
   return (
     <aside
-      className={`fixed left-0 bottom-0 z-30 top-[var(--header-height)] overflow-hidden bg-bg-primary border-r border-border transition-[width] duration-300 ease-in-out ${
-        isCollapsed ? 'w-[var(--sidebar-collapsed)]' : 'w-[var(--sidebar-width)]'
+      className={`fixed left-0 bottom-0 z-30 top-header overflow-hidden bg-bg-primary border-r border-border transition-[width] duration-300 ease-in-out ${
+        isCollapsed ? 'w-sidebar-collapsed' : 'w-sidebar'
       } ${className}`}
     >
       {children}
@@ -39,8 +39,8 @@ export function Sidebar({
 
 export function SidebarMenu({ children }: SidebarMenuProps) {
   return (
-    <nav className="h-full w-[var(--sidebar-width)] px-md py-lg overflow-y-auto overflow-x-hidden">
-      <ul className="flex w-full flex-col gap-xs list-none m-0 p-0">
+    <nav className="h-full w-sidebar px-md py-lg overflow-y-auto overflow-x-hidden">
+      <ul className="flex w-full flex-col gap-xs list-none m-none p-none">
         {children}
       </ul>
     </nav>
@@ -68,7 +68,7 @@ export function SidebarMenuItem({
       <span
         aria-hidden="true"
         className={`absolute left-0 top-0 h-full rounded transition-[width,background-color] duration-300 ${
-          isCollapsed ? 'w-[calc(var(--sidebar-collapsed)-var(--spacing-lg))]' : 'w-full'
+          isCollapsed ? 'w-sidebar-collapsed-active' : 'w-full'
         } ${
           isActive ? 'bg-primary' : 'bg-transparent group-hover:bg-bg-tertiary'
         }`}

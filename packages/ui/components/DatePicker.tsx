@@ -265,7 +265,7 @@ export function DatePicker({
                 ))}
               </div>
 
-              <div className="grid grid-cols-7 gap-xs p-md pt-0">
+              <div className="grid grid-cols-7 gap-xs p-md pt-none">
                 {Array.from({ length: firstDayOfMonth }).map((_, index) => (
                   <div key={`empty-${index}`} className="h-control-md" />
                 ))}

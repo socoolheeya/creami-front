@@ -554,14 +554,14 @@ export function RateGrid({
         backgroundColor: 'var(--bg-primary)',
         borderRadius: 'var(--radius)',
         boxShadow: 'var(--shadow)',
-        border: '1px solid var(--border-color)'
+        border: 'var(--border)'
       }}
     >
       {/* Toolbar */}
       <div
         className="p-md space-y-md"
         style={{
-          borderBottom: '1px solid var(--border-color)'
+          borderBottom: 'var(--border)'
         }}
       >
         {/* Top Row: View Mode + Package Info + Bulk Register */}
@@ -577,7 +577,7 @@ export function RateGrid({
                 className="flex h-control-md items-center justify-center rounded border-none px-control-px-md py-none text-base leading-none transition-colors"
                 style={{
                   backgroundColor: viewMode === 'week' ? 'var(--primary)' : 'transparent',
-                  color: viewMode === 'week' ? '#ffffff' : 'var(--text-primary)',
+                  color: viewMode === 'week' ? 'var(--text-on-primary)' : 'var(--text-primary)',
                   borderRadius: 'var(--radius)',
                   fontWeight: 'var(--font-medium)'
                 }}
@@ -589,7 +589,7 @@ export function RateGrid({
                 className="flex h-control-md items-center justify-center rounded border-none px-control-px-md py-none text-base leading-none transition-colors"
                 style={{
                   backgroundColor: viewMode === 'month' ? 'var(--primary)' : 'transparent',
-                  color: viewMode === 'month' ? '#ffffff' : 'var(--text-primary)',
+                  color: viewMode === 'month' ? 'var(--text-on-primary)' : 'var(--text-primary)',
                   borderRadius: 'var(--radius)',
                   fontWeight: 'var(--font-medium)'
                 }}
@@ -601,7 +601,7 @@ export function RateGrid({
                 className="flex h-control-md items-center justify-center rounded border-none px-control-px-md py-none text-base leading-none transition-colors"
                 style={{
                   backgroundColor: viewMode === 'all' ? 'var(--primary)' : 'transparent',
-                  color: viewMode === 'all' ? '#ffffff' : 'var(--text-primary)',
+                  color: viewMode === 'all' ? 'var(--text-on-primary)' : 'var(--text-primary)',
                   borderRadius: 'var(--radius)',
                   fontWeight: 'var(--font-medium)'
                 }}
@@ -628,7 +628,7 @@ export function RateGrid({
             className="flex items-center gap-sm px-control-px-lg py-sm rounded text-base leading-none transition-colors"
             style={{
               backgroundColor: 'var(--primary)',
-              color: '#ffffff',
+              color: 'var(--text-on-primary)',
               borderRadius: 'var(--radius)',
               fontWeight: 'var(--font-bold)'
             }}
@@ -720,7 +720,7 @@ export function RateGrid({
                 className="flex items-center gap-sm px-control-px-lg py-sm rounded text-base leading-none transition-colors"
                 style={{
                   backgroundColor: 'var(--primary)',
-                  color: '#ffffff',
+                  color: 'var(--text-on-primary)',
                   borderRadius: 'var(--radius)',
                   fontWeight: 'var(--font-medium)'
                 }}
@@ -737,7 +737,7 @@ export function RateGrid({
                   color: 'var(--text-primary)',
                   borderRadius: 'var(--radius)',
                   fontWeight: 'var(--font-medium)',
-                  border: '1px solid var(--border-color)'
+                  border: 'var(--border)'
                 }}
               >
                 <Copy className="w-md h-md" />
@@ -769,8 +769,8 @@ export function RateGrid({
                 className="px-md py-sm text-left sticky left-0 z-10"
                 style={{
                   backgroundColor: 'var(--bg-secondary)',
-                  borderRight: '1px solid var(--border-color)',
-                  borderBottom: '1px solid var(--border-color)',
+                  borderRight: 'var(--border)',
+                  borderBottom: 'var(--border)',
                   fontWeight: 'var(--font-bold)',
                   color: 'var(--text-primary)',
                   minWidth: 'var(--rate-row-header-width)'
@@ -787,9 +787,9 @@ export function RateGrid({
                     key={date.toISOString()}
                     className="px-md py-sm text-center"
                     style={{
-                      borderBottom: '1px solid var(--border-color)',
+                      borderBottom: 'var(--border)',
                       fontWeight: 'var(--font-bold)',
-                      color: dayOfWeek === 0 ? '#ef4444' : dayOfWeek === 6 ? '#3b82f6' : 'var(--text-primary)',
+                      color: dayOfWeek === 0 ? 'var(--error)' : dayOfWeek === 6 ? 'var(--info)' : 'var(--text-primary)',
                       minWidth: 'var(--rate-date-column-width)',
                       backgroundColor: isWeekend ? 'var(--bg-tertiary)' : 'var(--bg-secondary)'
                     }}
@@ -810,8 +810,8 @@ export function RateGrid({
                   className="px-md py-sm sticky left-0 z-10"
                   style={{
                     backgroundColor: 'var(--bg-primary)',
-                    borderRight: '1px solid var(--border-color)',
-                    borderBottom: '1px solid var(--border-color)',
+                    borderRight: 'var(--border)',
+                    borderBottom: 'var(--border)',
                     fontWeight: 'var(--font-bold)',
                     color: 'var(--text-primary)'
                   }}
@@ -836,7 +836,7 @@ export function RateGrid({
                       onDoubleClick={() => handleCellDoubleClick(room.id, dateStr)}
                       className="px-sm py-sm cursor-pointer transition-all"
                       style={{
-                        borderBottom: '1px solid var(--border-color)',
+                        borderBottom: 'var(--border)',
                         backgroundColor: isSelected
                           ? 'var(--primary)'
                           : isWeekend
@@ -859,7 +859,7 @@ export function RateGrid({
                           className="w-full px-sm py-xs text-center rounded"
                           style={{
                             backgroundColor: 'var(--bg-secondary)',
-                            border: '2px solid var(--primary)',
+                            border: 'var(--border-primary-strong)',
                             color: 'var(--text-primary)',
                             fontWeight: 'var(--font-bold)'
                           }}
@@ -871,7 +871,7 @@ export function RateGrid({
                             className="text-lg"
                             style={{
                               fontWeight: 'var(--font-bold)',
-                              color: isSelected ? '#ffffff' : 'var(--primary)'
+                              color: isSelected ? 'var(--text-on-primary)' : 'var(--primary)'
                             }}
                           >
                             ₩{formatCurrency(dayData.rate)}
@@ -881,7 +881,7 @@ export function RateGrid({
                           <div
                             className="text-base"
                             style={{
-                              color: isSelected ? '#ffffff' : 'var(--text-tertiary)',
+                              color: isSelected ? 'var(--text-on-primary)' : 'var(--text-tertiary)',
                               fontWeight: 'var(--font-light)'
                             }}
                           >
@@ -903,7 +903,7 @@ export function RateGrid({
         <div
           className="fixed inset-0 z-50 flex items-center justify-center"
           style={{
-            backgroundColor: 'rgba(0, 0, 0, 0.5)'
+            backgroundColor: 'var(--overlay-bg)'
           }}
           onClick={() => setShowBulkEdit(false)}
         >
@@ -913,7 +913,7 @@ export function RateGrid({
               backgroundColor: 'var(--bg-primary)',
               borderRadius: 'var(--radius)',
               boxShadow: 'var(--shadow-md)',
-              border: '1px solid var(--border-color)'
+              border: 'var(--border)'
             }}
             onClick={(e) => e.stopPropagation()}
           >
@@ -954,7 +954,7 @@ export function RateGrid({
               className="w-full px-control-px-lg py-sm rounded mb-md text-base"
               style={{
                 backgroundColor: 'var(--bg-secondary)',
-                border: '1px solid var(--border-color)',
+                border: 'var(--border)',
                 color: 'var(--text-primary)',
                 borderRadius: 'var(--radius)',
                 fontWeight: 'var(--font-medium)'
@@ -967,7 +967,7 @@ export function RateGrid({
                 className="flex-1 flex items-center justify-center gap-sm px-control-px-lg py-sm rounded text-base leading-none"
                 style={{
                   backgroundColor: 'var(--primary)',
-                  color: '#ffffff',
+                  color: 'var(--text-on-primary)',
                   borderRadius: 'var(--radius)',
                   fontWeight: 'var(--font-medium)'
                 }}
@@ -986,7 +986,7 @@ export function RateGrid({
                   color: 'var(--text-primary)',
                   borderRadius: 'var(--radius)',
                   fontWeight: 'var(--font-medium)',
-                  border: '1px solid var(--border-color)'
+                  border: 'var(--border)'
                 }}
               >
                 {t('ari.common.cancel')}
@@ -1039,7 +1039,7 @@ export function RateGrid({
       <div
         className="p-md flex flex-wrap gap-md"
         style={{
-          borderTop: '1px solid var(--border-color)'
+          borderTop: 'var(--border)'
         }}
       >
         <div className="text-base" style={{ color: 'var(--text-secondary)' }}>

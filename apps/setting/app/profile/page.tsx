@@ -211,7 +211,7 @@ export default function ProfilePage() {
             <button
               type="button"
               onClick={() => fileInputRef.current?.click()}
-              className="relative flex h-[var(--profile-avatar-size)] w-[var(--profile-avatar-size)] shrink-0 items-center justify-center overflow-hidden rounded border border-border bg-bg-tertiary text-text-tertiary"
+              className="relative flex h-profile-avatar w-profile-avatar shrink-0 items-center justify-center overflow-hidden rounded border border-border bg-bg-tertiary text-text-tertiary"
               aria-label={t('setting.profile.avatarAction')}
               title={t('setting.profile.avatarAction')}
             >
@@ -259,19 +259,19 @@ export default function ProfilePage() {
             </div>
             <dl className="mt-md grid gap-sm text-base">
               <div className="flex gap-md">
-                <dt className="w-[var(--profile-info-label-width)] shrink-0 font-light text-text-tertiary">
+                <dt className="w-profile-label shrink-0 font-light text-text-tertiary">
                   {t('setting.profile.organization')}
                 </dt>
                 <dd className="font-medium text-text-primary">{profile.organization}</dd>
               </div>
               <div className="flex gap-md">
-                <dt className="w-[var(--profile-info-label-width)] shrink-0 font-light text-text-tertiary">
+                <dt className="w-profile-label shrink-0 font-light text-text-tertiary">
                   {t('setting.profile.department')}
                 </dt>
                 <dd className="font-medium text-text-primary">{profile.department}</dd>
               </div>
               <div className="flex gap-md">
-                <dt className="w-[var(--profile-info-label-width)] shrink-0 font-light text-text-tertiary">
+                <dt className="w-profile-label shrink-0 font-light text-text-tertiary">
                   {t('setting.profile.userId')}
                 </dt>
                 <dd className="font-medium text-text-primary">{profile.employeeId}</dd>

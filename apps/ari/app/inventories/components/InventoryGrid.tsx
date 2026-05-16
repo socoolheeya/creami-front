@@ -288,11 +288,11 @@ export function InventoryGrid({ startDate, endDate, selectedRooms, initialRows, 
 
   const getUtilizationColor = (available: number, total: number) => {
     const percentage = ((total - available) / total) * 100
-    if (percentage >= 90) return '#ef4444'
-    if (percentage >= 70) return '#f59e0b'
-    if (percentage >= 50) return '#eab308'
-    if (percentage >= 30) return '#22c55e'
-    return '#10b981'
+    if (percentage >= 90) return 'var(--error)'
+    if (percentage >= 70) return 'var(--warning)'
+    if (percentage >= 50) return 'var(--warning)'
+    if (percentage >= 30) return 'var(--success)'
+    return 'var(--success)'
   }
 
   const hasBulkRegisterValue = () => {
@@ -425,14 +425,14 @@ export function InventoryGrid({ startDate, endDate, selectedRooms, initialRows, 
         backgroundColor: 'var(--bg-primary)',
         borderRadius: 'var(--radius)',
         boxShadow: 'var(--shadow)',
-        border: '1px solid var(--border-color)'
+        border: 'var(--border)'
       }}
     >
       {/* Toolbar */}
       <div
         className="p-md space-y-md"
         style={{
-          borderBottom: '1px solid var(--border-color)'
+          borderBottom: 'var(--border)'
         }}
       >
         {/* Top Row: View Mode + Bulk Register */}
@@ -447,7 +447,7 @@ export function InventoryGrid({ startDate, endDate, selectedRooms, initialRows, 
               className="flex h-control-md items-center justify-center rounded border-none px-control-px-md py-none text-base leading-none transition-colors"
               style={{
                 backgroundColor: viewMode === 'week' ? 'var(--primary)' : 'transparent',
-                color: viewMode === 'week' ? '#ffffff' : 'var(--text-primary)',
+                color: viewMode === 'week' ? 'var(--text-on-primary)' : 'var(--text-primary)',
                 borderRadius: 'var(--radius)',
                 fontWeight: 'var(--font-medium)'
               }}
@@ -459,7 +459,7 @@ export function InventoryGrid({ startDate, endDate, selectedRooms, initialRows, 
               className="flex h-control-md items-center justify-center rounded border-none px-control-px-md py-none text-base leading-none transition-colors"
               style={{
                 backgroundColor: viewMode === 'month' ? 'var(--primary)' : 'transparent',
-                color: viewMode === 'month' ? '#ffffff' : 'var(--text-primary)',
+                color: viewMode === 'month' ? 'var(--text-on-primary)' : 'var(--text-primary)',
                 borderRadius: 'var(--radius)',
                 fontWeight: 'var(--font-medium)'
               }}
@@ -471,7 +471,7 @@ export function InventoryGrid({ startDate, endDate, selectedRooms, initialRows, 
               className="flex h-control-md items-center justify-center rounded border-none px-control-px-md py-none text-base leading-none transition-colors"
               style={{
                 backgroundColor: viewMode === 'all' ? 'var(--primary)' : 'transparent',
-                color: viewMode === 'all' ? '#ffffff' : 'var(--text-primary)',
+                color: viewMode === 'all' ? 'var(--text-on-primary)' : 'var(--text-primary)',
                 borderRadius: 'var(--radius)',
                 fontWeight: 'var(--font-medium)'
               }}
@@ -486,7 +486,7 @@ export function InventoryGrid({ startDate, endDate, selectedRooms, initialRows, 
             className="flex items-center gap-sm px-control-px-lg py-sm rounded text-base leading-none transition-colors"
             style={{
               backgroundColor: 'var(--primary)',
-              color: '#ffffff',
+              color: 'var(--text-on-primary)',
               borderRadius: 'var(--radius)',
               fontWeight: 'var(--font-bold)'
             }}
@@ -578,7 +578,7 @@ export function InventoryGrid({ startDate, endDate, selectedRooms, initialRows, 
               className="flex items-center gap-sm px-control-px-lg py-sm rounded text-base leading-none transition-colors"
               style={{
                 backgroundColor: 'var(--primary)',
-                color: '#ffffff',
+                color: 'var(--text-on-primary)',
                 borderRadius: 'var(--radius)',
                 fontWeight: 'var(--font-medium)'
               }}
@@ -595,7 +595,7 @@ export function InventoryGrid({ startDate, endDate, selectedRooms, initialRows, 
                 color: 'var(--text-primary)',
                 borderRadius: 'var(--radius)',
                 fontWeight: 'var(--font-medium)',
-                border: '1px solid var(--border-color)'
+                border: 'var(--border)'
               }}
             >
               <Copy className="w-md h-md" />
@@ -627,8 +627,8 @@ export function InventoryGrid({ startDate, endDate, selectedRooms, initialRows, 
                 className="px-md py-sm text-left sticky left-0 z-10"
                 style={{
                   backgroundColor: 'var(--bg-secondary)',
-                  borderRight: '1px solid var(--border-color)',
-                  borderBottom: '1px solid var(--border-color)',
+                  borderRight: 'var(--border)',
+                  borderBottom: 'var(--border)',
                   fontWeight: 'var(--font-bold)',
                   color: 'var(--text-primary)',
                   minWidth: 'var(--rate-row-header-width)'
@@ -645,7 +645,7 @@ export function InventoryGrid({ startDate, endDate, selectedRooms, initialRows, 
                     key={date.toISOString()}
                     className="px-md py-sm text-center"
                     style={{
-                      borderBottom: '1px solid var(--border-color)',
+                      borderBottom: 'var(--border)',
                       fontWeight: 'var(--font-bold)',
                       color: dayOfWeek === 0 ? 'var(--error)' : dayOfWeek === 6 ? 'var(--primary)' : 'var(--text-primary)',
                       minWidth: 'var(--rate-date-column-width)',
@@ -668,8 +668,8 @@ export function InventoryGrid({ startDate, endDate, selectedRooms, initialRows, 
                   className="px-md py-sm sticky left-0 z-10"
                   style={{
                     backgroundColor: 'var(--bg-primary)',
-                    borderRight: '1px solid var(--border-color)',
-                    borderBottom: '1px solid var(--border-color)',
+                    borderRight: 'var(--border)',
+                    borderBottom: 'var(--border)',
                     fontWeight: 'var(--font-bold)',
                     color: 'var(--text-primary)'
                   }}
@@ -694,7 +694,7 @@ export function InventoryGrid({ startDate, endDate, selectedRooms, initialRows, 
                       onDoubleClick={() => handleCellDoubleClick(room.id, dateStr)}
                       className="px-sm py-sm cursor-pointer transition-all"
                       style={{
-                        borderBottom: '1px solid var(--border-color)',
+                        borderBottom: 'var(--border)',
                         backgroundColor: isSelected
                           ? 'var(--primary)'
                           : isWeekend
@@ -717,7 +717,7 @@ export function InventoryGrid({ startDate, endDate, selectedRooms, initialRows, 
                           className="w-full px-sm py-xs text-center rounded"
                           style={{
                             backgroundColor: 'var(--bg-secondary)',
-                            border: '2px solid var(--primary)',
+                            border: 'var(--border-primary-strong)',
                             color: 'var(--text-primary)',
                             fontWeight: 'var(--font-bold)'
                           }}
@@ -745,7 +745,7 @@ export function InventoryGrid({ startDate, endDate, selectedRooms, initialRows, 
                             className="text-lg"
                             style={{
                               fontWeight: 'var(--font-bold)',
-                              color: isSelected ? '#ffffff' : 'var(--text-primary)'
+                              color: isSelected ? 'var(--text-on-primary)' : 'var(--text-primary)'
                             }}
                           >
                             {dayData.available}
@@ -755,7 +755,7 @@ export function InventoryGrid({ startDate, endDate, selectedRooms, initialRows, 
                           <div
                             className="text-base"
                             style={{
-                              color: isSelected ? '#ffffff' : 'var(--text-tertiary)',
+                              color: isSelected ? 'var(--text-on-primary)' : 'var(--text-tertiary)',
                               fontWeight: 'var(--font-light)'
                             }}
                           >
@@ -777,7 +777,7 @@ export function InventoryGrid({ startDate, endDate, selectedRooms, initialRows, 
         <div
           className="fixed inset-0 z-50 flex items-center justify-center"
           style={{
-            backgroundColor: 'rgba(0, 0, 0, 0.5)'
+            backgroundColor: 'var(--overlay-bg)'
           }}
           onClick={() => setShowBulkEdit(false)}
         >
@@ -787,7 +787,7 @@ export function InventoryGrid({ startDate, endDate, selectedRooms, initialRows, 
               backgroundColor: 'var(--bg-primary)',
               borderRadius: 'var(--radius)',
               boxShadow: 'var(--shadow-md)',
-              border: '1px solid var(--border-color)'
+              border: 'var(--border)'
             }}
             onClick={(e) => e.stopPropagation()}
           >
@@ -828,7 +828,7 @@ export function InventoryGrid({ startDate, endDate, selectedRooms, initialRows, 
               className="w-full h-control-md px-control-px-lg py-none rounded mb-md text-base leading-none"
               style={{
                 backgroundColor: 'var(--bg-secondary)',
-                border: '1px solid var(--border-color)',
+                border: 'var(--border)',
                 color: 'var(--text-primary)',
                 borderRadius: 'var(--radius)',
                 fontWeight: 'var(--font-medium)'
@@ -841,7 +841,7 @@ export function InventoryGrid({ startDate, endDate, selectedRooms, initialRows, 
                 className="flex h-control-md w-modal-action items-center justify-center gap-sm rounded border-none px-control-px-md py-none text-base leading-none"
                 style={{
                   backgroundColor: 'var(--primary)',
-                  color: '#ffffff',
+                  color: 'var(--text-on-primary)',
                   borderRadius: 'var(--radius)',
                   fontWeight: 'var(--font-medium)'
                 }}
@@ -860,7 +860,7 @@ export function InventoryGrid({ startDate, endDate, selectedRooms, initialRows, 
                   color: 'var(--text-primary)',
                   borderRadius: 'var(--radius)',
                   fontWeight: 'var(--font-medium)',
-                  border: '1px solid var(--border-color)'
+                  border: 'var(--border)'
                 }}
               >
                 {t('ari.common.cancel')}
@@ -875,7 +875,7 @@ export function InventoryGrid({ startDate, endDate, selectedRooms, initialRows, 
         <div
           className="fixed inset-0 z-50 flex items-center justify-center"
           style={{
-            backgroundColor: 'rgba(0, 0, 0, 0.5)'
+            backgroundColor: 'var(--overlay-bg)'
           }}
           onClick={() => setShowBulkRegister(false)}
         >
@@ -885,7 +885,7 @@ export function InventoryGrid({ startDate, endDate, selectedRooms, initialRows, 
               backgroundColor: 'var(--bg-primary)',
               borderRadius: 'var(--radius)',
               boxShadow: 'var(--shadow-md)',
-              border: '1px solid var(--border-color)',
+              border: 'var(--border)',
               maxHeight: 'var(--modal-max-height)'
             }}
             onClick={(e) => e.stopPropagation()}
@@ -907,7 +907,7 @@ export function InventoryGrid({ startDate, endDate, selectedRooms, initialRows, 
                   className="flex h-control-md w-modal-action items-center justify-center gap-sm rounded border-none px-control-px-md py-none text-base leading-none"
                   style={{
                     backgroundColor: (bulkRegisterStart && bulkRegisterEnd && hasBulkRegisterValue() && bulkRegisterWeekdays.length > 0) ? 'var(--primary)' : 'var(--bg-tertiary)',
-                    color: (bulkRegisterStart && bulkRegisterEnd && hasBulkRegisterValue() && bulkRegisterWeekdays.length > 0) ? '#ffffff' : 'var(--text-tertiary)',
+                    color: (bulkRegisterStart && bulkRegisterEnd && hasBulkRegisterValue() && bulkRegisterWeekdays.length > 0) ? 'var(--text-on-primary)' : 'var(--text-tertiary)',
                     borderRadius: 'var(--radius)',
                     fontWeight: 'var(--font-bold)',
                     cursor: (bulkRegisterStart && bulkRegisterEnd && hasBulkRegisterValue() && bulkRegisterWeekdays.length > 0) ? 'pointer' : 'not-allowed'
@@ -930,7 +930,7 @@ export function InventoryGrid({ startDate, endDate, selectedRooms, initialRows, 
                     color: 'var(--text-primary)',
                     borderRadius: 'var(--radius)',
                     fontWeight: 'var(--font-medium)',
-                    border: '1px solid var(--border-color)'
+                    border: 'var(--border)'
                   }}
                 >
                   {t('ari.common.cancel')}
@@ -981,7 +981,7 @@ export function InventoryGrid({ startDate, endDate, selectedRooms, initialRows, 
                     color: 'var(--text-primary)',
                     borderRadius: 'var(--radius)',
                     fontWeight: 'var(--font-medium)',
-                    border: '1px solid var(--border-color)'
+                    border: 'var(--border)'
                   }}
                 >
                   {t('ari.common.view.all')}
@@ -994,7 +994,7 @@ export function InventoryGrid({ startDate, endDate, selectedRooms, initialRows, 
                     color: 'var(--text-primary)',
                     borderRadius: 'var(--radius)',
                     fontWeight: 'var(--font-medium)',
-                    border: '1px solid var(--border-color)'
+                    border: 'var(--border)'
                   }}
                 >
                   {t('ari.inventories.grid.weekdaysOnly')}
@@ -1007,7 +1007,7 @@ export function InventoryGrid({ startDate, endDate, selectedRooms, initialRows, 
                     color: 'var(--text-primary)',
                     borderRadius: 'var(--radius)',
                     fontWeight: 'var(--font-medium)',
-                    border: '1px solid var(--border-color)'
+                    border: 'var(--border)'
                   }}
                 >
                   {t('ari.inventories.grid.weekendsOnly')}
@@ -1034,7 +1034,7 @@ export function InventoryGrid({ startDate, endDate, selectedRooms, initialRows, 
                         className="mb-xs flex h-control-md w-full items-center justify-center rounded border-none text-base leading-none transition-colors"
                         style={{
                           backgroundColor: active ? 'var(--primary)' : 'var(--bg-secondary)',
-                          color: active ? '#ffffff' : color,
+                          color: active ? 'var(--text-on-primary)' : color,
                           borderRadius: 'var(--radius)',
                           fontWeight: 'var(--font-bold)'
                         }}
@@ -1050,7 +1050,7 @@ export function InventoryGrid({ startDate, endDate, selectedRooms, initialRows, 
                         className="h-control-md w-full rounded px-control-px-sm py-none text-center text-base leading-none"
                         style={{
                           backgroundColor: active ? 'var(--bg-secondary)' : 'var(--bg-tertiary)',
-                          border: '1px solid var(--border-color)',
+                          border: 'var(--border)',
                           borderRadius: 'var(--radius)',
                           color: active ? 'var(--text-primary)' : 'var(--text-tertiary)',
                           cursor: active ? 'text' : 'not-allowed',
@@ -1093,26 +1093,26 @@ export function InventoryGrid({ startDate, endDate, selectedRooms, initialRows, 
               <div
                 className="overflow-x-auto rounded"
                 style={{
-                  border: '1px solid var(--border-color)',
+                  border: 'var(--border)',
                   borderRadius: 'var(--radius)'
                 }}
               >
                 <table className="w-full border-separate border-spacing-0">
                   <thead>
                     <tr style={{ backgroundColor: 'var(--bg-secondary)' }}>
-                      <th className="px-md py-sm text-left text-base" style={{ color: 'var(--text-primary)', fontWeight: 'var(--font-bold)', borderBottom: '1px solid var(--border-color)' }}>
+                      <th className="px-md py-sm text-left text-base" style={{ color: 'var(--text-primary)', fontWeight: 'var(--font-bold)', borderBottom: 'var(--border)' }}>
                         {t('ari.inventories.grid.room')}
                       </th>
-                      <th className="px-md py-sm text-left text-base" style={{ color: 'var(--text-primary)', fontWeight: 'var(--font-bold)', borderBottom: '1px solid var(--border-color)' }}>
+                      <th className="px-md py-sm text-left text-base" style={{ color: 'var(--text-primary)', fontWeight: 'var(--font-bold)', borderBottom: 'var(--border)' }}>
                         {t('ari.inventories.grid.weekday')}
                       </th>
-                      <th className="px-md py-sm text-right text-base" style={{ color: 'var(--text-primary)', fontWeight: 'var(--font-bold)', borderBottom: '1px solid var(--border-color)' }}>
+                      <th className="px-md py-sm text-right text-base" style={{ color: 'var(--text-primary)', fontWeight: 'var(--font-bold)', borderBottom: 'var(--border)' }}>
                         {t('ari.inventories.grid.inputInventory')}
                       </th>
-                      <th className="px-md py-sm text-right text-base" style={{ color: 'var(--text-primary)', fontWeight: 'var(--font-bold)', borderBottom: '1px solid var(--border-color)' }}>
+                      <th className="px-md py-sm text-right text-base" style={{ color: 'var(--text-primary)', fontWeight: 'var(--font-bold)', borderBottom: 'var(--border)' }}>
                         {t('ari.inventories.grid.totalInventory')}
                       </th>
-                      <th className="px-md py-sm text-right text-base" style={{ color: 'var(--text-primary)', fontWeight: 'var(--font-bold)', borderBottom: '1px solid var(--border-color)' }}>
+                      <th className="px-md py-sm text-right text-base" style={{ color: 'var(--text-primary)', fontWeight: 'var(--font-bold)', borderBottom: 'var(--border)' }}>
                         {t('ari.inventories.grid.booked')}
                       </th>
                     </tr>
@@ -1128,19 +1128,19 @@ export function InventoryGrid({ startDate, endDate, selectedRooms, initialRows, 
                       bulkRegisterPreviewRows.flatMap((row) =>
                         row.cells.map((cell, index) => (
                           <tr key={`${row.id}-${cell.day}`}>
-                            <td className="px-md py-sm text-base" style={{ color: 'var(--text-primary)', fontWeight: 'var(--font-medium)', borderBottom: '1px solid var(--border-color)' }}>
+                            <td className="px-md py-sm text-base" style={{ color: 'var(--text-primary)', fontWeight: 'var(--font-medium)', borderBottom: 'var(--border)' }}>
                               {index === 0 ? `${row.id} / ${row.name}` : ''}
                             </td>
-                            <td className="px-md py-sm text-base" style={{ color: cell.day === 0 ? 'var(--error)' : cell.day === 6 ? 'var(--primary)' : 'var(--text-secondary)', fontWeight: 'var(--font-bold)', borderBottom: '1px solid var(--border-color)' }}>
+                            <td className="px-md py-sm text-base" style={{ color: cell.day === 0 ? 'var(--error)' : cell.day === 6 ? 'var(--primary)' : 'var(--text-secondary)', fontWeight: 'var(--font-bold)', borderBottom: 'var(--border)' }}>
                               {cell.label}
                             </td>
-                            <td className="px-md py-sm text-right text-base" style={{ color: 'var(--primary)', fontWeight: 'var(--font-bold)', borderBottom: '1px solid var(--border-color)' }}>
+                            <td className="px-md py-sm text-right text-base" style={{ color: 'var(--primary)', fontWeight: 'var(--font-bold)', borderBottom: 'var(--border)' }}>
                               {cell.available}
                             </td>
-                            <td className="px-md py-sm text-right text-base" style={{ color: 'var(--text-primary)', fontWeight: 'var(--font-medium)', borderBottom: '1px solid var(--border-color)' }}>
+                            <td className="px-md py-sm text-right text-base" style={{ color: 'var(--text-primary)', fontWeight: 'var(--font-medium)', borderBottom: 'var(--border)' }}>
                               {cell.total}
                             </td>
-                            <td className="px-md py-sm text-right text-base" style={{ color: 'var(--text-secondary)', fontWeight: 'var(--font-medium)', borderBottom: '1px solid var(--border-color)' }}>
+                            <td className="px-md py-sm text-right text-base" style={{ color: 'var(--text-secondary)', fontWeight: 'var(--font-medium)', borderBottom: 'var(--border)' }}>
                               {cell.booked}
                             </td>
                           </tr>
@@ -1160,7 +1160,7 @@ export function InventoryGrid({ startDate, endDate, selectedRooms, initialRows, 
       <div
         className="p-md flex flex-wrap gap-md"
         style={{
-          borderTop: '1px solid var(--border-color)'
+          borderTop: 'var(--border)'
         }}
       >
         <div className="text-base" style={{ color: 'var(--text-secondary)' }}>

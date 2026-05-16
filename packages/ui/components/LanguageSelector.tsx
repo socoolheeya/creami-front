@@ -54,7 +54,7 @@ export function LanguageSelector({ currentLocale, onLocaleChange }: LanguageSele
             onClick={() => setIsOpen(false)}
             aria-hidden="true"
           />
-          <div className="absolute right-0 top-full z-50 mt-xs min-w-[120px] rounded bg-bg-secondary border border-border shadow-lg">
+          <div className="absolute right-0 top-full z-50 mt-xs min-w-dropdown-sm rounded bg-bg-secondary border border-border shadow-lg">
             {locales.map((locale) => (
               <button
                 key={locale}

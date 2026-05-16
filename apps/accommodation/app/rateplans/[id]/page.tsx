@@ -351,7 +351,7 @@ export default function RatePlanPage({ params }: RatePlanPageProps) {
       <style jsx>{`
         .container {
           padding: var(--spacing-md);
-          max-width: 1400px;
+          max-width: var(--page-max-width);
           margin: 0 auto;
         }
 
@@ -461,7 +461,7 @@ export default function RatePlanPage({ params }: RatePlanPageProps) {
 
         .section-card {
           background: var(--bg-secondary);
-          border: 1px solid var(--border-color);
+          border: var(--border);
           border-radius: var(--radius-lg);
           padding: var(--spacing-lg);
         }
@@ -490,8 +490,8 @@ export default function RatePlanPage({ params }: RatePlanPageProps) {
         }
 
         .benefit-icon {
-          width: 24px;
-          height: 24px;
+          width: var(--spacing-lg);
+          height: var(--spacing-lg);
           color: var(--primary);
         }
 
@@ -569,7 +569,7 @@ export default function RatePlanPage({ params }: RatePlanPageProps) {
           color: var(--text-primary);
           margin: 0;
           padding-bottom: var(--spacing-xs);
-          border-bottom: 2px solid var(--border-color);
+          border-bottom: var(--border-strong);
         }
 
         .setting-items {
@@ -640,7 +640,7 @@ export default function RatePlanPage({ params }: RatePlanPageProps) {
         }
 
         .policy-card {
-          border: 1px solid var(--border-color);
+          border: var(--border);
           border-radius: var(--radius-md);
           padding: var(--spacing-md);
           background: var(--bg-primary);
@@ -652,7 +652,7 @@ export default function RatePlanPage({ params }: RatePlanPageProps) {
           align-items: center;
           margin-bottom: var(--spacing-sm);
           padding-bottom: var(--spacing-sm);
-          border-bottom: 1px solid var(--border-color);
+          border-bottom: var(--border);
         }
 
         .policy-name {
@@ -692,8 +692,8 @@ export default function RatePlanPage({ params }: RatePlanPageProps) {
         }
 
         .day {
-          width: 28px;
-          height: 28px;
+          width: var(--spacing-xl);
+          height: var(--spacing-xl);
           display: flex;
           align-items: center;
           justify-content: center;
@@ -712,7 +712,7 @@ export default function RatePlanPage({ params }: RatePlanPageProps) {
 
         .penalties-section {
           padding-top: var(--spacing-sm);
-          border-top: 1px solid var(--border-color);
+          border-top: var(--border);
         }
 
         .penalties-label {

@@ -283,7 +283,7 @@ export function TimePicker({
       <div
         data-time-options="true"
         className="overflow-y-auto"
-        style={{ maxHeight: 'var(--timepicker-options-max-height, 12rem)' }}
+        style={{ maxHeight: 'var(--timepicker-options-max-height)' }}
       >
         <div className="flex flex-col gap-xs">
           {options.map((option) => {
@@ -368,7 +368,7 @@ export function TimePicker({
             style={{
               top: popupPosition.top,
               left: popupPosition.left,
-              width: 'var(--timepicker-width, 18rem)',
+              width: 'var(--timepicker-width)',
               zIndex: 'var(--layer-popover, 1000)',
             }}
             onMouseDown={(event) => event.stopPropagation()}

@@ -70,7 +70,40 @@
         "period": "期間",
         "usage": "使用状況",
         "status": "状態",
+        "actions": "管理",
         "all": "全体"
+      },
+      "form": {
+        "createTitle": "割引新規登録",
+        "editTitle": "割引修正",
+        "name": "割引名",
+        "namePlaceholder": "例: 春の基本割引",
+        "discountType": "割引ポリシー",
+        "type": "割引方式",
+        "value": "割引値",
+        "startDate": "開始日",
+        "endDate": "終了日",
+        "status": "状態",
+        "audienceType": "対象顧客",
+        "create": "登録",
+        "update": "修正保存",
+        "saving": "保存中",
+        "cancelEdit": "修正取消",
+        "createSuccess": "割引が登録されました。",
+        "updateSuccess": "割引が修正されました。",
+        "saveError": "割引の保存に失敗しました。",
+        "validationError": "割引名と1以上の割引値を入力してください。",
+        "discountTypes": {
+          "BASIC": "基本割引",
+          "EARLY_BIRD": "早割",
+          "LAST_MINUTE": "直前割引",
+          "LONG_STAY": "長期宿泊"
+        },
+        "audienceTypes": {
+          "PUBLIC": "全顧客",
+          "MEMBER_ONLY": "会員専用",
+          "MOBILE_ONLY": "モバイル専用"
+        }
       }
     },
     "mappings": {

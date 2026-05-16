@@ -91,9 +91,9 @@ export default function CurlBookingPage() {
   return (
     <div>
       {/* Header */}
-      <div className="mb-6">
-        <div className="flex items-center gap-3 mb-2">
-          <Terminal className="w-8 h-8" style={{ color: 'var(--primary)' }} />
+      <div className="mb-lg">
+        <div className="flex items-center gap-md mb-sm">
+          <Terminal className="w-xl h-xl" style={{ color: 'var(--primary)' }} />
           <h1 className="text-2xl" style={{ fontWeight: 'var(--font-bold)', color: 'var(--text-primary)' }}>
             cURL 예약 (개발자용)
           </h1>
@@ -103,17 +103,17 @@ export default function CurlBookingPage() {
         </p>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-lg">
         {/* 왼쪽: 입력 */}
         <div>
           <div
-            className="p-6 rounded-lg mb-4"
+            className="p-lg rounded mb-md"
             style={{
               backgroundColor: 'var(--bg-primary)',
-              border: '1px solid var(--border-color)'
+              border: 'var(--border)'
             }}
           >
-            <label className="block mb-3" style={{ fontWeight: 'var(--font-bold)', color: 'var(--text-primary)' }}>
+            <label className="block mb-md" style={{ fontWeight: 'var(--font-bold)', color: 'var(--text-primary)' }}>
               cURL 명령어 붙여넣기
             </label>
 
@@ -122,10 +122,10 @@ export default function CurlBookingPage() {
               onChange={(e) => setCurlCommand(e.target.value)}
               placeholder="curl 명령어를 여기에 붙여넣으세요..."
               rows={15}
-              className="w-full px-4 py-3 rounded-lg font-mono text-sm"
+              className="w-full px-md py-md rounded font-mono text-base"
               style={{
                 backgroundColor: 'var(--bg-tertiary)',
-                border: '1px solid var(--border-color)',
+                border: 'var(--border)',
                 color: 'var(--text-primary)',
                 resize: 'vertical'
               }}
@@ -133,24 +133,24 @@ export default function CurlBookingPage() {
 
             {error && (
               <div
-                className="mt-3 p-3 rounded-lg flex items-start gap-2"
+                className="mt-md p-md rounded flex items-start gap-sm"
                 style={{
-                  backgroundColor: 'rgba(239, 68, 68, 0.1)',
-                  border: '1px solid rgba(239, 68, 68, 0.3)'
+                  backgroundColor: 'var(--error-bg)',
+                  border: 'var(--border-error)'
                 }}
               >
-                <AlertCircle className="w-5 h-5 flex-shrink-0" style={{ color: '#ef4444' }} />
-                <p style={{ color: '#ef4444', fontSize: '14px' }}>{error}</p>
+                <AlertCircle className="w-5 h-5 flex-shrink-0" style={{ color: 'var(--error)' }} />
+                <p style={{ color: 'var(--error)', fontSize: 'var(--font-size-base)' }}>{error}</p>
               </div>
             )}
 
             <button
               onClick={handleSubmit}
               disabled={!curlCommand.trim() || isProcessing}
-              className="w-full mt-4 flex items-center justify-center gap-2 px-4 py-3 rounded-lg transition-colors"
+              className="w-full mt-md flex items-center justify-center gap-sm px-md py-md rounded transition-colors"
               style={{
                 backgroundColor: (!curlCommand.trim() || isProcessing) ? 'var(--text-tertiary)' : 'var(--primary)',
-                color: '#ffffff',
+                color: 'var(--text-on-primary)',
                 fontWeight: 'var(--font-bold)',
                 cursor: (!curlCommand.trim() || isProcessing) ? 'not-allowed' : 'pointer'
               }}
@@ -164,37 +164,37 @@ export default function CurlBookingPage() {
         {/* 오른쪽: 예시 */}
         <div>
           <div
-            className="p-6 rounded-lg"
+            className="p-lg rounded"
             style={{
               backgroundColor: 'var(--bg-primary)',
-              border: '1px solid var(--border-color)'
+              border: 'var(--border)'
             }}
           >
-            <h3 className="mb-3" style={{ fontWeight: 'var(--font-bold)', color: 'var(--text-primary)' }}>
+            <h3 className="mb-md" style={{ fontWeight: 'var(--font-bold)', color: 'var(--text-primary)' }}>
               cURL 예시
             </h3>
 
-            <p className="mb-3" style={{ fontSize: '14px', color: 'var(--text-secondary)' }}>
+            <p className="mb-md" style={{ fontSize: 'var(--font-size-base)', color: 'var(--text-secondary)' }}>
               아래 형식의 cURL 명령어를 사용하세요:
             </p>
 
             <pre
-              className="p-4 rounded-lg overflow-x-auto"
+              className="p-md rounded overflow-x-auto"
               style={{
                 backgroundColor: 'var(--bg-tertiary)',
-                border: '1px solid var(--border-color)',
-                fontSize: '12px',
+                border: 'var(--border)',
+                fontSize: 'var(--font-size-sm)',
                 lineHeight: '1.6'
               }}
             >
               <code style={{ color: 'var(--text-primary)' }}>{exampleCurl}</code>
             </pre>
 
-            <div className="mt-4 p-4 rounded-lg" style={{ backgroundColor: 'var(--bg-secondary)' }}>
-              <h4 className="mb-2" style={{ fontWeight: 'var(--font-bold)', color: 'var(--text-primary)', fontSize: '14px' }}>
+            <div className="mt-md p-md rounded" style={{ backgroundColor: 'var(--bg-secondary)' }}>
+              <h4 className="mb-sm" style={{ fontWeight: 'var(--font-bold)', color: 'var(--text-primary)', fontSize: 'var(--font-size-base)' }}>
                 필수 필드
               </h4>
-              <ul className="space-y-1" style={{ fontSize: '13px', color: 'var(--text-secondary)' }}>
+              <ul className="space-y-xs" style={{ fontSize: 'var(--font-size-sm)', color: 'var(--text-secondary)' }}>
                 <li>• accommodationId: 숙소 ID</li>
                 <li>• roomId: 객실 ID</li>
                 <li>• ratePlanId: 요금제 ID</li>
@@ -207,12 +207,12 @@ export default function CurlBookingPage() {
               </ul>
             </div>
 
-            <div className="mt-4 p-4 rounded-lg" style={{ backgroundColor: 'rgba(250, 131, 131, 0.1)', border: '1px solid var(--primary)' }}>
-              <h4 className="mb-2 flex items-center gap-2" style={{ fontWeight: 'var(--font-bold)', color: 'var(--primary)', fontSize: '14px' }}>
-                <AlertCircle className="w-4 h-4" />
+            <div className="mt-md p-md rounded" style={{ backgroundColor: 'var(--primary-bg)', border: 'var(--border-primary)' }}>
+              <h4 className="mb-sm flex items-center gap-sm" style={{ fontWeight: 'var(--font-bold)', color: 'var(--primary)', fontSize: 'var(--font-size-base)' }}>
+                <AlertCircle className="w-md h-md" />
                 주의사항
               </h4>
-              <p style={{ fontSize: '13px', color: 'var(--text-secondary)' }}>
+              <p style={{ fontSize: 'var(--font-size-sm)', color: 'var(--text-secondary)' }}>
                 이 기능은 개발 및 테스트 목적으로만 사용하세요. 프로덕션 환경에서는 보안에 주의해야 합니다.
               </p>
             </div>

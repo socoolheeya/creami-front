@@ -66,7 +66,7 @@ export function Header({
   }, [isProfileMenuOpen])
 
   return (
-    <header className="fixed left-0 right-0 top-0 z-40 flex h-[var(--header-height)] items-center justify-between border-b border-border bg-bg-primary">
+    <header className="fixed left-0 right-0 top-0 z-40 flex h-header items-center justify-between border-b border-border bg-bg-primary">
       <div
         className="flex h-full shrink-0 items-center gap-sm px-md"
         style={{ minWidth: 'var(--sidebar-width)' }}
@@ -110,7 +110,7 @@ export function Header({
 
             {isProfileMenuOpen && (
               <div
-                className="absolute right-0 top-full z-50 mt-sm w-[280px] overflow-hidden rounded border border-border bg-bg-primary p-sm shadow-md"
+                className="absolute right-0 top-full z-50 mt-sm w-dropdown-md overflow-hidden rounded border border-border bg-bg-primary p-sm shadow-md"
                 role="menu"
               >
                 {profileUser && (

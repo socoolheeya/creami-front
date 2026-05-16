@@ -331,12 +331,12 @@ export default function CreatePolicyPage() {
                       ))}
                     </Select>
                     {isLoadingMenuOptions && (
-                      <p className="text-sm font-light text-text-tertiary">
+                      <p className="text-base font-light text-text-tertiary">
                         {t('setting.policies.form.menuOptionsLoading')}
                       </p>
                     )}
                     {!isLoadingMenuOptions && menuOptions.length === 0 && (
-                      <p className="text-sm font-light text-text-tertiary">
+                      <p className="text-base font-light text-text-tertiary">
                         {t('setting.policies.form.menuOptionsEmpty')}
                       </p>
                     )}
@@ -405,7 +405,7 @@ export default function CreatePolicyPage() {
               </p>
             </div>
 
-            <div className="grid max-h-[20rem] gap-sm overflow-y-auto rounded border border-border bg-bg-secondary p-md md:grid-cols-2">
+            <div className="grid max-h-policy-list gap-sm overflow-y-auto rounded border border-border bg-bg-secondary p-md md:grid-cols-2">
               {isLoadingGroups && (
                 <div className="text-base text-text-secondary">
                   {t('setting.policies.form.groupsLoading')}

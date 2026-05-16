@@ -27,18 +27,18 @@ export function RatePlanCardView({ ratePlan }: RatePlanCardViewProps) {
 
   return (
     <div
-      className="rounded-lg overflow-hidden transition-all hover:shadow-lg"
+      className="rounded overflow-hidden transition-all hover:shadow-lg"
       style={{
         backgroundColor: 'var(--bg-primary)',
-        border: '1px solid var(--border-color)'
+        border: 'var(--border)'
       }}
     >
-      <div className="p-3">
+      <div className="p-md">
         {/* Header with Status */}
-        <div className="flex items-start justify-between mb-2">
+        <div className="flex items-start justify-between mb-sm">
           <div className="flex-1">
             <h3
-              className="text-base mb-0.5"
+              className="text-base mb-xs"
               style={{
                 fontWeight: 'var(--font-bold)',
                 color: 'var(--text-primary)'
@@ -53,7 +53,7 @@ export function RatePlanCardView({ ratePlan }: RatePlanCardViewProps) {
             )}
           </div>
           <span
-            className="px-2 py-0.5 rounded-full text-xs"
+            className="px-sm py-xs rounded text-xs"
             style={{
               backgroundColor: getStatusColor(ratePlan.status) + '20',
               color: getStatusColor(ratePlan.status),
@@ -66,20 +66,20 @@ export function RatePlanCardView({ ratePlan }: RatePlanCardViewProps) {
 
         {/* Benefit */}
         <div
-          className="mb-2 p-2 rounded-lg"
+          className="mb-sm p-sm rounded"
           style={{
             backgroundColor: 'var(--bg-secondary)',
-            border: '1px solid var(--border-color)'
+            border: 'var(--border)'
           }}
         >
           <p
-            className="text-xs mb-0.5"
+            className="text-xs mb-xs"
             style={{ color: 'var(--text-secondary)', fontWeight: 'var(--font-light)' }}
           >
             {t('fields.benefitName')}
           </p>
           <p
-            className="text-sm"
+            className="text-base"
             style={{
               color: 'var(--primary)',
               fontWeight: 'var(--font-bold)'
@@ -90,16 +90,16 @@ export function RatePlanCardView({ ratePlan }: RatePlanCardViewProps) {
         </div>
 
         {/* Info Grid */}
-        <div className="grid grid-cols-2 gap-2 mb-2">
+        <div className="grid grid-cols-2 gap-sm mb-sm">
           <div>
             <p
-              className="text-xs mb-0.5"
+              className="text-xs mb-xs"
               style={{ color: 'var(--text-secondary)', fontWeight: 'var(--font-light)' }}
             >
               {t('fields.ratePlanType')}
             </p>
             <p
-              className="text-sm"
+              className="text-base"
               style={{ color: 'var(--text-primary)', fontWeight: 'var(--font-medium)' }}
             >
               {t(`types.${ratePlan.ratePlanType}`)}
@@ -107,13 +107,13 @@ export function RatePlanCardView({ ratePlan }: RatePlanCardViewProps) {
           </div>
           <div>
             <p
-              className="text-xs mb-0.5"
+              className="text-xs mb-xs"
               style={{ color: 'var(--text-secondary)', fontWeight: 'var(--font-light)' }}
             >
               {t('fields.priceType')}
             </p>
             <p
-              className="text-sm"
+              className="text-base"
               style={{ color: 'var(--text-primary)', fontWeight: 'var(--font-medium)' }}
             >
               {t(`priceTypes.${ratePlan.priceType}`)}
@@ -121,13 +121,13 @@ export function RatePlanCardView({ ratePlan }: RatePlanCardViewProps) {
           </div>
           <div className="col-span-2">
             <p
-              className="text-xs mb-0.5"
+              className="text-xs mb-xs"
               style={{ color: 'var(--text-secondary)', fontWeight: 'var(--font-light)' }}
             >
               {t('fields.mealIncluded')}
             </p>
             <p
-              className="text-sm"
+              className="text-base"
               style={{ color: 'var(--text-primary)', fontWeight: 'var(--font-medium)' }}
             >
               {t(`mealPlans.${ratePlan.mealPlan}`)}
@@ -138,18 +138,18 @@ export function RatePlanCardView({ ratePlan }: RatePlanCardViewProps) {
         {/* Settings */}
         {ratePlan.setting && (
           <div
-            className="grid grid-cols-2 gap-2 p-2 mb-2 rounded-lg"
+            className="grid grid-cols-2 gap-sm p-sm mb-sm rounded"
             style={{ backgroundColor: 'var(--bg-secondary)' }}
           >
             <div className="text-center">
               <p
-                className="text-xs mb-0.5"
+                className="text-xs mb-xs"
                 style={{ color: 'var(--text-secondary)' }}
               >
                 {t('fields.minLos')}
               </p>
               <p
-                className="text-sm"
+                className="text-base"
                 style={{ fontWeight: 'var(--font-bold)', color: 'var(--text-primary)' }}
               >
                 {commonT('night', { count: ratePlan.setting.minLos })}
@@ -157,13 +157,13 @@ export function RatePlanCardView({ ratePlan }: RatePlanCardViewProps) {
             </div>
             <div className="text-center">
               <p
-                className="text-xs mb-0.5"
+                className="text-xs mb-xs"
                 style={{ color: 'var(--text-secondary)' }}
               >
                 {t('fields.maxLos')}
               </p>
               <p
-                className="text-sm"
+                className="text-base"
                 style={{ fontWeight: 'var(--font-bold)', color: 'var(--text-primary)' }}
               >
                 {commonT('night', { count: ratePlan.setting.maxLos })}
@@ -173,13 +173,13 @@ export function RatePlanCardView({ ratePlan }: RatePlanCardViewProps) {
         )}
 
         {/* Action Buttons */}
-        <div className="flex gap-2 pt-2" style={{ borderTop: '1px solid var(--border-color)' }}>
+        <div className="flex gap-sm pt-sm" style={{ borderTop: 'var(--border)' }}>
           <Link href={`/rateplans/${ratePlan.id}`} className="flex-1">
             <button
-              className="w-full flex items-center justify-center gap-1 px-2 py-1 rounded-lg transition-colors text-xs"
+              className="w-full flex items-center justify-center gap-xs px-sm py-xs rounded transition-colors text-xs"
               style={{
                 backgroundColor: 'var(--bg-secondary)',
-                border: '1px solid var(--border-color)',
+                border: 'var(--border)',
                 color: 'var(--text-primary)',
                 fontWeight: 'var(--font-medium)',
                 borderRadius: 'var(--radius-sm)'
@@ -191,10 +191,10 @@ export function RatePlanCardView({ ratePlan }: RatePlanCardViewProps) {
           </Link>
           <Link href={`/rateplans/${ratePlan.id}/edit`} className="flex-1">
             <button
-              className="w-full flex items-center justify-center gap-1 px-2 py-1 rounded-lg transition-colors text-xs"
+              className="w-full flex items-center justify-center gap-xs px-sm py-xs rounded transition-colors text-xs"
               style={{
                 backgroundColor: 'var(--primary)',
-                color: '#ffffff',
+                color: 'var(--text-on-primary)',
                 fontWeight: 'var(--font-medium)',
                 borderRadius: 'var(--radius-sm)'
               }}

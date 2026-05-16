@@ -72,7 +72,7 @@ export function OccupancyInput({ occupancies, onChange }: OccupancyInputProps) {
             className="p-md rounded"
             style={{
               backgroundColor: 'var(--bg-secondary)',
-              border: '1px solid var(--border-color)'
+              border: 'var(--border)'
             }}
           >
             <div className="flex items-center justify-between mb-md">
@@ -101,7 +101,7 @@ export function OccupancyInput({ occupancies, onChange }: OccupancyInputProps) {
                   className="h-control-md w-control-md rounded"
                   style={{
                     backgroundColor: 'var(--bg-primary)',
-                    border: '1px solid var(--border-color)',
+                    border: 'var(--border)',
                     color: room.adults <= 1 ? 'var(--text-tertiary)' : 'var(--text-primary)',
                     cursor: room.adults <= 1 ? 'not-allowed' : 'pointer'
                   }}
@@ -116,7 +116,7 @@ export function OccupancyInput({ occupancies, onChange }: OccupancyInputProps) {
                   className="h-control-md w-control-md rounded"
                   style={{
                     backgroundColor: 'var(--bg-primary)',
-                    border: '1px solid var(--border-color)',
+                    border: 'var(--border)',
                     color: 'var(--text-primary)'
                   }}
                 >
@@ -134,7 +134,7 @@ export function OccupancyInput({ occupancies, onChange }: OccupancyInputProps) {
                   className="h-control-sm px-control-px-sm py-none text-base rounded leading-none"
                   style={{
                     backgroundColor: 'var(--primary)',
-                    color: '#ffffff',
+                    color: 'var(--text-on-primary)',
                     fontWeight: 'var(--font-medium)'
                   }}
                 >
@@ -150,7 +150,7 @@ export function OccupancyInput({ occupancies, onChange }: OccupancyInputProps) {
                     className="flex-1 h-control-md px-control-px-md py-none rounded text-base leading-none"
                     style={{
                       backgroundColor: 'var(--bg-primary)',
-                      border: '1px solid var(--border-color)',
+                      border: 'var(--border)',
                       color: 'var(--text-primary)'
                     }}
                   >
@@ -185,7 +185,7 @@ export function OccupancyInput({ occupancies, onChange }: OccupancyInputProps) {
         className="w-full mt-md h-control-md py-none rounded text-base leading-none"
         style={{
           backgroundColor: 'var(--bg-secondary)',
-          border: '1px dashed var(--border-color)',
+          border: 'var(--border-dashed)',
           color: 'var(--text-secondary)',
           fontWeight: 'var(--font-medium)'
         }}

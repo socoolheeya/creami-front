@@ -1,5 +1,5 @@
 import { Accommodation } from '@/lib/types/accommodation'
-import { Discount } from '@/lib/types/discount'
+import { Discount, DiscountFormData } from '@/lib/types/discount'
 import { DiscountRatePlanMapping, RatePlan } from '@/lib/types/rateplan'
 
 const DISCOUNT_API_BASE_URL =
@@ -31,6 +31,10 @@ type BackendDiscount = {
 
 type BackendDiscountsResponse = {
   discounts: BackendDiscount[]
+}
+
+type BackendDiscountResponse = {
+  discount: BackendDiscount
 }
 
 type BackendProperty = {
@@ -106,6 +110,49 @@ function toDiscountType(unit: BackendDiscountUnit): Discount['type'] {
   return unit === 'PERCENTAGE' ? 'percentage' : 'fixed'
 }
 
+function toBackendStatus(status: Discount['status'] | undefined): BackendDiscountStatus {
+  if (status === 'active') return 'ACTIVE'
+  if (status === 'disabled') return 'INACTIVE'
+  if (status === 'expired') return 'ARCHIVED'
+  return 'DRAFT'
+}
+
+function toBackendUnit(type: Discount['type'] | undefined): BackendDiscountUnit {
+  return type === 'percentage' ? 'PERCENTAGE' : 'AMOUNT'
+}
+
+function toDateTimeString(value: Date | undefined): string | null {
+  if (!value || Number.isNaN(value.getTime())) {
+    return null
+  }
+
+  const year = value.getFullYear()
+  const month = String(value.getMonth() + 1).padStart(2, '0')
+  const day = String(value.getDate()).padStart(2, '0')
+  return `${year}-${month}-${day}T00:00:00`
+}
+
+function toDiscountPayload(form: DiscountFormData) {
+  const discountType =
+    form.discountType === 'BASE_DISCOUNT' ? 'BASIC' :
+    form.discountType === 'EARLYBIRD' ? 'EARLY_BIRD' :
+    form.discountType === 'LAST_MINUTES' ? 'LAST_MINUTE' :
+    form.discountType ?? 'BASIC'
+
+  return {
+    name: form.name?.trim() ?? '',
+    type: discountType,
+    audienceType: form.audienceType ?? (form.isPublic === false ? 'MEMBER_ONLY' : 'PUBLIC'),
+    bookingStartDate: toDateTimeString(form.startDate),
+    bookingEndDate: toDateTimeString(form.endDate),
+    stayStartDate: toDateTimeString(form.startDate),
+    stayEndDate: toDateTimeString(form.endDate),
+    amount: form.value ?? 0,
+    unit: toBackendUnit(form.type),
+    status: toBackendStatus(form.status),
+  }
+}
+
 function toDiscount(dto: BackendDiscount): Discount {
   const id = String(dto.discountId)
   const now = new Date()
@@ -158,7 +205,7 @@ function toRatePlan(dto: BackendRatePlan, accommodation: Accommodation | null): 
 export async function fetchDiscounts(params: { search?: string; activeOnly?: boolean } = {}): Promise<Discount[]> {
   const searchParams = new URLSearchParams()
   if (params.search?.trim()) {
-    searchParams.set('name', params.search.trim())
+    searchParams.set('search', params.search.trim())
   }
   if (params.activeOnly) {
     searchParams.set('activeOnly', 'true')
@@ -173,10 +220,46 @@ export async function fetchDiscounts(params: { search?: string; activeOnly?: boo
   return response.discounts.map(toDiscount)
 }
 
+export async function createDiscount(form: DiscountFormData): Promise<Discount> {
+  const response = await request<BackendDiscountResponse>(
+    DISCOUNT_API_BASE_URL,
+    '/discounts',
+    {
+      method: 'POST',
+      body: JSON.stringify({
+        discount: toDiscountPayload(form),
+      }),
+    }
+  )
+
+  return toDiscount(response.discount)
+}
+
+export async function updateDiscount(discountId: string, form: DiscountFormData): Promise<Discount> {
+  const response = await request<BackendDiscountResponse>(
+    DISCOUNT_API_BASE_URL,
+    `/discounts/${encodeURIComponent(discountId)}`,
+    {
+      method: 'PUT',
+      body: JSON.stringify({
+        discountId,
+        discount: {
+          discountId,
+          ...toDiscountPayload(form),
+        },
+      }),
+    }
+  )
+
+  return toDiscount(response.discount)
+}
+
 export async function fetchAccommodations(params: { search?: string } = {}): Promise<Accommodation[]> {
   const searchParams = new URLSearchParams({ size: '100' })
-  if (params.search?.trim()) {
-    searchParams.set('name', params.search.trim())
+  const normalizedSearch = params.search?.trim()
+
+  if (normalizedSearch) {
+    searchParams.set(/^\d+$/.test(normalizedSearch) ? 'propertyId' : 'name', normalizedSearch)
   }
 
   const response = await request<BackendPropertiesResponse>(
@@ -192,20 +275,36 @@ export async function fetchRatePlans(
   accommodation: Accommodation | null,
   params: { search?: string } = {},
 ): Promise<RatePlan[]> {
-  const searchParams = new URLSearchParams({
-    propertyId: accommodationId,
+  const buildSearchParams = (includePropertyId: boolean) => new URLSearchParams({
+    ...(includePropertyId ? { propertyId: accommodationId } : {}),
     size: '100',
   })
-  if (params.search?.trim()) {
-    searchParams.set('name', params.search.trim())
+  const normalizedSearch = params.search?.trim()
+  const appendSearchParams = (searchParams: URLSearchParams) => {
+    if (normalizedSearch) {
+      searchParams.set(/^\d+$/.test(normalizedSearch) ? 'ratePlanId' : 'name', normalizedSearch)
+    }
+
+    return searchParams
   }
 
+  const propertyScopedParams = appendSearchParams(buildSearchParams(true))
   const response = await request<BackendRatePlansResponse>(
     ACCOMMODATION_API_BASE_URL,
-    `/rate-plans/search?${searchParams.toString()}`
+    `/rate-plans/search?${propertyScopedParams.toString()}`
   )
 
-  return response.ratePlans.map((ratePlan) => toRatePlan(ratePlan, accommodation))
+  if (response.ratePlans.length > 0) {
+    return response.ratePlans.map((ratePlan) => toRatePlan(ratePlan, accommodation))
+  }
+
+  const fallbackParams = appendSearchParams(buildSearchParams(false))
+  const fallbackResponse = await request<BackendRatePlansResponse>(
+    ACCOMMODATION_API_BASE_URL,
+    `/rate-plans/search?${fallbackParams.toString()}`
+  )
+
+  return fallbackResponse.ratePlans.map((ratePlan) => toRatePlan(ratePlan, accommodation))
 }
 
 export async function fetchDiscountRatePlanMappings(ratePlanIds: string[]): Promise<DiscountRatePlanMapping[]> {

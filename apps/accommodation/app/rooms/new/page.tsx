@@ -110,17 +110,17 @@ function NewRoomPageContent() {
   }
 
   return (
-    <div className="min-h-screen p-6">
+    <div className="min-h-screen p-lg">
       <div
-        className="max-w-4xl mx-auto p-8 rounded-lg"
+        className="max-w-modal-lg mx-auto p-xl rounded"
         style={{
           backgroundColor: 'var(--bg-primary)',
-          border: '1px solid var(--border-color)'
+          border: 'var(--border)'
         }}
       >
-        <div className="mb-8">
+        <div className="mb-xl">
           <h1
-            className="text-2xl mb-2"
+            className="text-2xl mb-sm"
             style={{
               fontWeight: 'var(--font-bold)',
               color: 'var(--text-primary)'
@@ -141,7 +141,7 @@ function NewRoomPageContent() {
         />
 
         {/* Form Content */}
-        <div className="mb-8">
+        <div className="mb-xl">
           {currentStep === 1 && (
             <Step1Basic
               formData={formData}
@@ -185,7 +185,7 @@ export default function NewRoomPage() {
   const commonT = useTranslations('accommodation.common')
 
   return (
-    <Suspense fallback={<div className="p-6">{commonT('loading')}</div>}>
+    <Suspense fallback={<div className="p-lg">{commonT('loading')}</div>}>
       <NewRoomPageContent />
     </Suspense>
   )

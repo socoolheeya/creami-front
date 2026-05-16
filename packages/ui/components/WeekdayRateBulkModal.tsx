@@ -92,7 +92,7 @@ export function WeekdayRateBulkModal({
   return (
     <div
       className="fixed inset-0 z-50 flex items-center justify-center p-lg"
-      style={{ backgroundColor: 'rgba(0, 0, 0, 0.5)' }}
+      style={{ backgroundColor: 'var(--overlay-bg)' }}
       onClick={onClose}
     >
       <div
@@ -102,7 +102,7 @@ export function WeekdayRateBulkModal({
           maxWidth: '100%',
           maxHeight: 'var(--modal-max-height)',
           backgroundColor: 'var(--bg-primary)',
-          border: '1px solid var(--border-color)',
+          border: 'var(--border)',
           borderRadius: 'var(--radius)',
           boxShadow: 'var(--shadow-md)'
         }}
@@ -163,7 +163,7 @@ export function WeekdayRateBulkModal({
                     style={{
                       backgroundColor: selected ? 'var(--primary)' : 'var(--bg-secondary)',
                       borderRadius: 'var(--radius)',
-                      color: selected ? '#ffffff' : 'var(--text-primary)',
+                      color: selected ? 'var(--text-on-primary)' : 'var(--text-primary)',
                       fontWeight: 'var(--font-medium)'
                     }}
                   >
@@ -219,7 +219,7 @@ export function WeekdayRateBulkModal({
                   style={{
                     backgroundColor: active ? 'var(--primary)' : 'var(--bg-secondary)',
                     borderRadius: 'var(--radius)',
-                    color: active ? '#ffffff' : 'var(--text-tertiary)',
+                    color: active ? 'var(--text-on-primary)' : 'var(--text-tertiary)',
                     fontWeight: 'var(--font-bold)'
                   }}
                 >
@@ -234,7 +234,7 @@ export function WeekdayRateBulkModal({
                   className="h-control-md w-full rounded px-control-px-sm py-none text-center text-base leading-none"
                   style={{
                     backgroundColor: active ? 'var(--bg-secondary)' : 'var(--bg-tertiary)',
-                    border: '1px solid var(--border-color)',
+                    border: 'var(--border)',
                     borderRadius: 'var(--radius)',
                     color: active ? 'var(--text-primary)' : 'var(--text-tertiary)',
                     cursor: active ? 'text' : 'not-allowed',
@@ -271,7 +271,7 @@ export function WeekdayRateBulkModal({
           <div
             className="overflow-x-auto rounded"
             style={{
-              border: '1px solid var(--border-color)',
+              border: 'var(--border)',
               borderRadius: 'var(--radius)'
             }}
           >
@@ -283,7 +283,7 @@ export function WeekdayRateBulkModal({
                     style={{
                       color: 'var(--text-primary)',
                       fontWeight: 'var(--font-bold)',
-                      borderBottom: '1px solid var(--border-color)'
+                      borderBottom: 'var(--border)'
                     }}
                   >
                     {targetLabel}
@@ -293,7 +293,7 @@ export function WeekdayRateBulkModal({
                     style={{
                       color: 'var(--text-primary)',
                       fontWeight: 'var(--font-bold)',
-                      borderBottom: '1px solid var(--border-color)'
+                      borderBottom: 'var(--border)'
                     }}
                   >
                     요일
@@ -303,7 +303,7 @@ export function WeekdayRateBulkModal({
                     style={{
                       color: 'var(--text-primary)',
                       fontWeight: 'var(--font-bold)',
-                      borderBottom: '1px solid var(--border-color)'
+                      borderBottom: 'var(--border)'
                     }}
                   >
                     입력금액
@@ -313,7 +313,7 @@ export function WeekdayRateBulkModal({
                     style={{
                       color: 'var(--text-primary)',
                       fontWeight: 'var(--font-bold)',
-                      borderBottom: '1px solid var(--border-color)'
+                      borderBottom: 'var(--border)'
                     }}
                   >
                     판매가
@@ -323,7 +323,7 @@ export function WeekdayRateBulkModal({
                     style={{
                       color: 'var(--text-primary)',
                       fontWeight: 'var(--font-bold)',
-                      borderBottom: '1px solid var(--border-color)'
+                      borderBottom: 'var(--border)'
                     }}
                   >
                     커미션
@@ -333,7 +333,7 @@ export function WeekdayRateBulkModal({
                     style={{
                       color: 'var(--text-primary)',
                       fontWeight: 'var(--font-bold)',
-                      borderBottom: '1px solid var(--border-color)'
+                      borderBottom: 'var(--border)'
                     }}
                   >
                     입금가
@@ -360,7 +360,7 @@ export function WeekdayRateBulkModal({
                           style={{
                             color: 'var(--text-primary)',
                             fontWeight: 'var(--font-medium)',
-                            borderBottom: '1px solid var(--border-color)'
+                            borderBottom: 'var(--border)'
                           }}
                         >
                           {index === 0 ? `${row.id} / ${row.name}` : ''}
@@ -370,21 +370,21 @@ export function WeekdayRateBulkModal({
                           style={{
                             color: cell.day === 0 ? 'var(--error)' : cell.day === 6 ? 'var(--primary)' : 'var(--text-secondary)',
                             fontWeight: 'var(--font-bold)',
-                            borderBottom: '1px solid var(--border-color)'
+                            borderBottom: 'var(--border)'
                           }}
                         >
                           {cell.label}
                         </td>
-                        <td className="px-md py-sm text-right text-base" style={{ color: 'var(--text-primary)', fontWeight: 'var(--font-medium)', borderBottom: '1px solid var(--border-color)' }}>
+                        <td className="px-md py-sm text-right text-base" style={{ color: 'var(--text-primary)', fontWeight: 'var(--font-medium)', borderBottom: 'var(--border)' }}>
                           {formatCurrency(cell.inputAmount)}
                         </td>
-                        <td className="px-md py-sm text-right text-base" style={{ color: 'var(--primary)', fontWeight: 'var(--font-bold)', borderBottom: '1px solid var(--border-color)' }}>
+                        <td className="px-md py-sm text-right text-base" style={{ color: 'var(--primary)', fontWeight: 'var(--font-bold)', borderBottom: 'var(--border)' }}>
                           {formatCurrency(cell.sellRate)}
                         </td>
-                        <td className="px-md py-sm text-right text-base" style={{ color: 'var(--text-secondary)', fontWeight: 'var(--font-medium)', borderBottom: '1px solid var(--border-color)' }}>
+                        <td className="px-md py-sm text-right text-base" style={{ color: 'var(--text-secondary)', fontWeight: 'var(--font-medium)', borderBottom: 'var(--border)' }}>
                           {formatCurrency(cell.commissionAmount)}
                         </td>
-                        <td className="px-md py-sm text-right text-base" style={{ color: 'var(--text-primary)', fontWeight: 'var(--font-bold)', borderBottom: '1px solid var(--border-color)' }}>
+                        <td className="px-md py-sm text-right text-base" style={{ color: 'var(--text-primary)', fontWeight: 'var(--font-bold)', borderBottom: 'var(--border)' }}>
                           {formatCurrency(cell.netRate)}
                         </td>
                       </tr>

@@ -40,7 +40,7 @@ export function BookingForm({ onSubmit, isLoading }: BookingFormProps) {
       className="p-lg rounded"
       style={{
         backgroundColor: 'var(--bg-primary)',
-        border: '1px solid var(--border-color)'
+        border: 'var(--border)'
       }}
     >
       <h3 className="text-lg mb-md" style={{ fontWeight: 'var(--font-bold)', color: 'var(--text-primary)' }}>
@@ -62,7 +62,7 @@ export function BookingForm({ onSubmit, isLoading }: BookingFormProps) {
             className="w-full h-control-md rounded px-control-px-md py-none text-base leading-none"
             style={{
               backgroundColor: 'var(--bg-secondary)',
-              border: '1px solid var(--border-color)',
+              border: 'var(--border)',
               color: 'var(--text-primary)'
             }}
           />
@@ -82,7 +82,7 @@ export function BookingForm({ onSubmit, isLoading }: BookingFormProps) {
             className="w-full h-control-md rounded px-control-px-md py-none text-base leading-none"
             style={{
               backgroundColor: 'var(--bg-secondary)',
-              border: '1px solid var(--border-color)',
+              border: 'var(--border)',
               color: 'var(--text-primary)'
             }}
           />
@@ -102,7 +102,7 @@ export function BookingForm({ onSubmit, isLoading }: BookingFormProps) {
             className="w-full h-control-md rounded px-control-px-md py-none text-base leading-none"
             style={{
               backgroundColor: 'var(--bg-secondary)',
-              border: '1px solid var(--border-color)',
+              border: 'var(--border)',
               color: 'var(--text-primary)'
             }}
           />
@@ -121,7 +121,7 @@ export function BookingForm({ onSubmit, isLoading }: BookingFormProps) {
             className="w-full rounded px-control-px-md py-sm text-base leading-normal"
             style={{
               backgroundColor: 'var(--bg-secondary)',
-              border: '1px solid var(--border-color)',
+              border: 'var(--border)',
               color: 'var(--text-primary)',
               resize: 'vertical'
             }}

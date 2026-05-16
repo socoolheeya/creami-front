@@ -1,14 +1,15 @@
 'use client'
 
-import { ArrowUpDown } from 'lucide-react'
-import Link from 'next/link'
+import { ArrowUpDown, Edit } from 'lucide-react'
 import type { ReactNode } from 'react'
 import { useState, useMemo } from 'react'
 import { useLocale, useTranslations } from 'next-intl'
+import { Button } from '@creami/ui'
 import { Discount, DiscountStatus } from '@/lib/types/discount'
 
 interface DiscountTableProps {
   discounts: Discount[]
+  onEdit: (discount: Discount) => void
 }
 
 type SortField = 'name' | 'code' | 'value' | 'status' | 'usedCount' | null
@@ -42,7 +43,7 @@ function SortableHeader({ field, activeField, children, onSort }: SortableHeader
   )
 }
 
-export function DiscountTable({ discounts }: DiscountTableProps) {
+export function DiscountTable({ discounts, onEdit }: DiscountTableProps) {
   const t = useTranslations()
   const locale = useLocale()
   const [sortField, setSortField] = useState<SortField>(null)
@@ -107,13 +108,13 @@ export function DiscountTable({ discounts }: DiscountTableProps) {
       className="rounded overflow-hidden"
       style={{
         backgroundColor: 'var(--bg-primary)',
-        border: '1px solid var(--border-color)',
+        border: 'var(--border)',
         boxShadow: 'var(--shadow)'
       }}
     >
       <table className="w-full">
         <thead>
-          <tr style={{ backgroundColor: 'var(--bg-tertiary)', borderBottom: '1px solid var(--border-color)' }}>
+          <tr style={{ backgroundColor: 'var(--bg-tertiary)', borderBottom: 'var(--border)' }}>
             <SortableHeader field="name" activeField={sortField} onSort={handleSort}>{t('discount.discounts.table.name')}</SortableHeader>
             <SortableHeader field="code" activeField={sortField} onSort={handleSort}>{t('discount.discounts.table.code')}</SortableHeader>
             <th className="px-lg py-md text-left" style={{ color: 'var(--text-primary)', fontWeight: 'var(--font-bold)' }}>
@@ -125,9 +126,12 @@ export function DiscountTable({ discounts }: DiscountTableProps) {
             </th>
             <SortableHeader field="usedCount" activeField={sortField} onSort={handleSort}>{t('discount.discounts.table.usage')}</SortableHeader>
             <SortableHeader field="status" activeField={sortField} onSort={handleSort}>{t('discount.discounts.table.status')}</SortableHeader>
+            <th className="px-lg py-md text-left" style={{ color: 'var(--text-primary)', fontWeight: 'var(--font-bold)' }}>
+              {t('discount.discounts.table.actions')}
+            </th>
           </tr>
           {/* Filter Row */}
-          <tr style={{ backgroundColor: 'var(--bg-primary)', borderBottom: '1px solid var(--border-color)' }}>
+          <tr style={{ backgroundColor: 'var(--bg-primary)', borderBottom: 'var(--border)' }}>
             {/* 할인명 검색 */}
             <th className="px-lg py-sm">
               <input
@@ -138,7 +142,7 @@ export function DiscountTable({ discounts }: DiscountTableProps) {
                 className="h-control-sm w-full rounded px-control-px-sm text-base"
                 style={{
                   backgroundColor: 'var(--bg-secondary)',
-                  border: '1px solid var(--border-color)',
+                  border: 'var(--border)',
                   color: 'var(--text-primary)'
                 }}
               />
@@ -153,7 +157,7 @@ export function DiscountTable({ discounts }: DiscountTableProps) {
                 className="h-control-sm w-full rounded px-control-px-sm text-base"
                 style={{
                   backgroundColor: 'var(--bg-secondary)',
-                  border: '1px solid var(--border-color)',
+                  border: 'var(--border)',
                   color: 'var(--text-primary)'
                 }}
               />
@@ -174,7 +178,7 @@ export function DiscountTable({ discounts }: DiscountTableProps) {
                 className="h-control-sm w-full rounded px-control-px-sm text-base"
                 style={{
                   backgroundColor: 'var(--bg-secondary)',
-                  border: '1px solid var(--border-color)',
+                  border: 'var(--border)',
                   color: 'var(--text-primary)'
                 }}
               >
@@ -184,6 +188,7 @@ export function DiscountTable({ discounts }: DiscountTableProps) {
                 ))}
               </select>
             </th>
+            <th className="px-lg py-sm"></th>
           </tr>
         </thead>
         <tbody>
@@ -198,7 +203,7 @@ export function DiscountTable({ discounts }: DiscountTableProps) {
               <tr
                 key={discount.id}
                 className="transition-colors cursor-pointer"
-                style={{ borderBottom: '1px solid var(--border-color)' }}
+                style={{ borderBottom: 'var(--border)' }}
                 onMouseEnter={(e) => {
                   e.currentTarget.style.backgroundColor = 'var(--bg-secondary)'
                 }}
@@ -208,10 +213,8 @@ export function DiscountTable({ discounts }: DiscountTableProps) {
               >
                 {/* 할인명 */}
                 <td className="px-lg py-md">
-                  <Link href={`/discounts/${discount.id}`}>
-                    <div className="flex flex-col cursor-pointer">
+                    <div className="flex flex-col">
                       <span
-                        className="hover:underline"
                         style={{ fontWeight: 'var(--font-bold)', color: 'var(--text-primary)' }}
                       >
                         {discount.name}
@@ -222,7 +225,6 @@ export function DiscountTable({ discounts }: DiscountTableProps) {
                         </span>
                       )}
                     </div>
-                  </Link>
                 </td>
 
                 {/* 코드 */}
@@ -284,6 +286,13 @@ export function DiscountTable({ discounts }: DiscountTableProps) {
                   >
                     {t(`discount.labels.status.${discount.status}`)}
                   </span>
+                </td>
+
+                <td className="px-lg py-md">
+                  <Button type="button" variant="secondary" size="small" onClick={() => onEdit(discount)}>
+                    <Edit className="h-icon-md w-icon-md" />
+                    {t('discount.common.edit')}
+                  </Button>
                 </td>
               </tr>
             )

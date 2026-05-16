@@ -208,12 +208,12 @@ export default function NewAccommodationPage() {
   }
 
   return (
-    <div className="p-6 max-w-4xl mx-auto">
+    <div className="p-lg max-w-modal-lg mx-auto">
       {/* 헤더 */}
-      <div className="mb-6">
+      <div className="mb-lg">
         <Link
           href="/properties"
-          className="inline-flex items-center gap-2 mb-4 transition-colors"
+          className="inline-flex items-center gap-sm mb-md transition-colors"
           style={{ color: 'var(--text-secondary)' }}
         >
           <ArrowLeft className="w-5 h-5" />
@@ -222,25 +222,25 @@ export default function NewAccommodationPage() {
         <h1 className="text-2xl" style={{ fontWeight: 'var(--font-bold)', color: 'var(--text-primary)' }}>
           새 숙소 등록
         </h1>
-        <p className="mt-2" style={{ color: 'var(--text-secondary)' }}>
+        <p className="mt-sm" style={{ color: 'var(--text-secondary)' }}>
           단계별로 숙소 정보를 입력해주세요. 작성 중인 내용은 자동으로 저장됩니다.
         </p>
       </div>
 
       {/* 위저드 카드 */}
       <div
-        className="rounded-lg p-8 shadow-sm"
+        className="rounded p-xl shadow-sm"
         style={{
           backgroundColor: 'var(--bg-secondary)',
           borderRadius: 'var(--radius)',
-          border: '1px solid var(--border-color)'
+          border: 'var(--border)'
         }}
       >
         {/* 진행 표시기 */}
         <StepIndicator currentStep={currentStep} totalSteps={STEPS.length} steps={STEPS} />
 
         {/* 현재 단계 폼 */}
-        <div className="my-8">{renderStep()}</div>
+        <div className="my-xl">{renderStep()}</div>
 
         {/* 네비게이션 */}
         <WizardNavigation
@@ -255,7 +255,7 @@ export default function NewAccommodationPage() {
       </div>
 
       {/* 임시 저장 안내 */}
-      <div className="mt-4 text-center text-sm" style={{ color: 'var(--text-tertiary)' }}>
+      <div className="mt-md text-center text-base" style={{ color: 'var(--text-tertiary)' }}>
         💾 작성 중인 내용은 자동으로 저장되며, 나중에 이어서 작성할 수 있습니다
       </div>
     </div>

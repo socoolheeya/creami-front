@@ -25,9 +25,9 @@ export function BlockTable({ blocks }: BlockTableProps) {
       case 'active':
         return 'var(--primary)'
       case 'released':
-        return '#60a5fa'
+        return 'var(--info)'
       case 'cancelled':
-        return '#ef4444'
+        return 'var(--error)'
       case 'expired':
         return 'var(--text-tertiary)'
       default:
@@ -42,12 +42,12 @@ export function BlockTable({ blocks }: BlockTableProps) {
 
   return (
     <div
-      className="rounded-lg overflow-hidden"
+      className="rounded overflow-hidden"
       style={{
         backgroundColor: 'var(--bg-primary)',
         borderRadius: 'var(--radius)',
         boxShadow: 'var(--shadow)',
-        border: '1px solid var(--border-color)'
+        border: 'var(--border)'
       }}
     >
       <div className="overflow-x-auto">
@@ -55,91 +55,91 @@ export function BlockTable({ blocks }: BlockTableProps) {
           <thead>
             <tr style={{ backgroundColor: 'var(--bg-secondary)' }}>
               <th
-                className="px-4 py-3 text-left text-sm"
+                className="px-md py-md text-left text-base"
                 style={{
                   fontWeight: 'var(--font-bold)',
                   color: 'var(--text-primary)',
-                  borderBottom: '1px solid var(--border-color)'
+                  borderBottom: 'var(--border)'
                 }}
               >
                 {t('ari.inventories.table.status')}
               </th>
               <th
-                className="px-4 py-3 text-left text-sm"
+                className="px-md py-md text-left text-base"
                 style={{
                   fontWeight: 'var(--font-bold)',
                   color: 'var(--text-primary)',
-                  borderBottom: '1px solid var(--border-color)'
+                  borderBottom: 'var(--border)'
                 }}
               >
                 {t('ari.inventories.table.code')}
               </th>
               <th
-                className="px-4 py-3 text-left text-sm"
+                className="px-md py-md text-left text-base"
                 style={{
                   fontWeight: 'var(--font-bold)',
                   color: 'var(--text-primary)',
-                  borderBottom: '1px solid var(--border-color)'
+                  borderBottom: 'var(--border)'
                 }}
               >
                 {t('ari.inventories.table.name')}
               </th>
               <th
-                className="px-4 py-3 text-left text-sm"
+                className="px-md py-md text-left text-base"
                 style={{
                   fontWeight: 'var(--font-bold)',
                   color: 'var(--text-primary)',
-                  borderBottom: '1px solid var(--border-color)'
+                  borderBottom: 'var(--border)'
                 }}
               >
                 {t('ari.inventories.table.type')}
               </th>
               <th
-                className="px-4 py-3 text-left text-sm"
+                className="px-md py-md text-left text-base"
                 style={{
                   fontWeight: 'var(--font-bold)',
                   color: 'var(--text-primary)',
-                  borderBottom: '1px solid var(--border-color)'
+                  borderBottom: 'var(--border)'
                 }}
               >
                 {t('ari.inventories.table.organization')}
               </th>
               <th
-                className="px-4 py-3 text-center text-sm"
+                className="px-md py-md text-center text-base"
                 style={{
                   fontWeight: 'var(--font-bold)',
                   color: 'var(--text-primary)',
-                  borderBottom: '1px solid var(--border-color)'
+                  borderBottom: 'var(--border)'
                 }}
               >
                 {t('ari.inventories.table.roomStatus')}
               </th>
               <th
-                className="px-4 py-3 text-center text-sm"
+                className="px-md py-md text-center text-base"
                 style={{
                   fontWeight: 'var(--font-bold)',
                   color: 'var(--text-primary)',
-                  borderBottom: '1px solid var(--border-color)'
+                  borderBottom: 'var(--border)'
                 }}
               >
                 {t('ari.inventories.table.utilization')}
               </th>
               <th
-                className="px-4 py-3 text-left text-sm"
+                className="px-md py-md text-left text-base"
                 style={{
                   fontWeight: 'var(--font-bold)',
                   color: 'var(--text-primary)',
-                  borderBottom: '1px solid var(--border-color)'
+                  borderBottom: 'var(--border)'
                 }}
               >
                 {t('ari.inventories.table.period')}
               </th>
               <th
-                className="px-4 py-3 text-center text-sm"
+                className="px-md py-md text-center text-base"
                 style={{
                   fontWeight: 'var(--font-bold)',
                   color: 'var(--text-primary)',
-                  borderBottom: '1px solid var(--border-color)'
+                  borderBottom: 'var(--border)'
                 }}
               >
                 {t('ari.inventories.table.manage')}
@@ -155,15 +155,15 @@ export function BlockTable({ blocks }: BlockTableProps) {
                   key={block.id}
                   className="hover:bg-opacity-50"
                   style={{
-                    borderBottom: '1px solid var(--border-color)'
+                    borderBottom: 'var(--border)'
                   }}
                 >
-                  <td className="px-4 py-3">
+                  <td className="px-md py-md">
                     <span
-                      className="inline-block px-2 py-1 rounded text-xs"
+                      className="inline-block px-sm py-xs rounded text-xs"
                       style={{
                         backgroundColor: getStatusColor(block.status),
-                        color: '#ffffff',
+                        color: 'var(--text-on-primary)',
                         fontWeight: 'var(--font-medium)'
                       }}
                     >
@@ -171,7 +171,7 @@ export function BlockTable({ blocks }: BlockTableProps) {
                     </span>
                   </td>
                   <td
-                    className="px-4 py-3 text-sm"
+                    className="px-md py-md text-base"
                     style={{
                       color: 'var(--text-primary)',
                       fontWeight: 'var(--font-medium)'
@@ -180,7 +180,7 @@ export function BlockTable({ blocks }: BlockTableProps) {
                     {block.code}
                   </td>
                   <td
-                    className="px-4 py-3 text-sm"
+                    className="px-md py-md text-base"
                     style={{
                       color: 'var(--text-primary)',
                       fontWeight: 'var(--font-medium)'
@@ -189,7 +189,7 @@ export function BlockTable({ blocks }: BlockTableProps) {
                     {block.name}
                   </td>
                   <td
-                    className="px-4 py-3 text-sm"
+                    className="px-md py-md text-base"
                     style={{
                       color: 'var(--text-secondary)',
                       fontWeight: 'var(--font-light)'
@@ -198,7 +198,7 @@ export function BlockTable({ blocks }: BlockTableProps) {
                     {t(`ari.inventories.block.types.${block.type}`)}
                   </td>
                   <td
-                    className="px-4 py-3 text-sm"
+                    className="px-md py-md text-base"
                     style={{
                       color: 'var(--text-secondary)',
                       fontWeight: 'var(--font-light)'
@@ -207,7 +207,7 @@ export function BlockTable({ blocks }: BlockTableProps) {
                     {block.organization || '-'}
                   </td>
                   <td
-                    className="px-4 py-3 text-sm text-center"
+                    className="px-md py-md text-base text-center"
                     style={{
                       color: 'var(--text-secondary)',
                       fontWeight: 'var(--font-light)'
@@ -215,10 +215,10 @@ export function BlockTable({ blocks }: BlockTableProps) {
                   >
                     {block.bookedRooms} / {block.totalRooms}
                   </td>
-                  <td className="px-4 py-3">
-                    <div className="flex items-center justify-center gap-2">
+                  <td className="px-md py-md">
+                    <div className="flex items-center justify-center gap-sm">
                       <div
-                        className="w-20 h-2 rounded-full overflow-hidden"
+                        className="w-3xl h-xs rounded overflow-hidden"
                         style={{
                           backgroundColor: 'var(--bg-tertiary)'
                         }}
@@ -236,7 +236,7 @@ export function BlockTable({ blocks }: BlockTableProps) {
                         style={{
                           color: 'var(--text-secondary)',
                           fontWeight: 'var(--font-medium)',
-                          minWidth: '35px'
+                          minWidth: 'var(--touch-target-min-width)'
                         }}
                       >
                         {utilizationPercentage}%
@@ -244,7 +244,7 @@ export function BlockTable({ blocks }: BlockTableProps) {
                     </div>
                   </td>
                   <td
-                    className="px-4 py-3 text-sm"
+                    className="px-md py-md text-base"
                     style={{
                       color: 'var(--text-secondary)',
                       fontWeight: 'var(--font-light)'
@@ -252,17 +252,17 @@ export function BlockTable({ blocks }: BlockTableProps) {
                   >
                     {formatDate(block.startDate)} ~ {formatDate(block.endDate)}
                   </td>
-                  <td className="px-4 py-3 text-center">
+                  <td className="px-md py-md text-center">
                     <Link href={`/inventories/${block.id}`}>
                       <button
-                        className="inline-flex items-center justify-center p-2 rounded-lg transition-colors"
+                        className="inline-flex items-center justify-center p-sm rounded transition-colors"
                         style={{
                           backgroundColor: 'var(--bg-tertiary)',
                           color: 'var(--text-primary)'
                         }}
                         title={t('ari.common.edit')}
                       >
-                        <Edit className="w-4 h-4" />
+                        <Edit className="w-md h-md" />
                       </button>
                     </Link>
                   </td>
