@@ -374,6 +374,8 @@
         "summaryInfo": "Policy Summary",
         "summaryDescription": "Review policy version and attachment status.",
         "attachmentsLoadFailed": "Failed to load policy attachments.",
+        "permissionStatements": "Included Permissions",
+        "permissionStatementsDescription": "Review and edit the menu permissions included in this policy.",
         "groupAttachments": "User Group Attachments",
         "groupAttachmentsDescription": "Add or remove user groups that can use this policy.",
         "selectGroup": "Select a user group",

@@ -45,6 +45,7 @@ export type Policy = {
   description?: string | null
   status: PolicyStatus
   defaultVersionNumber?: number | null
+  documentJson?: string | null
   versionCount: number
   attachmentCount: number
   createdAt?: string | null
@@ -129,6 +130,7 @@ export type PolicyCreateRequest = {
 export type PolicyUpdateRequest = {
   name?: string
   description?: string | null
+  documentJson?: string | null
 }
 
 export type PolicyAttachRequest = {
@@ -229,6 +231,7 @@ function normalizePolicy(policy: RawPolicy): Policy {
     policyId: policy.policyId === undefined || policy.policyId === null ? '' : String(policy.policyId),
     description: policy.description ?? null,
     defaultVersionNumber: policy.defaultVersionNumber ?? null,
+    documentJson: policy.documentJson ?? null,
     versionCount: policy.versionCount ?? 0,
     attachmentCount: policy.attachmentCount ?? 0,
     createdAt: policy.createdAt ?? null,

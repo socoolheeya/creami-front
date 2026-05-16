@@ -374,6 +374,8 @@
         "summaryInfo": "ポリシー概要",
         "summaryDescription": "ポリシーのバージョンと連結状況を確認します。",
         "attachmentsLoadFailed": "ポリシー連結情報を読み込めませんでした。",
+        "permissionStatements": "含まれる権限",
+        "permissionStatementsDescription": "このポリシーに含まれるメニュー別権限を確認・修正します。",
         "groupAttachments": "ユーザーグループ連結",
         "groupAttachmentsDescription": "このポリシーを使用するユーザーグループを追加または解除します。",
         "selectGroup": "ユーザーグループを選択してください",

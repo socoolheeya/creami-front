@@ -2,19 +2,22 @@
 
 import { useEffect, useState } from 'react'
 import { Alert, Button, Input, Select, notifySaveError, notifySaveSuccess } from '@creami/ui'
-import { ArrowLeft, FileSliders, Save, ShieldCheck } from 'lucide-react'
+import { ArrowLeft, FileSliders, Plus, Save, ShieldCheck, Trash2 } from 'lucide-react'
 import Link from 'next/link'
 import { useParams } from 'next/navigation'
 import { useTranslations } from 'next-intl'
 import {
   attachPolicy,
   activatePolicy,
+  createPolicyDocument,
   deactivatePolicy,
   detachPolicy,
   getIamGroups,
   getPolicy,
   getPolicyAttachments,
   type IamGroup,
+  type PolicyMenuKey,
+  type PolicyPermissionKey,
   updatePolicy,
   type Policy,
   type PolicyAttachment,
@@ -28,6 +31,21 @@ type PolicyForm = {
   status: PolicyStatus
 }
 
+type PolicyStatementRow = {
+  id: string
+  menu: PolicyMenuKey | ''
+  permission: PolicyPermissionKey | ''
+}
+
+const MENU_OPTIONS: PolicyMenuKey[] = ['users', 'permissions', 'policies', 'subscriptions']
+const PERMISSION_OPTIONS: PolicyPermissionKey[] = ['read', 'write', 'all']
+const ACTION_PREFIX_TO_MENU: Record<string, PolicyMenuKey> = {
+  member: 'users',
+  role: 'permissions',
+  policy: 'policies',
+  subscription: 'subscriptions'
+}
+
 function createPolicyForm(policy: Policy): PolicyForm {
   return {
     name: policy.name,
@@ -39,6 +57,39 @@ function createPolicyForm(policy: Policy): PolicyForm {
 function formatDate(value?: string | null) {
   if (!value) return '-'
   return value.slice(0, 16).replace('T', ' ')
+}
+
+function createEmptyStatementRow(index = Date.now()): PolicyStatementRow {
+  return { id: `statement-${index}`, menu: '', permission: '' }
+}
+
+function parsePolicyStatements(documentJson?: string | null): PolicyStatementRow[] {
+  if (!documentJson) return [createEmptyStatementRow(1)]
+
+  try {
+    const parsed = JSON.parse(documentJson) as {
+      statements?: Array<{ actions?: string[] }>
+    }
+    const rows = parsed.statements?.reduce<PolicyStatementRow[]>((result, statement, index) => {
+        const firstAction = statement.actions?.[0]
+        if (!firstAction) return result
+        const [prefix, action] = firstAction.split(':')
+        const menu = ACTION_PREFIX_TO_MENU[prefix]
+        const permission =
+          action === '*' ? 'all' :
+          action === 'read' ? 'read' :
+          action === 'write' || action === 'create' ? 'write' :
+          ''
+
+        if (!menu || !permission) return result
+        result.push({ id: `statement-${index + 1}`, menu, permission })
+        return result
+      }, [])
+
+    return rows && rows.length > 0 ? rows : [createEmptyStatementRow(1)]
+  } catch {
+    return [createEmptyStatementRow(1)]
+  }
 }
 
 export default function PolicyDetailPage() {
@@ -57,6 +108,8 @@ export default function PolicyDetailPage() {
   const [groups, setGroups] = useState<IamGroup[]>([])
   const [attachments, setAttachments] = useState<PolicyAttachment[]>([])
   const [selectedGroupId, setSelectedGroupId] = useState('')
+  const [statements, setStatements] = useState<PolicyStatementRow[]>([createEmptyStatementRow(1)])
+  const [statementError, setStatementError] = useState<string | null>(null)
 
   useEffect(() => {
     const abortController = new AbortController()
@@ -69,6 +122,7 @@ export default function PolicyDetailPage() {
         const nextPolicy = await getPolicy(params.id, { signal: abortController.signal })
         setPolicy(nextPolicy)
         setForm(createPolicyForm(nextPolicy))
+        setStatements(parsePolicyStatements(nextPolicy.documentJson))
       } catch (error) {
         if (abortController.signal.aborted) return
         setPolicy(null)
@@ -118,13 +172,29 @@ export default function PolicyDetailPage() {
   const handleSave = async () => {
     if (!policy) return
 
+    const hasInvalidStatement = statements.length === 0 || statements.some(
+      (statement) => !statement.menu || !statement.permission
+    )
+    if (hasInvalidStatement) {
+      const nextErrorMessage = t('setting.policies.validation.statementRequired')
+      setStatementError(nextErrorMessage)
+      notifySaveError(nextErrorMessage)
+      return
+    }
+
     setIsSaving(true)
     setErrorMessage(null)
+    setStatementError(null)
 
     try {
+      const selectedStatements = statements.map((statement) => ({
+        menu: statement.menu as PolicyMenuKey,
+        permission: statement.permission as PolicyPermissionKey
+      }))
       const updatedPolicy = await updatePolicy(policy.policyId, {
         name: form.name.trim(),
-        description: form.description.trim() || null
+        description: form.description.trim() || null,
+        documentJson: JSON.stringify(createPolicyDocument(selectedStatements))
       })
 
       const statusSyncedPolicy =
@@ -136,6 +206,7 @@ export default function PolicyDetailPage() {
 
       setPolicy(statusSyncedPolicy)
       setForm(createPolicyForm(statusSyncedPolicy))
+      setStatements(parsePolicyStatements(statusSyncedPolicy.documentJson))
       notifySaveSuccess(t('setting.policies.updated'))
     } catch (error) {
       const nextErrorMessage = getDisplayApiErrorMessage(error, t('setting.policies.updateFailed'))
@@ -144,6 +215,33 @@ export default function PolicyDetailPage() {
     } finally {
       setIsSaving(false)
     }
+  }
+
+  const addStatement = () => {
+    setStatements((current) => [...current, createEmptyStatementRow(Date.now())])
+    setStatementError(null)
+  }
+
+  const removeStatement = (statementId: string) => {
+    setStatements((current) =>
+      current.length === 1
+        ? current
+        : current.filter((statement) => statement.id !== statementId)
+    )
+    setStatementError(null)
+  }
+
+  const updateStatement = <K extends keyof Omit<PolicyStatementRow, 'id'>>(
+    statementId: string,
+    field: K,
+    value: PolicyStatementRow[K]
+  ) => {
+    setStatements((current) =>
+      current.map((statement) =>
+        statement.id === statementId ? { ...statement, [field]: value } : statement
+      )
+    )
+    setStatementError(null)
   }
 
   const reloadAttachments = async () => {
@@ -377,6 +475,95 @@ export default function PolicyDetailPage() {
           </dl>
         </section>
       </div>
+
+      <section className="mt-lg rounded border border-border bg-bg-primary p-lg shadow">
+        <div className="mb-lg flex flex-wrap items-start justify-between gap-md">
+          <div>
+            <h2 className="flex items-center gap-sm text-xl font-bold text-text-primary">
+              <FileSliders className="h-icon-md w-icon-md text-primary" />
+              {t('setting.policies.detail.permissionStatements')}
+            </h2>
+            <p className="mt-xs text-base font-light text-text-tertiary">
+              {t('setting.policies.detail.permissionStatementsDescription')}
+            </p>
+          </div>
+          <Button
+            type="button"
+            size="small"
+            onClick={addStatement}
+            disabled={isLoading || isSaving || form.status === 'DELETED'}
+          >
+            <Plus className="h-icon-md w-icon-md" />
+            {t('setting.policies.form.addStatement')}
+          </Button>
+        </div>
+
+        <div className="grid gap-sm">
+          {statements.map((statement, index) => (
+            <div
+              key={statement.id}
+              className="grid gap-sm rounded border border-border bg-bg-secondary p-md lg:grid-cols-[1fr_1fr_auto]"
+            >
+              <label className="grid gap-sm text-base font-medium text-text-primary">
+                {t('setting.policies.form.menu')}
+                <Select
+                  value={statement.menu}
+                  onChange={(event) =>
+                    updateStatement(statement.id, 'menu', event.target.value as PolicyStatementRow['menu'])
+                  }
+                  aria-invalid={Boolean(statementError && !statement.menu)}
+                  disabled={isLoading || isSaving || form.status === 'DELETED'}
+                >
+                  <option value="">{t('setting.policies.form.menuPlaceholder')}</option>
+                  {MENU_OPTIONS.map((menu) => (
+                    <option key={menu} value={menu}>
+                      {t(`setting.policies.menus.${menu}`)}
+                    </option>
+                  ))}
+                </Select>
+              </label>
+
+              <label className="grid gap-sm text-base font-medium text-text-primary">
+                {t('setting.policies.form.permission')}
+                <Select
+                  value={statement.permission}
+                  onChange={(event) =>
+                    updateStatement(statement.id, 'permission', event.target.value as PolicyStatementRow['permission'])
+                  }
+                  aria-invalid={Boolean(statementError && !statement.permission)}
+                  disabled={isLoading || isSaving || form.status === 'DELETED'}
+                >
+                  <option value="">{t('setting.policies.form.permissionPlaceholder')}</option>
+                  {PERMISSION_OPTIONS.map((permission) => (
+                    <option key={permission} value={permission}>
+                      {t(`setting.policies.permissions.${permission}`)}
+                    </option>
+                  ))}
+                </Select>
+              </label>
+
+              <div className="flex items-end">
+                <Button
+                  type="button"
+                  variant="tertiary"
+                  iconOnly
+                  onClick={() => removeStatement(statement.id)}
+                  disabled={isSaving || form.status === 'DELETED' || statements.length === 1}
+                  aria-label={t('setting.policies.form.removeStatement', { number: index + 1 })}
+                >
+                  <Trash2 className="h-icon-md w-icon-md" />
+                </Button>
+              </div>
+            </div>
+          ))}
+        </div>
+
+        {statementError && (
+          <p className="mt-sm text-base font-light text-error">
+            {statementError}
+          </p>
+        )}
+      </section>
 
       <section className="mt-lg rounded border border-border bg-bg-primary p-lg shadow">
         <div className="mb-lg">

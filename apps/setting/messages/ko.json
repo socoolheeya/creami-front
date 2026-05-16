@@ -375,6 +375,8 @@
         "summaryInfo": "정책 요약",
         "summaryDescription": "정책 버전과 연결 현황을 확인합니다.",
         "attachmentsLoadFailed": "정책 연결 정보를 불러오지 못했습니다.",
+        "permissionStatements": "포함 권한",
+        "permissionStatementsDescription": "이 정책에 포함된 메뉴별 권한을 확인하고 수정합니다.",
         "groupAttachments": "사용자 그룹 연결",
         "groupAttachmentsDescription": "이 정책을 사용할 사용자 그룹을 추가하거나 해제합니다.",
         "selectGroup": "사용자 그룹을 선택하세요",
