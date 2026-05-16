@@ -157,10 +157,16 @@ export default function ApiKeysPage() {
       return
     }
 
-    handleAddApiKey()
+    void handleAddApiKey()
   }
 
   const handleRegenerateKey = async (apiKeyId: string) => {
+    const confirmed = window.confirm(t('setting.apiKeys.regenerateConfirm'))
+
+    if (!confirmed) {
+      return
+    }
+
     setPendingAction({ type: 'rotate', id: apiKeyId })
     setErrorMessage(null)
 

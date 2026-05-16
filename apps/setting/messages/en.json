@@ -200,6 +200,7 @@
       "copy": "Copy",
       "copied": "Copied",
       "regenerate": "Regenerate",
+      "regenerateConfirm": "Are you sure you want to regenerate this API Key?",
       "regenerating": "Regenerating",
       "deleting": "Deleting",
       "created": "API Key has been created.",

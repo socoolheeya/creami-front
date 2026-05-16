@@ -200,6 +200,7 @@
       "copy": "コピー",
       "copied": "コピー済み",
       "regenerate": "再生成",
+      "regenerateConfirm": "本当に再生成しますか？",
       "regenerating": "再生成中",
       "deleting": "削除中",
       "created": "API Keyを作成しました。",

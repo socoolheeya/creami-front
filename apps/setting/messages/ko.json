@@ -200,6 +200,7 @@
       "copy": "복사",
       "copied": "복사됨",
       "regenerate": "재생성",
+      "regenerateConfirm": "정말 재생성하시겠습니까?",
       "regenerating": "재생성 중",
       "deleting": "삭제 중",
       "created": "API Key가 생성되었습니다.",
