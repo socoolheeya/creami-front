@@ -18,10 +18,8 @@ export interface TableBodyProps {
   className?: string
 }
 
-export interface TableRowProps {
+export interface TableRowProps extends React.HTMLAttributes<HTMLTableRowElement> {
   children: React.ReactNode
-  onClick?: () => void
-  className?: string
   isSelected?: boolean
 }
 
@@ -52,6 +50,13 @@ export interface TableFilterCellProps extends React.ThHTMLAttributes<HTMLTableHe
   align?: 'left' | 'center' | 'right'
   truncate?: boolean
   titleText?: string
+}
+
+export interface TableStateRowProps extends React.HTMLAttributes<HTMLTableRowElement> {
+  colSpan: number
+  children: React.ReactNode
+  variant?: 'empty' | 'loading' | 'error'
+  className?: string
 }
 
 export function Table({ children, className = '', overflow = 'auto' }: TableProps) {
@@ -88,16 +93,15 @@ export function TableRow({
   children,
   onClick,
   className = '',
-  isSelected = false
+  isSelected = false,
+  ...props
 }: TableRowProps) {
   const baseClasses = `transition-all ${
-    isSelected
-      ? 'bg-primary-bg border-l border-l-primary'
-      : 'bg-bg-primary border-l border-l-transparent'
+    isSelected ? 'bg-primary-bg border-l border-l-primary' : 'border-l border-l-transparent'
   } ${onClick ? 'cursor-pointer hover:bg-bg-secondary' : 'cursor-default'}`
 
   return (
-    <tr className={`${baseClasses} ${className}`} onClick={onClick}>
+    <tr className={`${baseClasses} ${className}`} onClick={onClick} {...props}>
       {children}
     </tr>
   )
@@ -140,9 +144,10 @@ export function TableHead({
 
   return (
     <th
-      className={`px-md py-xs text-base font-bold text-text-primary ${alignClass} ${truncateClass} ${className}`}
+      className={`bg-bg-tertiary px-md py-xs text-base font-bold text-text-primary ${alignClass} ${truncateClass} ${className}`}
       title={resolvedTitle}
       {...props}
+      style={{ ...props.style, backgroundColor: 'var(--bg-tertiary)' }}
     >
       {children}
     </th>
@@ -177,8 +182,30 @@ export function TableFilterCell({
       className={`px-md py-xs text-base font-medium text-text-primary ${alignClass} ${truncateClass} ${className}`}
       title={resolvedTitle}
       {...props}
+      style={{ ...props.style, backgroundColor: 'var(--bg-primary)' }}
     >
       {children}
     </th>
+  )
+}
+
+export function TableStateRow({
+  colSpan,
+  children,
+  variant = 'empty',
+  className = '',
+  ...props
+}: TableStateRowProps) {
+  const variantClass = variant === 'error' ? 'text-error' : 'text-text-secondary'
+
+  return (
+    <tr className={`bg-bg-primary ${className}`} {...props}>
+      <td
+        colSpan={colSpan}
+        className={`border-b border-border px-md py-xl text-center text-base font-medium ${variantClass}`}
+      >
+        {children}
+      </td>
+    </tr>
   )
 }

@@ -4,6 +4,7 @@ import { useState, useRef, useEffect, useMemo } from 'react'
 import { ChevronLeft, ChevronRight, Edit2, Copy, Save, X, CalendarRange } from 'lucide-react'
 import { WeekdayRateBulkModal, notification, type WeekdayRatePreviewRow, type WeekdayRateValues } from '@creami/ui'
 import { useLocale, useTranslations } from 'next-intl'
+import type { RateRow } from '@/lib/api/ari'
 
 interface RoomRate {
   roomId: string
@@ -22,6 +23,8 @@ interface RateGridProps {
   endDate: string
   selectedRooms: { id: string; name: string }[]
   packageName: string
+  initialRows: RateRow[]
+  onSaveRates: (updates: { rowId: string; date: string; rate: number }[]) => Promise<void>
   rowHeaderLabel?: string
   bulkTargetLabel?: string
   ratePlanPricing?: RatePlanPricingSetting
@@ -51,6 +54,8 @@ export function RateGrid({
   endDate,
   selectedRooms,
   packageName,
+  initialRows,
+  onSaveRates,
   rowHeaderLabel,
   bulkTargetLabel,
   ratePlanPricing = {
@@ -89,33 +94,44 @@ export function RateGrid({
   const scrollContainerRef = useRef<HTMLDivElement>(null)
   const autoScrollIntervalRef = useRef<number | null>(null)
 
-  // Initialize rate data
   useEffect(() => {
     const data: Record<string, RoomRate> = {}
 
-    selectedRooms.forEach(room => {
-      const dates: Record<string, DayRate> = {}
-      const start = new Date(startDate)
-      const end = new Date(endDate)
-
-      for (let d = new Date(start); d <= end; d.setDate(d.getDate() + 1)) {
-        const dateStr = d.toISOString().split('T')[0]
-        dates[dateStr] = {
-          date: dateStr,
-          rate: 100000 + Math.floor(Math.random() * 50000), // Mock data
-          currency: 'KRW'
-        }
-      }
-
-      data[room.id] = {
-        roomId: room.id,
-        roomName: room.name,
-        dates
+    initialRows.forEach(row => {
+      data[row.id] = {
+        roomId: row.id,
+        roomName: row.name,
+        dates: row.dates
       }
     })
 
     setRateData(data)
-  }, [selectedRooms, startDate, endDate])
+  }, [initialRows])
+
+  const applyRateUpdates = async (updates: { rowId: string; date: string; rate: number }[]) => {
+    if (updates.length === 0) return
+
+    await onSaveRates(updates)
+
+    setRateData(prev => {
+      const updated = { ...prev }
+      updates.forEach(update => {
+        if (updated[update.rowId]?.dates[update.date]) {
+          updated[update.rowId] = {
+            ...updated[update.rowId],
+            dates: {
+              ...updated[update.rowId].dates,
+              [update.date]: {
+                ...updated[update.rowId].dates[update.date],
+                rate: update.rate
+              }
+            }
+          }
+        }
+      })
+      return updated
+    })
+  }
 
   // Generate dates based on view mode
   const getDatesForView = () => {
@@ -259,50 +275,21 @@ export function RateGrid({
     setEditValue(current?.rate.toString() || '')
   }
 
-  const handleSaveEdit = () => {
+  const handleSaveEdit = async () => {
     if (editingCell) {
       const value = parseInt(editValue)
       if (!isNaN(value)) {
-        setRateData(prev => ({
-          ...prev,
-          [editingCell.roomId]: {
-            ...prev[editingCell.roomId],
-            dates: {
-              ...prev[editingCell.roomId].dates,
-              [editingCell.date]: {
-                ...prev[editingCell.roomId].dates[editingCell.date],
-                rate: value
-              }
-            }
-          }
-        }))
+        await applyRateUpdates([{ rowId: editingCell.roomId, date: editingCell.date, rate: value }])
       }
     }
     setEditingCell(null)
     setEditValue('')
   }
 
-  const handleBulkEdit = () => {
+  const handleBulkEdit = async () => {
     const value = parseInt(bulkEditValue)
     if (!isNaN(value) && selectedCells.length > 0) {
-      setRateData(prev => {
-        const updated = { ...prev }
-        selectedCells.forEach(cell => {
-          if (updated[cell.roomId]?.dates[cell.date]) {
-            updated[cell.roomId] = {
-              ...updated[cell.roomId],
-              dates: {
-                ...updated[cell.roomId].dates,
-                [cell.date]: {
-                  ...updated[cell.roomId].dates[cell.date],
-                  rate: value
-                }
-              }
-            }
-          }
-        })
-        return updated
-      })
+      await applyRateUpdates(selectedCells.map(cell => ({ rowId: cell.roomId, date: cell.date, rate: value })))
       setShowBulkEdit(false)
       setBulkEditValue('')
       setSelectedCells([])
@@ -314,30 +301,13 @@ export function RateGrid({
     }
   }
 
-  const handleCopyDown = () => {
+  const handleCopyDown = async () => {
     if (selectedCells.length > 0) {
       const firstCell = selectedCells[0]
       const firstValue = rateData[firstCell.roomId]?.dates[firstCell.date]?.rate
 
       if (firstValue !== undefined) {
-        setRateData(prev => {
-          const updated = { ...prev }
-          selectedCells.forEach(cell => {
-            if (updated[cell.roomId]?.dates[cell.date]) {
-              updated[cell.roomId] = {
-                ...updated[cell.roomId],
-                dates: {
-                  ...updated[cell.roomId].dates,
-                  [cell.date]: {
-                    ...updated[cell.roomId].dates[cell.date],
-                    rate: firstValue
-                  }
-                }
-              }
-            }
-          })
-          return updated
-        })
+        await applyRateUpdates(selectedCells.map(cell => ({ rowId: cell.roomId, date: cell.date, rate: firstValue })))
         setSelectedCells([])
       }
     }
@@ -501,7 +471,7 @@ export function RateGrid({
     }))
   }, [bulkRegisterValues, bulkRegisterActiveWeekdays, selectedBulkRegisterTargets, ratePlanPricing])
 
-  const handleBulkRegister = () => {
+  const handleBulkRegister = async () => {
     const warning = getDateRangeWarning()
 
     if (warning) {
@@ -519,35 +489,23 @@ export function RateGrid({
       return
     }
 
-    setRateData(prev => {
-      const updated = { ...prev }
-      const start = new Date(bulkRegisterStart)
-      const end = new Date(bulkRegisterEnd)
+    const updates: { rowId: string; date: string; rate: number }[] = []
+    const start = new Date(bulkRegisterStart)
+    const end = new Date(bulkRegisterEnd)
 
-      selectedBulkRegisterTargets.forEach(room => {
-        for (let d = new Date(start); d <= end; d.setDate(d.getDate() + 1)) {
-          const dateStr = d.toISOString().split('T')[0]
-          const value = parseInt(bulkRegisterValues[d.getDay()] ?? '')
+    selectedBulkRegisterTargets.forEach(room => {
+      for (let d = new Date(start); d <= end; d.setDate(d.getDate() + 1)) {
+        const dateStr = d.toISOString().split('T')[0]
+        const value = parseInt(bulkRegisterValues[d.getDay()] ?? '')
 
-          if (bulkRegisterActiveWeekdays.includes(d.getDay()) && !isNaN(value) && updated[room.id]?.dates[dateStr]) {
-            const calculated = calculateRateByType(value)
-
-            updated[room.id] = {
-              ...updated[room.id],
-              dates: {
-                ...updated[room.id].dates,
-                [dateStr]: {
-                  ...updated[room.id].dates[dateStr],
-                  rate: calculated.sellRate
-                }
-              }
-            }
-          }
+        if (bulkRegisterActiveWeekdays.includes(d.getDay()) && !isNaN(value) && rateData[room.id]?.dates[dateStr]) {
+          const calculated = calculateRateByType(value)
+          updates.push({ rowId: room.id, date: dateStr, rate: calculated.sellRate })
         }
-      })
-
-      return updated
+      }
     })
+
+    await applyRateUpdates(updates)
 
     setShowBulkRegister(false)
     setBulkRegisterStart('')

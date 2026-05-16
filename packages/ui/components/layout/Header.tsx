@@ -19,6 +19,11 @@ export interface HeaderProps {
   onLocaleChange: (locale: Locale) => void
   rightSlot?: ReactNode
   profileHref?: string
+  profileUser?: {
+    name: string
+    email: string
+    status?: string
+  } | null
 }
 
 export function Header({
@@ -27,6 +32,7 @@ export function Header({
   currentLocale,
   rightSlot,
   profileHref,
+  profileUser,
   onLocaleChange
 }: HeaderProps) {
   const { isCollapsed, setIsCollapsed } = useSidebar()
@@ -35,7 +41,10 @@ export function Header({
   const t = useTranslations()
   const settingApp = apps.find((app) => app.id === 'setting')
   const resolvedProfileHref = profileHref ?? (settingApp ? `${settingApp.url}/profile` : '/profile')
-  const resolvedLoginHref = settingApp ? `${settingApp.url}/login` : '/login'
+  const resolvedLogoutHref = settingApp ? `${settingApp.url}/logout` : '/logout'
+  const profileInitial = profileUser
+    ? (profileUser.name.trim() || profileUser.email.trim()).slice(0, 1).toUpperCase()
+    : ''
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -101,9 +110,31 @@ export function Header({
 
             {isProfileMenuOpen && (
               <div
-                className="absolute right-0 top-full z-50 mt-sm w-[160px] overflow-hidden rounded border border-border bg-bg-primary p-sm shadow-md"
+                className="absolute right-0 top-full z-50 mt-sm w-[280px] overflow-hidden rounded border border-border bg-bg-primary p-sm shadow-md"
                 role="menu"
               >
+                {profileUser && (
+                  <div className="mb-sm border-b border-border px-control-px-md pb-sm">
+                    <div className="flex items-start gap-sm">
+                      <span className="flex h-control-md w-control-md shrink-0 items-center justify-center rounded bg-primary text-base font-bold text-white">
+                        {profileInitial}
+                      </span>
+                      <div className="min-w-0 flex-1">
+                        <p className="truncate text-base font-bold text-text-primary" title={profileUser.name}>
+                          {profileUser.name}
+                        </p>
+                        <p className="truncate text-base font-light text-text-tertiary" title={profileUser.email}>
+                          {profileUser.email}
+                        </p>
+                        {profileUser.status && (
+                          <span className="mt-xs inline-flex h-control-sm items-center rounded bg-primary-bg px-sm text-xs font-medium text-primary">
+                            {profileUser.status}
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                )}
                 <a
                   href={resolvedProfileHref}
                   className="flex h-control-md items-center gap-sm rounded px-control-px-md text-base font-medium text-text-primary no-underline transition-colors hover:bg-bg-secondary"
@@ -114,7 +145,7 @@ export function Header({
                   {t('common.profile')}
                 </a>
                 <a
-                  href={resolvedLoginHref}
+                  href={resolvedLogoutHref}
                   className="flex h-control-md items-center gap-sm rounded px-control-px-md text-base font-medium text-text-primary no-underline transition-colors hover:bg-bg-secondary"
                   role="menuitem"
                   onClick={() => setIsProfileMenuOpen(false)}

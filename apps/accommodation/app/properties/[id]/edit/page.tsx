@@ -1,17 +1,16 @@
 'use client'
 
-import Link from 'next/link'
 import { useParams, useRouter } from 'next/navigation'
-import { ArrowLeft } from 'lucide-react'
 import { Card } from '@creami/ui'
 import { useProperty } from '@/hooks/useProperties'
 import { PropertyEditForm } from '../../components/PropertyEditForm'
+import { ErrorTemplate } from '@/components/common/ErrorTemplate'
 
 export default function EditAccommodationPage() {
   const router = useRouter()
   const params = useParams<{ id: string }>()
   const propertyId = params.id ?? ''
-  const { data: accommodation, isLoading, isError } = useProperty(propertyId)
+  const { data: accommodation, isLoading } = useProperty(propertyId)
 
   if (isLoading) {
     return (
@@ -21,20 +20,13 @@ export default function EditAccommodationPage() {
     )
   }
 
-  if (isError || !accommodation) {
+  if (!accommodation) {
     return (
-      <div>
-        <Link
-          href="/properties"
-          className="mb-lg inline-flex items-center gap-sm text-base font-medium text-text-secondary no-underline hover:text-primary"
-        >
-          <ArrowLeft className="h-icon-md w-icon-md" />
-          숙소 목록으로
-        </Link>
-        <Card className="p-lg" hover={false}>
-          <h1 className="text-xl font-bold text-text-primary">숙소를 찾을 수 없습니다</h1>
-        </Card>
-      </div>
+      <ErrorTemplate
+        title="숙소를 찾을 수 없습니다"
+        backHref="/properties"
+        backLabel="숙소 목록으로"
+      />
     )
   }
 

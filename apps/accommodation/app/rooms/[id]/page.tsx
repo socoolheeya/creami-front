@@ -136,30 +136,13 @@ export default function RoomDetailPage({ params }: { params: Promise<{ id: strin
   const router = useRouter()
   const [showDeleteModal, setShowDeleteModal] = useState(false)
 
-  const { data: room, isLoading, error } = useRoom(id)
+  const { data: room, isLoading } = useRoom(id)
   const deleteRoomMutation = useDeleteRoom()
 
   if (isLoading) {
     return (
       <div className="flex items-center justify-center py-2xl">
         <div className="text-base font-light text-text-secondary">{commonT('loading')}</div>
-      </div>
-    )
-  }
-
-  if (error) {
-    return (
-      <div className="flex flex-col items-center justify-center py-3xl text-center">
-        <DoorOpen className="mb-md h-3xl w-3xl text-text-tertiary" />
-        <h3 className="mb-xs text-lg font-bold text-text-primary">
-          {commonT('loadFailedNoPeriod')}
-        </h3>
-        <p className="mb-md text-base font-light text-text-secondary">
-          {error.message}
-        </p>
-        <Link href="/rooms">
-          <Button>{commonT('backToList')}</Button>
-        </Link>
       </div>
     )
   }

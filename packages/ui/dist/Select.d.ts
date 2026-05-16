@@ -3,5 +3,5 @@ export interface SelectProps extends Omit<React.SelectHTMLAttributes<HTMLSelectE
     size?: 'large' | 'medium' | 'small' | 'mini';
     children: React.ReactNode;
 }
-export declare function Select({ size, className, children, ...props }: SelectProps): import("react/jsx-runtime").JSX.Element;
+export declare const Select: React.ForwardRefExoticComponent<SelectProps & React.RefAttributes<HTMLSelectElement>>;
 //# sourceMappingURL=Select.d.ts.map

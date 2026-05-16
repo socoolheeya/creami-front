@@ -14,6 +14,8 @@ export function QueryProvider({ children }: { children: React.ReactNode }) {
             staleTime: 5 * 60 * 1000,
             // 에러 발생 시 재시도 1회
             retry: 1,
+            // 조회 실패는 화면별 원문 메시지 출력 대신 공통 error boundary에서 처리
+            throwOnError: true,
             // 윈도우 포커스 시 자동 재요청 비활성화
             refetchOnWindowFocus: false,
           },

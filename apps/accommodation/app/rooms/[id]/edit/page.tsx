@@ -34,7 +34,7 @@ import {
   type RoomType,
   type ViewType
 } from '@/lib/types/room'
-import { Button, Card, Input, Select, notification } from '@creami/ui'
+import { Button, Card, Input, Select, notifySaveError, notifySaveSuccess } from '@creami/ui'
 
 type RoomEditFormData = RoomFormData & {
   baseMinLos?: number
@@ -172,28 +172,12 @@ export default function RoomEditPage({ params }: { params: Promise<{ id: string 
   const { id } = use(params)
   const t = useTranslations('accommodation.rooms')
   const commonT = useTranslations('accommodation.common')
-  const { data: room, isLoading, error } = useRoom(id)
+  const { data: room, isLoading } = useRoom(id)
 
   if (isLoading) {
     return (
       <div className="flex items-center justify-center py-2xl">
         <div className="text-base font-light text-text-secondary">{commonT('loading')}</div>
-      </div>
-    )
-  }
-
-  if (error) {
-    return (
-      <div className="flex flex-col items-center justify-center py-3xl text-center">
-        <h3 className="mb-xs text-lg font-bold text-text-primary">
-          {commonT('loadFailedNoPeriod')}
-        </h3>
-        <p className="mb-md text-base font-light text-text-secondary">
-          {error.message}
-        </p>
-        <Link href="/rooms">
-          <Button>{commonT('backToList')}</Button>
-        </Link>
       </div>
     )
   }
@@ -299,14 +283,14 @@ function RoomEditForm({ id, room }: { id: string; room: Room }) {
   }
 
   const handleSubmit = () => {
-    console.log(t('messages.editLog'), formData)
+    try {
+      console.log(t('messages.editLog'), formData)
 
-    notification.success({
-      message: commonT('successUpdated'),
-      placement: 'top-right',
-      direction: 'right'
-    })
-    router.push(`/rooms/${id}`)
+      notifySaveSuccess(commonT('successUpdated'))
+      router.push(`/rooms/${id}`)
+    } catch {
+      notifySaveError(commonT('updateFailed'))
+    }
   }
 
   return (

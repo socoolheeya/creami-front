@@ -1,41 +1,39 @@
 'use client'
 
-import { useState } from 'react'
-import { Button, DatePicker, Input, Select, TimePicker, notification } from '@creami/ui'
+import { useEffect, useState } from 'react'
+import { Alert, Button, DatePicker, Input, Select, TimePicker, notifySaveError, notifySaveSuccess } from '@creami/ui'
 import { ArrowLeft, Handshake, Save, SlidersHorizontal } from 'lucide-react'
 import Link from 'next/link'
 import { useParams } from 'next/navigation'
 import { useTranslations } from 'next-intl'
 import {
   createSupplierForm,
-  currentUserId,
-  formatAuditDate,
-  initialSuppliers,
-  normalizeOptionalValue,
+  createSupplierRequest,
+  getSupplier,
+  updateSupplier,
+  type Supplier,
   type SupplierForm,
   type SupplierStatus
-} from '@/lib/data/suppliers'
+} from '@/lib/api/suppliers'
+import { getDisplayApiErrorMessage } from '@/lib/api/errors'
 
 export default function SupplierDetailPage() {
   const params = useParams<{ id: string }>()
   const t = useTranslations()
-  const supplier = initialSuppliers.find((item) => item.id === params.id)
-  const [form, setForm] = useState<SupplierForm>(() =>
-    supplier
-      ? createSupplierForm(supplier)
-      : {
-          code: '',
-          name: '',
-          status: 'active',
-          blockStartDate: '',
-          blockStartTime: '',
-          blockEndDate: '',
-          blockEndTime: '',
-          tpsLimit: '10'
-        }
-  )
-  const [updatedAt, setUpdatedAt] = useState(supplier?.updatedAt ?? '')
-  const [updatedById, setUpdatedById] = useState(supplier?.updatedById ?? '')
+  const [supplier, setSupplier] = useState<Supplier | null>(null)
+  const [form, setForm] = useState<SupplierForm>({
+    code: '',
+    name: '',
+    status: 'active',
+    blockStartDate: '',
+    blockStartTime: '',
+    blockEndDate: '',
+    blockEndTime: '',
+    tpsLimit: '10'
+  })
+  const [isLoading, setIsLoading] = useState(true)
+  const [isSaving, setIsSaving] = useState(false)
+  const [errorMessage, setErrorMessage] = useState<string | null>(null)
 
   const canSave =
     form.code.trim().length > 0 &&
@@ -47,40 +45,53 @@ export default function SupplierDetailPage() {
       ? t('setting.status.active')
       : t('setting.status.inactive')
 
-  const handleSave = () => {
-    const nextSupplier = {
-      code: form.code.trim(),
-      name: form.name.trim(),
-      status: form.status,
-      blockStartDate: normalizeOptionalValue(form.blockStartDate),
-      blockStartTime: normalizeOptionalValue(form.blockStartTime),
-      blockEndDate: normalizeOptionalValue(form.blockEndDate),
-      blockEndTime: normalizeOptionalValue(form.blockEndTime),
-      tpsLimit: Number(form.tpsLimit),
-      updatedById: currentUserId,
-      updatedAt: formatAuditDate()
+  useEffect(() => {
+    const abortController = new AbortController()
+
+    async function loadSupplier() {
+      setIsLoading(true)
+      setErrorMessage(null)
+
+      try {
+        const nextSupplier = await getSupplier(params.id, { signal: abortController.signal })
+        setSupplier(nextSupplier)
+        setForm(createSupplierForm(nextSupplier))
+      } catch {
+        if (abortController.signal.aborted) return
+        setSupplier(null)
+        setErrorMessage(t('setting.suppliers.loadFailed'))
+      } finally {
+        if (!abortController.signal.aborted) {
+          setIsLoading(false)
+        }
+      }
     }
 
-    setForm({
-      code: nextSupplier.code,
-      name: nextSupplier.name,
-      status: nextSupplier.status,
-      blockStartDate: nextSupplier.blockStartDate ?? '',
-      blockStartTime: nextSupplier.blockStartTime ?? '',
-      blockEndDate: nextSupplier.blockEndDate ?? '',
-      blockEndTime: nextSupplier.blockEndTime ?? '',
-      tpsLimit: String(nextSupplier.tpsLimit)
-    })
-    setUpdatedById(nextSupplier.updatedById)
-    setUpdatedAt(nextSupplier.updatedAt)
-    notification.success({
-      message: '수정이 완료되었습니다.',
-      placement: 'top-right',
-      direction: 'right'
-    })
+    loadSupplier()
+
+    return () => abortController.abort()
+  }, [params.id, t])
+
+  const handleSave = async () => {
+    if (!supplier) return
+
+    setIsSaving(true)
+    setErrorMessage(null)
+
+    try {
+      const updatedSupplier = await updateSupplier(supplier.id, createSupplierRequest(form))
+      setSupplier(updatedSupplier)
+      setForm(createSupplierForm(updatedSupplier))
+      notifySaveSuccess(t('setting.suppliers.detail.saved'))
+    } catch (error) {
+      setErrorMessage(getDisplayApiErrorMessage(error, t('setting.suppliers.saveFailed')))
+      notifySaveError(t('setting.suppliers.saveFailed'))
+    } finally {
+      setIsSaving(false)
+    }
   }
 
-  if (!supplier) {
+  if (!isLoading && !supplier) {
     return (
       <div>
         <Link
@@ -90,6 +101,11 @@ export default function SupplierDetailPage() {
           <ArrowLeft className="h-icon-md w-icon-md" />
           {t('setting.suppliers.detail.backToList')}
         </Link>
+        {errorMessage && (
+          <Alert variant="error" className="mb-md">
+            {errorMessage}
+          </Alert>
+        )}
         <section className="rounded border border-border bg-bg-primary p-lg shadow">
           <h1 className="text-xl font-bold text-text-primary">
             {t('setting.suppliers.detail.notFound')}
@@ -123,11 +139,17 @@ export default function SupplierDetailPage() {
       </div>
 
       <div className="mb-sm flex justify-end">
-        <Button type="button" disabled={!canSave} onClick={handleSave}>
+        <Button type="button" disabled={!canSave || isSaving || !supplier} onClick={handleSave}>
           <Save className="h-icon-md w-icon-md" />
-          {t('common.save')}
+          {isSaving ? t('setting.suppliers.saving') : t('common.save')}
         </Button>
       </div>
+
+      {errorMessage && (
+        <Alert variant="error" className="mb-md">
+          {errorMessage}
+        </Alert>
+      )}
 
       <div className="grid gap-lg xl:grid-cols-[minmax(0,0.85fr)_minmax(0,1.15fr)]">
         <section className="rounded border border-border bg-bg-primary p-lg shadow">
@@ -200,31 +222,31 @@ export default function SupplierDetailPage() {
               <dt className="w-modal-action shrink-0 font-light text-text-tertiary">
                 {t('setting.suppliers.columns.id')}
               </dt>
-              <dd className="font-medium text-text-primary">{supplier.id}</dd>
+              <dd className="font-medium text-text-primary">{supplier?.id ?? '-'}</dd>
             </div>
             <div className="flex gap-md">
               <dt className="w-modal-action shrink-0 font-light text-text-tertiary">
                 {t('setting.suppliers.columns.createdById')}
               </dt>
-              <dd className="font-medium text-text-primary">{supplier.createdById}</dd>
+              <dd className="font-medium text-text-primary">{supplier?.createdById ?? '-'}</dd>
             </div>
             <div className="flex gap-md">
               <dt className="w-modal-action shrink-0 font-light text-text-tertiary">
                 {t('setting.suppliers.columns.createdAt')}
               </dt>
-              <dd className="font-medium text-text-primary">{supplier.createdAt}</dd>
+              <dd className="font-medium text-text-primary">{supplier?.createdAt ?? '-'}</dd>
             </div>
             <div className="flex gap-md">
               <dt className="w-modal-action shrink-0 font-light text-text-tertiary">
                 {t('setting.suppliers.columns.updatedById')}
               </dt>
-              <dd className="font-medium text-text-primary">{updatedById}</dd>
+              <dd className="font-medium text-text-primary">{supplier?.updatedById ?? '-'}</dd>
             </div>
             <div className="flex gap-md">
               <dt className="w-modal-action shrink-0 font-light text-text-tertiary">
                 {t('setting.suppliers.columns.updatedAt')}
               </dt>
-              <dd className="font-medium text-text-primary">{updatedAt}</dd>
+              <dd className="font-medium text-text-primary">{supplier?.updatedAt ?? '-'}</dd>
             </div>
           </dl>
         </section>

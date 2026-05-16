@@ -8,6 +8,11 @@ export interface HeaderProps {
     onLocaleChange: (locale: Locale) => void;
     rightSlot?: ReactNode;
     profileHref?: string;
+    profileUser?: {
+        name: string;
+        email: string;
+        status?: string;
+    } | null;
 }
-export declare function Header({ apps, currentAppId, currentLocale, rightSlot, profileHref, onLocaleChange }: HeaderProps): import("react/jsx-runtime").JSX.Element;
+export declare function Header({ apps, currentAppId, currentLocale, rightSlot, profileHref, profileUser, onLocaleChange }: HeaderProps): import("react/jsx-runtime").JSX.Element;
 //# sourceMappingURL=Header.d.ts.map

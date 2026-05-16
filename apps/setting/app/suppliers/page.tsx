@@ -1,28 +1,49 @@
 'use client'
 
-import { useState } from 'react'
-import { Button, DatePicker, Input, Select, TimePicker, notification } from '@creami/ui'
+import { useEffect, useState } from 'react'
+import {
+  Alert,
+  Button,
+  DatePicker,
+  Input,
+  Select,
+  Table,
+  TableBody,
+  TableCell,
+  TableFilterCell,
+  TableFilterRow,
+  TableHead,
+  TableHeader,
+  TableRow,
+  TableStateRow,
+  TimePicker,
+  notifySaveError,
+  notifySaveSuccess
+} from '@creami/ui'
 import { Handshake, Plus, Save, X } from 'lucide-react'
-import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 import { useTranslations } from 'next-intl'
 import {
-  createSupplierId,
-  currentUserId,
-  formatAuditDate,
+  createSupplier,
+  createSupplierRequest,
   formatBlockDateTimeRange,
   initialSupplierForm,
-  initialSuppliers,
-  normalizeOptionalValue,
+  getSuppliers,
   type Supplier,
   type SupplierForm,
   type SupplierStatus
-} from '@/lib/data/suppliers'
+} from '@/lib/api/suppliers'
+import { getDisplayApiErrorMessage } from '@/lib/api/errors'
 
 export default function SuppliersPage() {
   const t = useTranslations()
-  const [suppliers, setSuppliers] = useState<Supplier[]>(initialSuppliers)
+  const router = useRouter()
+  const [suppliers, setSuppliers] = useState<Supplier[]>([])
   const [form, setForm] = useState<SupplierForm>(initialSupplierForm)
   const [isModalOpen, setIsModalOpen] = useState(false)
+  const [isLoading, setIsLoading] = useState(true)
+  const [isSaving, setIsSaving] = useState(false)
+  const [errorMessage, setErrorMessage] = useState<string | null>(null)
 
   const canSave =
     form.code.trim().length > 0 &&
@@ -32,6 +53,31 @@ export default function SuppliersPage() {
     status === 'active'
       ? t('setting.status.active')
       : t('setting.status.inactive')
+
+  useEffect(() => {
+    const abortController = new AbortController()
+
+    async function loadSuppliers() {
+      setIsLoading(true)
+      setErrorMessage(null)
+
+      try {
+        const nextSuppliers = await getSuppliers({ signal: abortController.signal })
+        setSuppliers(nextSuppliers)
+      } catch {
+        if (abortController.signal.aborted) return
+        setErrorMessage(t('setting.suppliers.loadFailed'))
+      } finally {
+        if (!abortController.signal.aborted) {
+          setIsLoading(false)
+        }
+      }
+    }
+
+    loadSuppliers()
+
+    return () => abortController.abort()
+  }, [t])
 
   const resetForm = () => {
     setForm(initialSupplierForm)
@@ -43,35 +89,21 @@ export default function SuppliersPage() {
     setIsModalOpen(true)
   }
 
-  const handleSaveSupplier = () => {
-    const nextSupplier = {
-      code: form.code.trim(),
-      name: form.name.trim(),
-      status: form.status,
-      blockStartDate: normalizeOptionalValue(form.blockStartDate),
-      blockStartTime: normalizeOptionalValue(form.blockStartTime),
-      blockEndDate: normalizeOptionalValue(form.blockEndDate),
-      blockEndTime: normalizeOptionalValue(form.blockEndTime),
-      tpsLimit: Number(form.tpsLimit),
-      updatedById: currentUserId,
-      updatedAt: formatAuditDate()
-    }
+  const handleSaveSupplier = async () => {
+    setIsSaving(true)
+    setErrorMessage(null)
 
-    setSuppliers((currentSuppliers) => [
-      {
-        id: createSupplierId(currentSuppliers.length),
-        ...nextSupplier,
-        createdById: currentUserId,
-        createdAt: formatAuditDate()
-      },
-      ...currentSuppliers
-    ])
-    notification.success({
-      message: '저장이 완료되었습니다.',
-      placement: 'top-right',
-      direction: 'right'
-    })
-    resetForm()
+    try {
+      const createdSupplier = await createSupplier(createSupplierRequest(form))
+      setSuppliers((currentSuppliers) => [createdSupplier, ...currentSuppliers])
+      notifySaveSuccess(t('setting.suppliers.saved'))
+      resetForm()
+    } catch (error) {
+      setErrorMessage(getDisplayApiErrorMessage(error, t('setting.suppliers.saveFailed')))
+      notifySaveError(t('setting.suppliers.saveFailed'))
+    } finally {
+      setIsSaving(false)
+    }
   }
 
   return (
@@ -97,37 +129,82 @@ export default function SuppliersPage() {
         </Button>
       </div>
 
-      <div className="rounded border border-border bg-bg-primary shadow">
-        <div className="overflow-x-auto">
-          <div className="min-w-[1480px]">
-            <div className="grid grid-cols-[minmax(0,0.55fr)_minmax(0,1fr)_minmax(0,1fr)_minmax(0,0.55fr)_minmax(0,2.45fr)_minmax(0,0.55fr)_minmax(0,0.75fr)_minmax(0,1.1fr)_minmax(0,0.75fr)_minmax(0,1.1fr)] gap-sm border-b border-border px-lg py-sm text-base font-bold text-text-tertiary">
-              <span>{t('setting.suppliers.columns.id')}</span>
-              <span>{t('setting.suppliers.columns.supplierCode')}</span>
-              <span>{t('setting.suppliers.columns.supplierName')}</span>
-              <span>{t('setting.suppliers.columns.status')}</span>
-              <span>{t('setting.suppliers.columns.blockTime')}</span>
-              <span>{t('setting.suppliers.columns.tpsLimit')}</span>
-              <span>{t('setting.suppliers.columns.createdById')}</span>
-              <span>{t('setting.suppliers.columns.createdAt')}</span>
-              <span>{t('setting.suppliers.columns.updatedById')}</span>
-              <span>{t('setting.suppliers.columns.updatedAt')}</span>
-            </div>
+      {errorMessage && (
+        <Alert variant="error" className="mb-md">
+          {errorMessage}
+        </Alert>
+      )}
 
+      <div className="rounded border border-border bg-bg-primary shadow">
+        <Table className="table-fixed min-w-supplier-table">
+          <colgroup>
+            <col className="w-supplier-col-id" />
+            <col className="w-supplier-col-code" />
+            <col className="w-supplier-col-name" />
+            <col className="w-supplier-col-status" />
+            <col className="w-supplier-col-block-time" />
+            <col className="w-supplier-col-tps" />
+            <col className="w-supplier-col-user" />
+            <col className="w-supplier-col-date" />
+            <col className="w-supplier-col-user" />
+            <col className="w-supplier-col-date" />
+          </colgroup>
+          <TableHeader
+            filtersEnabled={false}
+            filterRow={
+              <TableFilterRow>
+                <TableFilterCell className="w-supplier-col-id">{null}</TableFilterCell>
+                <TableFilterCell className="w-supplier-col-code">{null}</TableFilterCell>
+                <TableFilterCell className="w-supplier-col-name">{null}</TableFilterCell>
+                <TableFilterCell className="w-supplier-col-status">{null}</TableFilterCell>
+                <TableFilterCell className="w-supplier-col-block-time">{null}</TableFilterCell>
+                <TableFilterCell className="w-supplier-col-tps">{null}</TableFilterCell>
+                <TableFilterCell className="w-supplier-col-user">{null}</TableFilterCell>
+                <TableFilterCell className="w-supplier-col-date">{null}</TableFilterCell>
+                <TableFilterCell className="w-supplier-col-user">{null}</TableFilterCell>
+                <TableFilterCell className="w-supplier-col-date">{null}</TableFilterCell>
+              </TableFilterRow>
+            }
+          >
+            <TableRow>
+              <TableHead className="w-supplier-col-id" truncate>{t('setting.suppliers.columns.id')}</TableHead>
+              <TableHead className="w-supplier-col-code" truncate>{t('setting.suppliers.columns.supplierCode')}</TableHead>
+              <TableHead className="w-supplier-col-name" truncate>{t('setting.suppliers.columns.supplierName')}</TableHead>
+              <TableHead className="w-supplier-col-status" truncate>{t('setting.suppliers.columns.status')}</TableHead>
+              <TableHead className="w-supplier-col-block-time" truncate>{t('setting.suppliers.columns.blockTime')}</TableHead>
+              <TableHead className="w-supplier-col-tps" truncate>{t('setting.suppliers.columns.tpsLimit')}</TableHead>
+              <TableHead className="w-supplier-col-user" truncate>{t('setting.suppliers.columns.createdById')}</TableHead>
+              <TableHead className="w-supplier-col-date" truncate>{t('setting.suppliers.columns.createdAt')}</TableHead>
+              <TableHead className="w-supplier-col-user" truncate>{t('setting.suppliers.columns.updatedById')}</TableHead>
+              <TableHead className="w-supplier-col-date" truncate>{t('setting.suppliers.columns.updatedAt')}</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {isLoading && (
+              <TableStateRow colSpan={10} variant="loading">
+                {t('setting.suppliers.loading')}
+              </TableStateRow>
+            )}
+            {!isLoading && suppliers.length === 0 && (
+              <TableStateRow colSpan={10} variant="empty">
+                {t('setting.suppliers.empty')}
+              </TableStateRow>
+            )}
             {suppliers.map((supplier) => (
-              <Link
+              <TableRow
                 key={supplier.id}
-                href={`/suppliers/${supplier.id}`}
-                className="grid cursor-pointer grid-cols-[minmax(0,0.55fr)_minmax(0,1fr)_minmax(0,1fr)_minmax(0,0.55fr)_minmax(0,2.45fr)_minmax(0,0.55fr)_minmax(0,0.75fr)_minmax(0,1.1fr)_minmax(0,0.75fr)_minmax(0,1.1fr)] gap-sm border-b border-border px-lg py-md no-underline transition-colors last:border-b-0 hover:bg-bg-secondary"
+                onClick={() => router.push(`/suppliers/${supplier.id}`)}
               >
-                <span className="text-base font-light text-text-tertiary">
+                <TableCell className="w-supplier-col-id text-text-tertiary" truncate titleText={supplier.id}>
                   {supplier.id}
-                </span>
-                <span className="truncate text-base font-medium text-text-secondary">
+                </TableCell>
+                <TableCell className="w-supplier-col-code text-text-secondary" truncate titleText={supplier.code}>
                   {supplier.code}
-                </span>
-                <span className="truncate text-base font-bold text-text-primary">
+                </TableCell>
+                <TableCell className="w-supplier-col-name font-bold" truncate titleText={supplier.name}>
                   {supplier.name}
-                </span>
+                </TableCell>
+                <TableCell className="w-supplier-col-status">
                 <span
                   className={`inline-flex h-control-sm w-fit items-center rounded px-control-px-sm py-none text-base font-bold ${
                     supplier.status === 'active'
@@ -137,28 +214,29 @@ export default function SuppliersPage() {
                 >
                   {getSupplierStatusLabel(supplier.status)}
                 </span>
-                <span className="block w-full truncate whitespace-nowrap text-base font-medium text-text-secondary">
+                </TableCell>
+                <TableCell className="w-supplier-col-block-time text-text-secondary" truncate titleText={formatBlockDateTimeRange(supplier)}>
                   {formatBlockDateTimeRange(supplier)}
-                </span>
-                <span className="text-base font-medium text-text-primary">
+                </TableCell>
+                <TableCell className="w-supplier-col-tps" truncate titleText={t('setting.suppliers.tpsValue', { count: supplier.tpsLimit })}>
                   {t('setting.suppliers.tpsValue', { count: supplier.tpsLimit })}
-                </span>
-                <span className="text-base font-light text-text-secondary">
+                </TableCell>
+                <TableCell className="w-supplier-col-user text-text-secondary" truncate titleText={supplier.createdById}>
                   {supplier.createdById}
-                </span>
-                <span className="whitespace-nowrap text-base font-light text-text-secondary">
+                </TableCell>
+                <TableCell className="w-supplier-col-date text-text-secondary" truncate titleText={supplier.createdAt}>
                   {supplier.createdAt}
-                </span>
-                <span className="text-base font-light text-text-secondary">
+                </TableCell>
+                <TableCell className="w-supplier-col-user text-text-secondary" truncate titleText={supplier.updatedById}>
                   {supplier.updatedById}
-                </span>
-                <span className="whitespace-nowrap text-base font-light text-text-secondary">
+                </TableCell>
+                <TableCell className="w-supplier-col-date text-text-secondary" truncate titleText={supplier.updatedAt}>
                   {supplier.updatedAt}
-                </span>
-              </Link>
+                </TableCell>
+              </TableRow>
             ))}
-          </div>
-        </div>
+          </TableBody>
+        </Table>
       </div>
 
       {isModalOpen && (
@@ -295,11 +373,11 @@ export default function SuppliersPage() {
               <Button
                 type="button"
                 variant="primary"
-                disabled={!canSave}
+                disabled={!canSave || isSaving}
                 onClick={handleSaveSupplier}
               >
                 <Save className="h-icon-md w-icon-md" />
-                {t('common.save')}
+                {isSaving ? t('setting.suppliers.saving') : t('common.save')}
               </Button>
             </div>
           </div>

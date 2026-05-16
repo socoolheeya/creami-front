@@ -15,6 +15,11 @@ export interface MainLayoutProps {
   onLocaleChange: (locale: Locale) => void
   rightSlot?: ReactNode
   profileHref?: string
+  profileUser?: {
+    name: string
+    email: string
+    status?: string
+  } | null
 }
 
 function MainLayoutContent({
@@ -25,6 +30,7 @@ function MainLayoutContent({
   currentLocale,
   rightSlot,
   profileHref,
+  profileUser,
   onLocaleChange
 }: MainLayoutProps) {
   const { isCollapsed } = useSidebar()
@@ -37,6 +43,7 @@ function MainLayoutContent({
         currentLocale={currentLocale}
         rightSlot={rightSlot}
         profileHref={profileHref}
+        profileUser={profileUser}
         onLocaleChange={onLocaleChange}
       />
       {sidebar}

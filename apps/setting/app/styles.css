@@ -40,6 +40,41 @@
   --modal-width-lg: 48rem;
   --modal-max-height: 90vh;
   --modal-action-width: 8rem;
+  --policy-preview-min-height: 9rem;
+  --table-col-id-9-width: 6.75rem;
+  --policy-col-id-width: 8.5rem;
+  --policy-col-name-width: 14rem;
+  --policy-col-status-width: 7rem;
+  --policy-col-count-width: 6rem;
+  --policy-col-date-width: 10rem;
+  --permission-col-filter-action-width: 8rem;
+  --permission-col-role-id-width: 8.5rem;
+  --permission-col-role-name-width: 12rem;
+  --permission-col-description-width: 20rem;
+  --permission-col-member-count-width: 7rem;
+  --permission-col-date-width: 10rem;
+  --member-col-name-width: 10rem;
+  --member-col-email-width: 16rem;
+  --member-col-phone-width: 10rem;
+  --member-col-role-width: 10rem;
+  --member-col-status-width: 8rem;
+  --api-key-col-id-width: 5rem;
+  --api-key-col-supplier-width: 10rem;
+  --api-key-col-key-width: 22rem;
+  --api-key-col-date-width: 7.5rem;
+  --api-key-col-actions-width: 18rem;
+  --supplier-col-id-width: 7rem;
+  --supplier-col-code-width: 12rem;
+  --supplier-col-name-width: 14rem;
+  --supplier-col-status-width: 7rem;
+  --supplier-col-block-time-width: 22rem;
+  --supplier-col-tps-width: 7rem;
+  --supplier-col-user-width: 8rem;
+  --supplier-col-date-width: 10rem;
+  --user-group-sidebar-width: 22rem;
+  --user-group-list-max-height: 34rem;
+  --user-group-panel-min-height: 24rem;
+  --user-group-panel-max-height: 32rem;
   --profile-avatar-size: 7rem;
   --profile-info-label-width: 8rem;
   --social-naver-bg: #03c75a;
@@ -130,4 +165,184 @@ h4,
 h5,
 h6 {
   font-weight: var(--font-bold);
+}
+
+.w-policy-col-id {
+  width: var(--policy-col-id-width);
+}
+
+.w-policy-col-name {
+  width: var(--policy-col-name-width);
+}
+
+.w-policy-col-status {
+  width: var(--policy-col-status-width);
+}
+
+.w-policy-col-count {
+  width: var(--policy-col-count-width);
+}
+
+.w-policy-col-date {
+  width: var(--policy-col-date-width);
+}
+
+.w-permission-col-role-id {
+  width: var(--permission-col-role-id-width);
+}
+
+.w-permission-col-role-name {
+  width: var(--permission-col-role-name-width);
+}
+
+.w-permission-col-description {
+  width: var(--permission-col-description-width);
+}
+
+.w-permission-col-member-count {
+  width: var(--permission-col-member-count-width);
+}
+
+.w-permission-col-date {
+  width: var(--permission-col-date-width);
+}
+
+.w-api-key-col-id {
+  width: var(--api-key-col-id-width);
+}
+
+.w-api-key-col-supplier {
+  width: var(--api-key-col-supplier-width);
+}
+
+.w-api-key-col-key {
+  width: var(--api-key-col-key-width);
+}
+
+.w-api-key-col-date {
+  width: var(--api-key-col-date-width);
+}
+
+.user-groups-layout {
+  display: grid;
+  gap: var(--spacing-lg);
+}
+
+.user-group-list-scroll {
+  max-height: var(--user-group-list-max-height);
+}
+
+.user-group-panel-scroll {
+  min-height: var(--user-group-panel-min-height);
+  max-height: var(--user-group-panel-max-height);
+}
+
+@media (min-width: 1280px) {
+  .user-groups-layout {
+    grid-template-columns: var(--user-group-sidebar-width) minmax(0, 1fr);
+  }
+}
+
+.w-api-key-col-actions {
+  width: var(--api-key-col-actions-width);
+}
+
+.w-supplier-col-id {
+  width: var(--supplier-col-id-width);
+}
+
+.w-supplier-col-code {
+  width: var(--supplier-col-code-width);
+}
+
+.w-supplier-col-name {
+  width: var(--supplier-col-name-width);
+}
+
+.w-supplier-col-status {
+  width: var(--supplier-col-status-width);
+}
+
+.w-supplier-col-block-time {
+  width: var(--supplier-col-block-time-width);
+}
+
+.w-supplier-col-tps {
+  width: var(--supplier-col-tps-width);
+}
+
+.w-supplier-col-user {
+  width: var(--supplier-col-user-width);
+}
+
+.w-supplier-col-date {
+  width: var(--supplier-col-date-width);
+}
+
+.min-w-policy-table {
+  min-width: calc(
+    var(--policy-col-id-width) +
+    var(--policy-col-name-width) +
+    var(--policy-col-status-width) +
+    var(--policy-col-count-width) * 3 +
+    var(--policy-col-date-width)
+  );
+}
+
+.min-w-permission-table {
+  min-width: calc(
+    var(--permission-col-role-id-width) +
+    var(--permission-col-role-name-width) +
+    var(--permission-col-description-width) +
+    var(--permission-col-member-count-width) +
+    var(--permission-col-date-width) * 2
+  );
+}
+
+.min-w-api-key-table {
+  min-width: calc(
+    var(--api-key-col-id-width) +
+    var(--api-key-col-supplier-width) +
+    var(--api-key-col-key-width) +
+    var(--api-key-col-date-width) * 2 +
+    var(--api-key-col-actions-width)
+  );
+}
+
+.min-w-supplier-table {
+  min-width: calc(
+    var(--supplier-col-id-width) +
+    var(--supplier-col-code-width) +
+    var(--supplier-col-name-width) +
+    var(--supplier-col-status-width) +
+    var(--supplier-col-block-time-width) +
+    var(--supplier-col-tps-width) +
+    var(--supplier-col-user-width) * 2 +
+    var(--supplier-col-date-width) * 2
+  );
+}
+
+.setting-modal-backdrop {
+  background-color: rgb(0 0 0 / 0.5);
+}
+
+.setting-modal-dialog {
+  max-width: var(--modal-width-lg);
+}
+
+.policy-create-form-grid {
+  display: grid;
+  gap: var(--spacing-md);
+}
+
+.policy-document-preview {
+  min-height: var(--policy-preview-min-height);
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+@media (min-width: 768px) {
+  .policy-create-form-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
 }

@@ -2,6 +2,7 @@ import axios, { AxiosError, AxiosRequestConfig } from 'axios'
 
 // API 기본 설정
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:9001'
+const GENERIC_API_ERROR_MESSAGE = '요청을 처리하는 중 문제가 발생했습니다.'
 
 // Axios 인스턴스 생성
 export const apiClient = axios.create({
@@ -65,7 +66,7 @@ export const api = {
         throw new ApiError(
           error.response?.status || 500,
           error.response?.statusText || 'Error',
-          error.response?.data?.message || error.message
+          GENERIC_API_ERROR_MESSAGE
         )
       }
       throw error
@@ -81,7 +82,7 @@ export const api = {
         throw new ApiError(
           error.response?.status || 500,
           error.response?.statusText || 'Error',
-          error.response?.data?.message || error.message
+          GENERIC_API_ERROR_MESSAGE
         )
       }
       throw error
@@ -97,7 +98,7 @@ export const api = {
         throw new ApiError(
           error.response?.status || 500,
           error.response?.statusText || 'Error',
-          error.response?.data?.message || error.message
+          GENERIC_API_ERROR_MESSAGE
         )
       }
       throw error
@@ -113,7 +114,7 @@ export const api = {
         throw new ApiError(
           error.response?.status || 500,
           error.response?.statusText || 'Error',
-          error.response?.data?.message || error.message
+          GENERIC_API_ERROR_MESSAGE
         )
       }
       throw error
@@ -129,7 +130,7 @@ export const api = {
         throw new ApiError(
           error.response?.status || 500,
           error.response?.statusText || 'Error',
-          error.response?.data?.message || error.message
+          GENERIC_API_ERROR_MESSAGE
         )
       }
       throw error

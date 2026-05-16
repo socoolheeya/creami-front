@@ -1,96 +1,213 @@
 'use client'
 
-import { useMemo, useState } from 'react'
-import { Button, Input } from '@creami/ui'
+import { type FormEvent, useEffect, useState } from 'react'
+import {
+  Alert,
+  Button,
+  Select,
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+  TableStateRow,
+  notification
+} from '@creami/ui'
 import { Copy, KeyRound, Plus, RefreshCw, Trash2 } from 'lucide-react'
 import { useTranslations } from 'next-intl'
+import {
+  createSupplierApiKey,
+  deleteSupplierApiKey,
+  getSupplierApiKeys,
+  rotateSupplierApiKey,
+  type SupplierApiKey
+} from '../../../lib/api/supplierApiKeys'
+import { getDisplayApiErrorMessage } from '../../../lib/api/errors'
+import { getSuppliers, type Supplier } from '../../../lib/api/suppliers'
 
-type SupplierApiKey = {
-  id: string
-  supplierName: string
-  apiKey: string
-  createdAt: string
-}
+type PendingAction = {
+  type: 'create' | 'rotate' | 'delete'
+  id?: string
+} | null
 
-const initialApiKeys: SupplierApiKey[] = [
-  {
-    id: 'KEY-001',
-    supplierName: 'Creami Partner',
-    apiKey: 'crmi_live_8Jf3Kp2Lq9Rt6Vz1Mx4N',
-    createdAt: '2026-05-10'
-  },
-  {
-    id: 'KEY-002',
-    supplierName: 'Stay API Hub',
-    apiKey: 'crmi_live_B7nQp5Xz2Lm8Va4Tc9Rk',
-    createdAt: '2026-05-10'
-  }
-]
-
-function createAuthorizationKey() {
-  const bytes = new Uint8Array(18)
-  crypto.getRandomValues(bytes)
-
-  return `crmi_live_${Array.from(bytes, (byte) => byte.toString(36).padStart(2, '0')).join('')}`
-}
-
-function createApiKeyId(count: number) {
-  return `KEY-${String(count + 1).padStart(3, '0')}`
+function formatDate(value?: string | null) {
+  if (!value) return '-'
+  return value.slice(0, 10)
 }
 
 export default function ApiKeysPage() {
   const t = useTranslations()
-  const [apiKeys, setApiKeys] = useState<SupplierApiKey[]>(initialApiKeys)
-  const [supplierName, setSupplierName] = useState('')
-  const [apiKey, setApiKey] = useState(createAuthorizationKey)
+  const [apiKeys, setApiKeys] = useState<SupplierApiKey[]>([])
+  const [suppliers, setSuppliers] = useState<Supplier[]>([])
+  const [selectedSupplierId, setSelectedSupplierId] = useState('')
   const [copiedApiKeyId, setCopiedApiKeyId] = useState<string | null>(null)
+  const [isLoading, setIsLoading] = useState(true)
+  const [errorMessage, setErrorMessage] = useState<string | null>(null)
+  const [pendingAction, setPendingAction] = useState<PendingAction>(null)
+  const [revealedApiKeys, setRevealedApiKeys] = useState<Record<string, string>>({})
 
-  const canAdd = supplierName.trim().length > 0 && apiKey.trim().length > 0
-  const createdAt = useMemo(() => new Date().toISOString().slice(0, 10), [])
+  const supplierById = new Map(suppliers.map((supplier) => [String(supplier.id), supplier]))
+  const registeredSupplierIds = new Set(
+    apiKeys
+      .map((apiKey) => apiKey.supplierId)
+      .filter((supplierId): supplierId is string => typeof supplierId === 'string' && supplierId.length > 0)
+  )
+  const availableSuppliers = suppliers.filter(
+    (supplier) => !registeredSupplierIds.has(String(supplier.id))
+  )
+  const canAdd =
+    Boolean(selectedSupplierId) &&
+    !registeredSupplierIds.has(selectedSupplierId) &&
+    !pendingAction
+  const showInitialLoading = isLoading && apiKeys.length === 0 && !errorMessage
+  const visibleError = errorMessage && apiKeys.length === 0
+  const apiKeyCount = apiKeys.length
 
-  const handleGenerateKey = () => {
-    setApiKey(createAuthorizationKey())
+  const markApiKeyRevealed = (apiKeyId: string, plainTextKey: string | null | undefined) => {
+    if (!plainTextKey) return
+
+    setRevealedApiKeys((current) => ({
+      ...current,
+      [apiKeyId]: plainTextKey
+    }))
+
+    setTimeout(() => {
+      setRevealedApiKeys((current) => {
+        const next = { ...current }
+        delete next[apiKeyId]
+        return next
+      })
+    }, 5 * 60 * 1000)
   }
 
-  const handleAddApiKey = () => {
-    const trimmedName = supplierName.trim()
+  const getDisplayApiKey = (supplierApiKey: SupplierApiKey) => {
+    return (
+      revealedApiKeys[supplierApiKey.id] ??
+      supplierApiKey.apiKey ??
+      supplierApiKey.maskedApiKey
+    )
+  }
 
-    if (!trimmedName) {
+  const refreshApiKeys = async () => {
+    const nextApiKeys = await getSupplierApiKeys()
+    setApiKeys(nextApiKeys)
+  }
+
+  useEffect(() => {
+    const abortController = new AbortController()
+
+    async function loadApiKeys() {
+      setIsLoading(true)
+      setErrorMessage(null)
+
+      try {
+        const [nextApiKeys, nextSuppliers] = await Promise.all([
+          getSupplierApiKeys({ signal: abortController.signal }),
+          getSuppliers({ signal: abortController.signal })
+        ])
+        setApiKeys(nextApiKeys)
+        setSuppliers(nextSuppliers)
+      } catch {
+        if (abortController.signal.aborted) return
+        setErrorMessage(t('setting.apiKeys.loadFailed'))
+      } finally {
+        if (!abortController.signal.aborted) {
+          setIsLoading(false)
+        }
+      }
+    }
+
+    loadApiKeys()
+
+    return () => abortController.abort()
+  }, [t])
+
+  const handleAddApiKey = async () => {
+    if (!selectedSupplierId) {
+      return
+    }
+    const selectedSupplier = supplierById.get(selectedSupplierId)
+    if (!selectedSupplier) {
+      setErrorMessage(t('setting.apiKeys.createFailed'))
       return
     }
 
-    setApiKeys((currentApiKeys) => [
-      {
-        id: createApiKeyId(currentApiKeys.length),
-        supplierName: trimmedName,
-        apiKey,
-        createdAt
-      },
-      ...currentApiKeys
-    ])
-    setSupplierName('')
-    setApiKey(createAuthorizationKey())
+    setPendingAction({ type: 'create' })
+    setErrorMessage(null)
+
+    try {
+      const createdApiKey = await createSupplierApiKey({ supplierId: selectedSupplier.id })
+      await refreshApiKeys()
+      markApiKeyRevealed(createdApiKey.id, createdApiKey.apiKey)
+      setSelectedSupplierId('')
+      notification.success({ message: t('setting.apiKeys.created') })
+    } catch (error) {
+      setErrorMessage(getDisplayApiErrorMessage(error, t('setting.apiKeys.createFailed')))
+      notification.error({ message: t('setting.apiKeys.createFailed') })
+    } finally {
+      setPendingAction(null)
+    }
   }
 
-  const handleRegenerateKey = (apiKeyId: string) => {
-    setApiKeys((currentApiKeys) =>
-      currentApiKeys.map((supplierApiKey) =>
-        supplierApiKey.id === apiKeyId
-          ? { ...supplierApiKey, apiKey: createAuthorizationKey() }
-          : supplierApiKey
-      )
-    )
-    setCopiedApiKeyId(null)
+  const handleCreateFormSubmit = (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault()
+
+    if (!canAdd) {
+      return
+    }
+
+    handleAddApiKey()
   }
 
-  const handleDeleteApiKey = (apiKeyId: string) => {
-    setApiKeys((currentApiKeys) =>
-      currentApiKeys.filter((supplierApiKey) => supplierApiKey.id !== apiKeyId)
-    )
+  const handleRegenerateKey = async (apiKeyId: string) => {
+    setPendingAction({ type: 'rotate', id: apiKeyId })
+    setErrorMessage(null)
+
+    try {
+      const rotatedApiKey = await rotateSupplierApiKey(apiKeyId)
+      await refreshApiKeys()
+      markApiKeyRevealed(rotatedApiKey.id, rotatedApiKey.apiKey)
+      setCopiedApiKeyId(null)
+      notification.success({ message: t('setting.apiKeys.regenerated') })
+    } catch (error) {
+      setErrorMessage(getDisplayApiErrorMessage(error, t('setting.apiKeys.regenerateFailed')))
+      notification.error({ message: t('setting.apiKeys.regenerateFailed') })
+    } finally {
+      setPendingAction(null)
+    }
+  }
+
+  const handleDeleteApiKey = async (apiKeyId: string) => {
+    setPendingAction({ type: 'delete', id: apiKeyId })
+    setErrorMessage(null)
+
+    try {
+      await deleteSupplierApiKey(apiKeyId)
+      await refreshApiKeys()
+      setRevealedApiKeys((current) => {
+        const next = { ...current }
+        delete next[apiKeyId]
+        return next
+      })
+      notification.success({ message: t('setting.apiKeys.deleted') })
+    } catch (error) {
+      setErrorMessage(getDisplayApiErrorMessage(error, t('setting.apiKeys.deleteFailed')))
+      notification.error({ message: t('setting.apiKeys.deleteFailed') })
+    } finally {
+      setPendingAction(null)
+    }
   }
 
   const handleCopyKey = async (supplierApiKey: SupplierApiKey) => {
-    await navigator.clipboard.writeText(`Authorization: Bearer ${supplierApiKey.apiKey}`)
+    const visibleApiKey = getDisplayApiKey(supplierApiKey)
+
+    if (!visibleApiKey) {
+      notification.warning({ message: t('setting.apiKeys.copyUnavailable') })
+      return
+    }
+
+    await navigator.clipboard.writeText(`Authorization: Bearer ${visibleApiKey}`)
     setCopiedApiKeyId(supplierApiKey.id)
   }
 
@@ -120,108 +237,192 @@ export default function ApiKeysPage() {
           </p>
         </div>
 
-        <div className="grid gap-md xl:grid-cols-[minmax(0,0.8fr)_minmax(0,1.4fr)_auto]">
-          <label className="grid gap-sm text-base font-medium text-text-primary">
+        <form
+          className="flex flex-col gap-md xl:flex-row xl:items-end"
+          onSubmit={handleCreateFormSubmit}
+        >
+          <label className="grid flex-1 gap-sm text-base font-medium text-text-primary">
             {t('setting.apiKeys.supplierName')}
-            <Input
-              value={supplierName}
-              onChange={(event) => setSupplierName(event.target.value)}
-              placeholder={t('setting.apiKeys.supplierNamePlaceholder')}
-            />
-          </label>
-
-          <label className="grid gap-sm text-base font-medium text-text-primary">
-            {t('setting.apiKeys.apiKey')}
-            <div className="flex min-w-0 gap-sm">
-              <Input
-                value={apiKey}
-                readOnly
-                aria-label={t('setting.apiKeys.apiKey')}
-              />
-              <Button
-                type="button"
-                variant="secondary"
-                onClick={handleGenerateKey}
-              >
-                <KeyRound className="h-icon-md w-icon-md" />
-                {t('setting.apiKeys.generateKey')}
-              </Button>
-            </div>
+            <Select
+              value={selectedSupplierId}
+              onChange={(event) => setSelectedSupplierId(event.target.value)}
+              disabled={pendingAction?.type === 'create'}
+            >
+              <option value="">
+                {t('setting.apiKeys.supplierNamePlaceholder')}
+              </option>
+              {availableSuppliers.map((supplier) => (
+                <option key={supplier.id} value={supplier.id}>
+                  {supplier.name} ({supplier.code})
+                </option>
+              ))}
+            </Select>
           </label>
 
           <div className="flex items-end">
             <Button
-              type="button"
+              type="submit"
               disabled={!canAdd}
-              onClick={handleAddApiKey}
             >
               <Plus className="h-icon-md w-icon-md" />
-              {t('setting.apiKeys.addApiKey')}
+              {pendingAction?.type === 'create'
+                ? t('setting.apiKeys.creating')
+                : t('setting.apiKeys.addApiKey')}
             </Button>
           </div>
-        </div>
+        </form>
       </section>
 
-      <div className="rounded border border-border bg-bg-primary shadow">
-        <div className="grid grid-cols-[minmax(0,0.8fr)_minmax(0,1fr)_minmax(0,1.8fr)_minmax(0,0.8fr)_minmax(0,1.2fr)] gap-md border-b border-border px-lg py-sm text-base font-bold text-text-tertiary">
-          <span>{t('setting.apiKeys.columns.id')}</span>
-          <span>{t('setting.apiKeys.columns.supplierName')}</span>
-          <span>{t('setting.apiKeys.columns.apiKey')}</span>
-          <span>{t('setting.apiKeys.columns.createdAt')}</span>
-          <span>{t('setting.apiKeys.columns.actions')}</span>
-        </div>
+      {errorMessage && (
+        <Alert variant="error" className="mb-md">
+          {errorMessage}
+        </Alert>
+      )}
 
-        {apiKeys.map((supplierApiKey) => (
-          <div
-            key={supplierApiKey.id}
-            className="grid grid-cols-[minmax(0,0.8fr)_minmax(0,1fr)_minmax(0,1.8fr)_minmax(0,0.8fr)_minmax(0,1.2fr)] gap-md border-b border-border px-lg py-md last:border-b-0"
-          >
-            <span className="text-base font-light text-text-tertiary">
-              {supplierApiKey.id}
-            </span>
-            <span className="truncate text-base font-bold text-text-primary">
-              {supplierApiKey.supplierName}
-            </span>
-            <code className="truncate rounded bg-bg-secondary px-control-px-sm py-xs text-base font-medium text-text-secondary">
-              Bearer {supplierApiKey.apiKey}
-            </code>
-            <span className="text-base font-light text-text-secondary">
-              {supplierApiKey.createdAt}
-            </span>
-            <div className="flex flex-wrap gap-sm">
-              <Button
-                type="button"
-                variant="secondary"
-                size="sm"
-                onClick={() => handleCopyKey(supplierApiKey)}
-              >
-                <Copy className="h-icon-md w-icon-md" />
-                {copiedApiKeyId === supplierApiKey.id
-                  ? t('setting.apiKeys.copied')
-                  : t('setting.apiKeys.copy')}
-              </Button>
-              <Button
-                type="button"
-                variant="secondary"
-                size="sm"
-                onClick={() => handleRegenerateKey(supplierApiKey.id)}
-              >
-                <RefreshCw className="h-icon-md w-icon-md" />
-                {t('setting.apiKeys.regenerate')}
-              </Button>
-              <Button
-                type="button"
-                variant="secondary"
-                size="sm"
-                onClick={() => handleDeleteApiKey(supplierApiKey.id)}
-              >
-                <Trash2 className="h-icon-md w-icon-md" />
-                {t('common.delete')}
-              </Button>
-            </div>
-          </div>
-        ))}
+      <div className="mb-sm text-base font-medium text-text-secondary">
+        {t('setting.apiKeys.total', { count: apiKeyCount })}
       </div>
+
+      <Table className="min-w-api-key-table table-fixed">
+        <colgroup>
+          <col className="w-api-key-col-id" />
+          <col className="w-api-key-col-supplier" />
+          <col className="w-api-key-col-key" />
+          <col className="w-api-key-col-date" />
+          <col className="w-api-key-col-date" />
+          <col className="w-api-key-col-actions" />
+        </colgroup>
+        <TableHeader filtersEnabled={false}>
+          <tr>
+            <TableHead className="w-api-key-col-id" truncate>
+              {t('setting.apiKeys.columns.supplierId')}
+            </TableHead>
+            <TableHead className="w-api-key-col-supplier" truncate>
+              {t('setting.apiKeys.columns.supplierName')}
+            </TableHead>
+            <TableHead className="w-api-key-col-key" truncate>
+              {t('setting.apiKeys.columns.apiKey')}
+            </TableHead>
+            <TableHead className="w-api-key-col-date" truncate>
+              {t('setting.apiKeys.columns.createdAt')}
+            </TableHead>
+            <TableHead className="w-api-key-col-date" truncate>
+              {t('setting.apiKeys.columns.lastUsedAt')}
+            </TableHead>
+            <TableHead className="w-api-key-col-actions">
+              {t('setting.apiKeys.columns.actions')}
+            </TableHead>
+          </tr>
+        </TableHeader>
+        <TableBody>
+          {showInitialLoading && (
+            <TableStateRow colSpan={6} variant="loading">
+              {t('setting.apiKeys.loading')}
+            </TableStateRow>
+          )}
+          {visibleError && (
+            <TableStateRow colSpan={6} variant="error">
+              {t('setting.apiKeys.loadFailed')}
+            </TableStateRow>
+          )}
+          {!isLoading && !errorMessage && apiKeys.length === 0 && (
+            <TableStateRow colSpan={6} variant="empty">
+              {t('setting.apiKeys.empty')}
+            </TableStateRow>
+          )}
+          {apiKeys.map((supplierApiKey) => {
+            const isRotating =
+              pendingAction?.type === 'rotate' && pendingAction.id === supplierApiKey.id
+            const isDeleting =
+              pendingAction?.type === 'delete' && pendingAction.id === supplierApiKey.id
+            const displayKey = getDisplayApiKey(supplierApiKey)
+            const displayAuthorizationKey = `Bearer ${displayKey}`
+            const supplier = supplierApiKey.supplierId
+              ? supplierById.get(String(supplierApiKey.supplierId))
+              : suppliers.find((item) => item.name === supplierApiKey.supplierName)
+            const supplierId = supplierApiKey.supplierId ?? supplier?.id ?? '-'
+
+            return (
+              <TableRow key={supplierApiKey.id}>
+                <TableCell className="w-api-key-col-id" truncate titleText={supplierId}>
+                  {supplierId}
+                </TableCell>
+                <TableCell
+                  className="w-api-key-col-supplier"
+                  truncate
+                  titleText={supplierApiKey.supplierName}
+                >
+                  {supplierApiKey.supplierName}
+                </TableCell>
+                <TableCell
+                  className="w-api-key-col-key"
+                  truncate
+                  titleText={displayAuthorizationKey}
+                >
+                  <code
+                    className="block truncate rounded bg-bg-secondary px-control-px-sm py-xs text-base font-medium text-text-secondary"
+                    title={displayAuthorizationKey}
+                  >
+                    {displayAuthorizationKey}
+                  </code>
+                </TableCell>
+                <TableCell
+                  className="w-api-key-col-date"
+                  truncate
+                  titleText={formatDate(supplierApiKey.createdAt)}
+                >
+                  {formatDate(supplierApiKey.createdAt)}
+                </TableCell>
+                <TableCell
+                  className="w-api-key-col-date"
+                  truncate
+                  titleText={formatDate(supplierApiKey.lastUsedAt)}
+                >
+                  {formatDate(supplierApiKey.lastUsedAt)}
+                </TableCell>
+                <TableCell className="w-api-key-col-actions">
+                  <div className="flex flex-wrap gap-sm">
+                    <Button
+                      type="button"
+                      variant="secondary"
+                      size="sm"
+                      disabled={Boolean(pendingAction)}
+                      onClick={() => handleCopyKey(supplierApiKey)}
+                    >
+                      <Copy className="h-icon-md w-icon-md" />
+                      {copiedApiKeyId === supplierApiKey.id
+                        ? t('setting.apiKeys.copied')
+                        : t('setting.apiKeys.copy')}
+                    </Button>
+                    <Button
+                      type="button"
+                      variant="secondary"
+                      size="sm"
+                      disabled={Boolean(pendingAction)}
+                      onClick={() => handleRegenerateKey(supplierApiKey.id)}
+                    >
+                      <RefreshCw className="h-icon-md w-icon-md" />
+                      {isRotating
+                        ? t('setting.apiKeys.regenerating')
+                        : t('setting.apiKeys.regenerate')}
+                    </Button>
+                    <Button
+                      type="button"
+                      variant="secondary"
+                      size="sm"
+                      disabled={Boolean(pendingAction)}
+                      onClick={() => handleDeleteApiKey(supplierApiKey.id)}
+                    >
+                      <Trash2 className="h-icon-md w-icon-md" />
+                      {isDeleting ? t('setting.apiKeys.deleting') : t('common.delete')}
+                    </Button>
+                  </div>
+                </TableCell>
+              </TableRow>
+            )
+          })}
+        </TableBody>
+      </Table>
     </div>
   )
 }

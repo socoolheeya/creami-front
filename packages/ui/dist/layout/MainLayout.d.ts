@@ -10,6 +10,11 @@ export interface MainLayoutProps {
     onLocaleChange: (locale: Locale) => void;
     rightSlot?: ReactNode;
     profileHref?: string;
+    profileUser?: {
+        name: string;
+        email: string;
+        status?: string;
+    } | null;
 }
 export declare function MainLayout(props: MainLayoutProps): import("react/jsx-runtime").JSX.Element;
 //# sourceMappingURL=MainLayout.d.ts.map

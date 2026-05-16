@@ -6,12 +6,15 @@ export interface InputProps extends Omit<React.InputHTMLAttributes<HTMLInputElem
   showSearchIcon?: boolean
 }
 
-export function Input({
-  size = 'medium',
-  showSearchIcon = false,
-  className = '',
-  ...props
-}: InputProps) {
+export const Input = React.forwardRef<HTMLInputElement, InputProps>(function Input(
+  {
+    size = 'medium',
+    showSearchIcon = false,
+    className = '',
+    ...props
+  },
+  ref
+) {
   const sizeStyles = {
     large: 'h-control-lg px-control-px-lg text-base leading-none',
     medium: 'h-control-md px-control-px-md text-base leading-none',
@@ -25,6 +28,7 @@ export function Input({
     return (
       <div className="relative w-full">
         <input
+          ref={ref}
           className={`${baseStyles} pr-control-search ${className}`}
           {...props}
         />
@@ -35,8 +39,9 @@ export function Input({
 
   return (
     <input
+      ref={ref}
       className={`${baseStyles} ${className}`}
       {...props}
     />
   )
-}
+})

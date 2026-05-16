@@ -19,7 +19,6 @@ export default function PropertiesPage() {
   const {
     data,
     isLoading,
-    error,
     fetchNextPage,
     hasNextPage,
     isFetchingNextPage
@@ -89,11 +88,6 @@ export default function PropertiesPage() {
         <div className="flex items-center justify-center py-2xl">
           <div className="text-text-secondary">로딩 중...</div>
         </div>
-      ) : error ? (
-        <Card className="flex flex-col items-center justify-center border-error py-2xl text-center" hover={false}>
-          <p className="text-error">데이터를 불러오는데 실패했습니다.</p>
-          <p className="text-base text-text-secondary">{error.message}</p>
-        </Card>
       ) : properties.length === 0 ? (
         <Card className="flex flex-col items-center justify-center border-dashed py-2xl text-center" hover={false}>
           <Building2 className="h-2xl w-2xl mb-md text-text-tertiary" />

@@ -14,6 +14,24 @@ export interface DatePickerProps {
   clearable?: boolean
 }
 
+function parseDateValue(value: string) {
+  const [year, month, day] = value.split('-').map(Number)
+
+  if (!year || !month || !day) {
+    return null
+  }
+
+  return new Date(year, month - 1, day)
+}
+
+function formatDateValue(date: Date) {
+  const year = date.getFullYear()
+  const month = String(date.getMonth() + 1).padStart(2, '0')
+  const day = String(date.getDate()).padStart(2, '0')
+
+  return `${year}-${month}-${day}`
+}
+
 export function DatePicker({
   value,
   onChange,
@@ -31,7 +49,7 @@ export function DatePicker({
     return year - (year % 12)
   })
   const containerRef = useRef<HTMLDivElement>(null)
-  const selectedDate = value ? new Date(value) : null
+  const selectedDate = value ? parseDateValue(value) : null
 
   useEffect(() => {
     if (isOpen) {
@@ -58,10 +76,10 @@ export function DatePicker({
     }
   }, [isOpen])
 
-  const formatDate = (date: Date) => date.toISOString().split('T')[0]
-
   const formatDisplayDate = (dateStr: string) => {
-    const date = new Date(dateStr)
+    const date = parseDateValue(dateStr)
+    if (!date) return dateStr
+
     return date.toLocaleDateString('ko-KR', {
       year: 'numeric',
       month: 'long',
@@ -71,14 +89,14 @@ export function DatePicker({
 
   const handleDateSelect = (day: number) => {
     const newDate = new Date(currentMonth.getFullYear(), currentMonth.getMonth(), day)
-    onChange(formatDate(newDate))
+    onChange(formatDateValue(newDate))
     setIsOpen(false)
   }
 
   const handleToday = () => {
     const today = new Date()
     setCurrentMonth(today)
-    onChange(formatDate(today))
+    onChange(formatDateValue(today))
     setIsOpen(false)
   }
 

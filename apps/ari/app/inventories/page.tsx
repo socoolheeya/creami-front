@@ -1,14 +1,22 @@
 'use client'
 
 import { Package, Search, ChevronDown, ChevronUp, X, Calendar, Building2, DoorOpen } from 'lucide-react'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useTranslations } from 'next-intl'
-import { mockProperties } from '@/lib/data/mock-properties'
-import { mockRoomTypes } from '@/lib/data/mock-rooms'
-import { mockBlocks } from '@/lib/data/mock-blocks'
 import { InventoryCalendar } from './components/InventoryCalendar'
 import { InventoryGrid } from './components/InventoryGrid'
-import { Button, DatePicker, Input, SearchableSelect, ViewToggle } from '@creami/ui'
+import { Button, DatePicker, Input, SearchableSelect, ViewToggle, notification } from '@creami/ui'
+import {
+  fetchAriInventories,
+  fetchAriProperties,
+  fetchAriRooms,
+  getDisplayApiErrorMessage,
+  updateAriInventories,
+  type AriProperty,
+  type AriRoom,
+  type InventoryRow
+} from '@/lib/api/ari'
+import type { Block } from '@/lib/types/block'
 
 type ViewType = 'calendar' | 'grid'
 
@@ -23,20 +31,64 @@ export default function InventoriesPage() {
   const [showResults, setShowResults] = useState(false)
   const [isCollapsed, setIsCollapsed] = useState(false)
   const [viewType, setViewType] = useState<ViewType>('grid')
+  const [properties, setProperties] = useState<AriProperty[]>([])
+  const [availableRooms, setAvailableRooms] = useState<AriRoom[]>([])
+  const [inventoryRows, setInventoryRows] = useState<InventoryRow[]>([])
+  const [blocks, setBlocks] = useState<Block[]>([])
+  const [errorMessage, setErrorMessage] = useState('')
+  const [isSearching, setIsSearching] = useState(false)
 
   // Filter properties by search query (ID or name)
   const filteredProperties = searchQuery
-    ? mockProperties.filter(p =>
+    ? properties.filter(p =>
         p.id.toLowerCase().includes(searchQuery.toLowerCase()) ||
         p.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
         p.code.toLowerCase().includes(searchQuery.toLowerCase())
       )
-    : mockProperties
+    : properties
 
-  // Get available room types for selected property
-  const availableRooms = selectedPropertyId
-    ? mockRoomTypes.filter(room => room.propertyId === selectedPropertyId)
-    : []
+  useEffect(() => {
+    let ignore = false
+
+    async function loadProperties() {
+      try {
+        const nextProperties = await fetchAriProperties()
+        if (!ignore) setProperties(nextProperties)
+      } catch (error) {
+        if (!ignore) setErrorMessage(getDisplayApiErrorMessage(error, t('ari.inventories.emptyDescription')))
+      }
+    }
+
+    loadProperties()
+
+    return () => {
+      ignore = true
+    }
+  }, [t])
+
+  useEffect(() => {
+    let ignore = false
+
+    async function loadRooms() {
+      if (!selectedPropertyId) {
+        setAvailableRooms([])
+        return
+      }
+
+      try {
+        const nextRooms = await fetchAriRooms(selectedPropertyId)
+        if (!ignore) setAvailableRooms(nextRooms)
+      } catch (error) {
+        if (!ignore) setErrorMessage(getDisplayApiErrorMessage(error, t('ari.inventories.emptyDescription')))
+      }
+    }
+
+    loadRooms()
+
+    return () => {
+      ignore = true
+    }
+  }, [selectedPropertyId, t])
 
   const roomOptions = availableRooms
     .filter(room => !selectedRoomIds.includes(room.id))
@@ -47,7 +99,7 @@ export default function InventoriesPage() {
     }))
 
   // Get selected room names
-  const selectedRooms = mockRoomTypes.filter(room => selectedRoomIds.includes(room.id))
+  const selectedRooms = availableRooms.filter(room => selectedRoomIds.includes(room.id))
 
   // Quick date range selection
   const handleQuickDateSelect = (days: number) => {
@@ -64,7 +116,7 @@ export default function InventoriesPage() {
     setSelectedPropertyId(propertyId)
     setSelectedRoomIds([]) // Reset room selection when property changes
     // Update search query with selected property name
-    const property = mockProperties.find(p => p.id === propertyId)
+    const property = properties.find(p => p.id === propertyId)
     if (property) {
       setSearchQuery(property.name)
     }
@@ -80,10 +132,46 @@ export default function InventoriesPage() {
     setSelectedRoomIds(selectedRoomIds.filter(id => id !== roomId))
   }
 
-  const handleSearch = () => {
+  const handleSearch = async () => {
     if (selectedPropertyId && selectedRoomIds.length > 0 && startDate && endDate) {
-      setShowResults(true)
-      setIsCollapsed(true)
+      try {
+        setIsSearching(true)
+        setErrorMessage('')
+        const matrix = await fetchAriInventories({
+          propertyId: selectedPropertyId,
+          roomIds: selectedRoomIds,
+          startDate,
+          endDate
+        })
+        setInventoryRows(matrix.rows)
+        setBlocks(matrix.blocks as Block[])
+        setShowResults(true)
+        setIsCollapsed(true)
+      } catch (error) {
+        setErrorMessage(getDisplayApiErrorMessage(error, t('ari.inventories.emptyDescription')))
+      } finally {
+        setIsSearching(false)
+      }
+    }
+  }
+
+  const handleSaveInventoryUpdates = async (updates: { rowId: string; date: string; available: number }[]) => {
+    try {
+      await updateAriInventories(
+        selectedPropertyId,
+        updates.map(update => ({
+          roomId: update.rowId,
+          date: update.date,
+          available: update.available
+        }))
+      )
+    } catch (error) {
+      notification.error({
+        message: getDisplayApiErrorMessage(error, t('ari.inventories.emptyDescription')),
+        placement: 'top-right',
+        direction: 'right'
+      })
+      throw error
     }
   }
 
@@ -96,21 +184,16 @@ export default function InventoriesPage() {
     setSelectedQuickRange(null)
     setShowResults(false)
     setIsCollapsed(false)
+    setInventoryRows([])
+    setBlocks([])
+    setErrorMessage('')
   }
 
   const toggleCollapse = () => {
     setIsCollapsed(!isCollapsed)
   }
 
-  // Filter blocks based on selected criteria
-  const filteredBlocks = showResults
-    ? mockBlocks.filter(block => {
-        // In real implementation, filter by property and date range
-        return true
-      })
-    : []
-
-  const selectedProperty = mockProperties.find(p => p.id === selectedPropertyId)
+  const selectedProperty = properties.find(p => p.id === selectedPropertyId)
 
   return (
     <div className="flex flex-col gap-xl">
@@ -123,6 +206,19 @@ export default function InventoriesPage() {
           </h1>
         </div>
       </div>
+
+      {errorMessage && (
+        <div
+          className="rounded px-md py-sm text-base"
+          style={{
+            backgroundColor: 'var(--error-bg)',
+            color: 'var(--error)',
+            border: '1px solid var(--error)'
+          }}
+        >
+          {errorMessage}
+        </div>
+      )}
 
       {/* Selection Panel */}
       <div
@@ -362,11 +458,11 @@ export default function InventoriesPage() {
             <div className="flex gap-md pt-sm">
               <Button
                 onClick={handleSearch}
-                disabled={!selectedPropertyId || selectedRoomIds.length === 0 || !startDate || !endDate}
+                disabled={isSearching || !selectedPropertyId || selectedRoomIds.length === 0 || !startDate || !endDate}
                 variant="primary"
               >
                 <Search className="w-lg h-lg" />
-                {t('ari.common.search')}
+                {isSearching ? '조회 중' : t('ari.common.search')}
               </Button>
 
               {showResults && (
@@ -400,10 +496,12 @@ export default function InventoriesPage() {
               startDate={startDate}
               endDate={endDate}
               selectedRooms={selectedRooms}
+              initialRows={inventoryRows}
+              onSaveInventories={handleSaveInventoryUpdates}
             />
           ) : (
             <InventoryCalendar
-              blocks={filteredBlocks}
+              blocks={blocks}
               startDate={startDate}
               endDate={endDate}
               propertyName={selectedProperty.name}

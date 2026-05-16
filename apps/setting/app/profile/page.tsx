@@ -4,23 +4,73 @@ import { ChangeEvent, useEffect, useRef, useState } from 'react'
 import Image from 'next/image'
 import { useLocale, useTranslations } from 'next-intl'
 import { Building2, Camera, LockKeyhole, Mail, Moon, Phone, Save, Sun, UserCog } from 'lucide-react'
-import { Button, Input, notification, writeThemeCookie, type CreamiTheme } from '@creami/ui'
-
-const profile = {
-  name: '이원희',
-  role: 'Owner',
-  department: 'Platform',
-  organization: 'Creami',
-  employeeId: 'USR-001',
-  email: 'wonhee.lee@creami.io',
-  phone: '010-1234-5678',
-  updatedAt: '2026-05-10 14:30'
-}
+import { Button, Input, notifySaveSuccess, writeThemeCookie, type CreamiTheme } from '@creami/ui'
+import { getCurrentAuthMember, type AuthMember } from '../../lib/api/iam'
 
 type PasswordMessage = {
   type: 'success' | 'error'
   key: string
 } | null
+
+type ProfileState = {
+  name: string
+  role: string
+  department: string
+  organization: string
+  employeeId: string
+  email: string
+  phone: string
+  updatedAt: string
+}
+
+const defaultProfile: ProfileState = {
+  name: '-',
+  role: '-',
+  department: 'IAM',
+  organization: 'Creami',
+  employeeId: '-',
+  email: '',
+  phone: '',
+  updatedAt: '-'
+}
+
+function readStoredAuthMember(): AuthMember | null {
+  if (typeof window === 'undefined') {
+    return null
+  }
+
+  const storedMember = window.localStorage.getItem('CREAMI_AUTH_MEMBER')
+  if (!storedMember) {
+    return null
+  }
+
+  try {
+    return JSON.parse(storedMember) as AuthMember
+  } catch {
+    window.localStorage.removeItem('CREAMI_AUTH_MEMBER')
+    return null
+  }
+}
+
+function toProfileState(member: AuthMember | null, updatedAt: string): ProfileState {
+  if (!member) {
+    return {
+      ...defaultProfile,
+      updatedAt
+    }
+  }
+
+  return {
+    name: member.name,
+    role: member.status,
+    department: 'IAM',
+    organization: 'Creami',
+    employeeId: member.memberId,
+    email: member.email,
+    phone: '',
+    updatedAt
+  }
+}
 
 function formatUpdatedAt(date: Date, locale: string) {
   return new Intl.DateTimeFormat(locale, {
@@ -40,15 +90,37 @@ function isPasswordPolicyValid(password: string) {
 export default function ProfilePage() {
   const t = useTranslations()
   const locale = useLocale()
-  const [email, setEmail] = useState(profile.email)
-  const [phone, setPhone] = useState(profile.phone)
+  const [profile, setProfile] = useState<ProfileState>(defaultProfile)
+  const [email, setEmail] = useState(defaultProfile.email)
+  const [phone, setPhone] = useState(defaultProfile.phone)
   const [currentPassword, setCurrentPassword] = useState('')
   const [newPassword, setNewPassword] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
   const [passwordMessage, setPasswordMessage] = useState<PasswordMessage>(null)
   const [avatarUrl, setAvatarUrl] = useState<string | null>(null)
-  const [updatedAt, setUpdatedAt] = useState(profile.updatedAt)
+  const [updatedAt, setUpdatedAt] = useState(defaultProfile.updatedAt)
   const fileInputRef = useRef<HTMLInputElement>(null)
+
+  useEffect(() => {
+    const storedMember = readStoredAuthMember()
+    const nextUpdatedAt = formatUpdatedAt(new Date(), locale)
+
+    setProfile(toProfileState(storedMember, nextUpdatedAt))
+    setEmail(storedMember?.email ?? '')
+    setUpdatedAt(nextUpdatedAt)
+
+    getCurrentAuthMember()
+      .then((member) => {
+        window.localStorage.setItem('CREAMI_AUTH_MEMBER', JSON.stringify(member))
+        const refreshedUpdatedAt = formatUpdatedAt(new Date(), locale)
+        setProfile(toProfileState(member, refreshedUpdatedAt))
+        setEmail(member.email)
+        setUpdatedAt(refreshedUpdatedAt)
+      })
+      .catch(() => {
+        setProfile(toProfileState(storedMember, nextUpdatedAt))
+      })
+  }, [locale])
 
   useEffect(() => {
     return () => {
@@ -108,11 +180,7 @@ export default function ProfilePage() {
     }
 
     setUpdatedAt(formatUpdatedAt(new Date(), locale))
-    notification.success({
-      message: '수정이 완료되었습니다.',
-      placement: 'top-right',
-      direction: 'right'
-    })
+    notifySaveSuccess('수정이 완료되었습니다.')
   }
 
   const handleThemeChange = (nextTheme: CreamiTheme) => {

@@ -55,6 +55,7 @@ export type {
   NotificationPlacement,
   NotificationType
 } from './Notification'
+export { notifySaveError, notifySaveSuccess } from './saveNotifications'
 
 export { Card } from './Card'
 export type { CardProps } from './Card'
@@ -67,7 +68,8 @@ export {
   TableCell,
   TableHead,
   TableFilterRow,
-  TableFilterCell
+  TableFilterCell,
+  TableStateRow
 } from './Table'
 export type {
   TableProps,
@@ -77,7 +79,8 @@ export type {
   TableCellProps,
   TableHeadProps,
   TableFilterRowProps,
-  TableFilterCellProps
+  TableFilterCellProps,
+  TableStateRowProps
 } from './Table'
 
 export { Pagination } from './Pagination'

@@ -14,13 +14,14 @@ import {
   Star,
   Trash2
 } from 'lucide-react'
-import { Button, Card, Input, Select, TimeRangePicker, notification } from '@creami/ui'
+import { Button, Card, Input, Select, TimeRangePicker, notifySaveError, notifySaveSuccess } from '@creami/ui'
 import {
   useProperties,
   usePropertyMappings,
   useSavePropertyMappings
 } from '@/hooks/useProperties'
 import { useParentProperty, useSaveParentProperty } from '@/hooks/useParentProperties'
+import { ErrorTemplate } from '@/components/common/ErrorTemplate'
 import type { Property } from '@/lib/types/property'
 import {
   getAddressDetail,
@@ -307,8 +308,7 @@ export default function MasterPropertyDetailPage() {
   const propertyId = params.id ?? ''
   const {
     data: property,
-    isLoading,
-    isError
+    isLoading
   } = useParentProperty(propertyId)
   const saveParentProperty = useSaveParentProperty()
   const savePropertyMappings = useSavePropertyMappings()
@@ -345,8 +345,7 @@ export default function MasterPropertyDetailPage() {
   }, [searchQuery])
   const {
     data: searchedSupplierProperties = [],
-    isLoading: isSupplierSearchLoading,
-    isError: isSupplierSearchError
+    isLoading: isSupplierSearchLoading
   } = useProperties(supplierSearchCondition, searchQuery.trim().length > 0)
   const {
     data: currentMappedSupplierProperties = []
@@ -442,17 +441,9 @@ export default function MasterPropertyDetailPage() {
 
       setFormEdits(createForm(savedProperty))
       setMappedSupplierPropertyEdits(savedMappedProperties)
-      notification.success({
-        message: '저장이 완료되었습니다.',
-        placement: 'top-right',
-        direction: 'right'
-      })
+      notifySaveSuccess('저장이 완료되었습니다.')
     } catch {
-      notification.error({
-        message: '저장에 실패했습니다.',
-        placement: 'top-right',
-        direction: 'right'
-      })
+      notifySaveError('저장에 실패했습니다.')
     }
   }
 
@@ -475,22 +466,13 @@ export default function MasterPropertyDetailPage() {
     )
   }
 
-  if (isError || !property) {
+  if (!property) {
     return (
-      <div>
-        <Link
-          href="/master-properties"
-          className="mb-lg inline-flex items-center gap-sm text-base font-medium text-text-secondary no-underline hover:text-primary"
-        >
-          <ArrowLeft className="h-icon-md w-icon-md" />
-          대표숙소 목록으로
-        </Link>
-        <Card className="p-lg" hover={false}>
-          <h1 className="text-xl font-bold text-text-primary">
-            대표숙소를 찾을 수 없습니다
-          </h1>
-        </Card>
-      </div>
+      <ErrorTemplate
+        title="대표숙소를 찾을 수 없습니다"
+        backHref="/master-properties"
+        backLabel="대표숙소 목록으로"
+      />
     )
   }
 
@@ -847,13 +829,7 @@ export default function MasterPropertyDetailPage() {
                   </div>
                 )}
 
-                {isSupplierSearchError && (
-                  <div className="rounded border border-border bg-bg-primary p-md text-center text-base font-light text-text-tertiary">
-                    숙소 검색에 실패했습니다.
-                  </div>
-                )}
-
-                {!isSupplierSearchLoading && !isSupplierSearchError && filteredSupplierProperties.length === 0 && (
+                {!isSupplierSearchLoading && filteredSupplierProperties.length === 0 && (
                   <div className="rounded border border-border bg-bg-primary p-md text-center text-base font-light text-text-tertiary">
                     검색 결과가 없습니다.
                   </div>

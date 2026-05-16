@@ -5,12 +5,15 @@ export interface SelectProps extends Omit<React.SelectHTMLAttributes<HTMLSelectE
   children: React.ReactNode
 }
 
-export function Select({
-  size = 'medium',
-  className = '',
-  children,
-  ...props
-}: SelectProps) {
+export const Select = React.forwardRef<HTMLSelectElement, SelectProps>(function Select(
+  {
+    size = 'medium',
+    className = '',
+    children,
+    ...props
+  },
+  ref
+) {
   const sizeStyles = {
     large: 'h-control-lg px-control-px-lg text-base leading-none',
     medium: 'h-control-md px-control-px-md text-base leading-none',
@@ -22,10 +25,11 @@ export function Select({
 
   return (
     <select
+      ref={ref}
       className={`${baseStyles} ${className}`}
       {...props}
     >
       {children}
     </select>
   )
-}
+})

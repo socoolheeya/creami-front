@@ -1,13 +1,14 @@
 'use client'
 
-import { CreditCard, FileSliders, Handshake, KeyRound, ShieldCheck, UserCog, Users } from 'lucide-react'
+import { CreditCard, FileSliders, Handshake, KeyRound, ShieldCheck, UserCog, Users, UsersRound } from 'lucide-react'
+import { useEffect, useState } from 'react'
 import { useTranslations } from 'next-intl'
-import { usePathname } from 'next/navigation'
 import { Sidebar as SidebarComponent, SidebarMenu, SidebarMenuItem, useSidebar } from '@creami/ui'
 
 const menuItems = [
   { icon: UserCog, labelKey: 'nav.profile', href: '/profile' },
   { icon: Users, labelKey: 'nav.users', href: '/users' },
+  { icon: UsersRound, labelKey: 'nav.userGroups', href: '/user-groups' },
   { icon: Handshake, labelKey: 'nav.suppliers', href: '/suppliers' },
   { icon: KeyRound, labelKey: 'nav.apiKeys', href: '/suppliers/api-keys' },
   { icon: ShieldCheck, labelKey: 'nav.permissions', href: '/permissions' },
@@ -17,15 +18,19 @@ const menuItems = [
 
 export function Sidebar() {
   const { isCollapsed } = useSidebar()
-  const pathname = usePathname()
+  const [resolvedPathname, setResolvedPathname] = useState('')
   const t = useTranslations()
+
+  useEffect(() => {
+    setResolvedPathname(window.location.pathname)
+  }, [])
 
   const getIsActive = (href: string) => {
     if (href === '/permissions' || href === '/suppliers') {
-      return pathname === href
+      return resolvedPathname === href
     }
 
-    return pathname.startsWith(href)
+    return resolvedPathname.startsWith(href)
   }
 
   return (

@@ -4,6 +4,7 @@ import { useState, useRef, useEffect, useMemo } from 'react'
 import { ChevronLeft, ChevronRight, Edit2, Copy, Save, X, CalendarRange, Calendar as CalendarIcon } from 'lucide-react'
 import { DatePicker, notification } from '@creami/ui'
 import { useLocale, useTranslations } from 'next-intl'
+import type { InventoryRow } from '@/lib/api/ari'
 
 interface RoomInventory {
   roomId: string
@@ -22,6 +23,8 @@ interface InventoryGridProps {
   startDate: string
   endDate: string
   selectedRooms: { id: string; name: string }[]
+  initialRows: InventoryRow[]
+  onSaveInventories: (updates: { rowId: string; date: string; available: number }[]) => Promise<void>
 }
 
 interface SelectedCell {
@@ -33,7 +36,7 @@ type ViewMode = 'week' | 'month' | 'all'
 
 const WEEKDAY_KEYS = ['sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat'] as const
 
-export function InventoryGrid({ startDate, endDate, selectedRooms }: InventoryGridProps) {
+export function InventoryGrid({ startDate, endDate, selectedRooms, initialRows, onSaveInventories }: InventoryGridProps) {
   const t = useTranslations()
   const locale = useLocale()
   const [viewMode, setViewMode] = useState<ViewMode>('week')
@@ -58,35 +61,46 @@ export function InventoryGrid({ startDate, endDate, selectedRooms }: InventoryGr
   const scrollContainerRef = useRef<HTMLDivElement>(null)
   const autoScrollIntervalRef = useRef<number | null>(null)
 
-  // Initialize inventory data
   useEffect(() => {
     const data: Record<string, RoomInventory> = {}
 
-    selectedRooms.forEach(room => {
-      const dates: Record<string, DayInventory> = {}
-      const start = new Date(startDate)
-      const end = new Date(endDate)
-
-      for (let d = new Date(start); d <= end; d.setDate(d.getDate() + 1)) {
-        const dateStr = d.toISOString().split('T')[0]
-        dates[dateStr] = {
-          date: dateStr,
-          total: 10, // Mock data
-          available: Math.floor(Math.random() * 10),
-          booked: 0
-        }
-        dates[dateStr].booked = dates[dateStr].total - dates[dateStr].available
-      }
-
-      data[room.id] = {
-        roomId: room.id,
-        roomName: room.name,
-        dates
+    initialRows.forEach(row => {
+      data[row.id] = {
+        roomId: row.id,
+        roomName: row.name,
+        dates: row.dates
       }
     })
 
     setInventoryData(data)
-  }, [selectedRooms, startDate, endDate])
+  }, [initialRows])
+
+  const applyInventoryUpdates = async (updates: { rowId: string; date: string; available: number }[]) => {
+    if (updates.length === 0) return
+
+    await onSaveInventories(updates)
+
+    setInventoryData(prev => {
+      const updated = { ...prev }
+      updates.forEach(update => {
+        if (updated[update.rowId]?.dates[update.date]) {
+          const total = updated[update.rowId].dates[update.date].total
+          updated[update.rowId] = {
+            ...updated[update.rowId],
+            dates: {
+              ...updated[update.rowId].dates,
+              [update.date]: {
+                ...updated[update.rowId].dates[update.date],
+                available: update.available,
+                booked: total - update.available
+              }
+            }
+          }
+        }
+      })
+      return updated
+    })
+  }
 
   // Generate dates based on view mode
   const getDatesForView = () => {
@@ -229,52 +243,21 @@ export function InventoryGrid({ startDate, endDate, selectedRooms }: InventoryGr
     setEditValue(current?.available.toString() || '')
   }
 
-  const handleSaveEdit = () => {
+  const handleSaveEdit = async () => {
     if (editingCell) {
       const value = parseInt(editValue)
       if (!isNaN(value)) {
-        setInventoryData(prev => ({
-          ...prev,
-          [editingCell.roomId]: {
-            ...prev[editingCell.roomId],
-            dates: {
-              ...prev[editingCell.roomId].dates,
-              [editingCell.date]: {
-                ...prev[editingCell.roomId].dates[editingCell.date],
-                available: value,
-                booked: prev[editingCell.roomId].dates[editingCell.date].total - value
-              }
-            }
-          }
-        }))
+        await applyInventoryUpdates([{ rowId: editingCell.roomId, date: editingCell.date, available: value }])
       }
     }
     setEditingCell(null)
     setEditValue('')
   }
 
-  const handleBulkEdit = () => {
+  const handleBulkEdit = async () => {
     const value = parseInt(bulkEditValue)
     if (!isNaN(value) && selectedCells.length > 0) {
-      setInventoryData(prev => {
-        const updated = { ...prev }
-        selectedCells.forEach(cell => {
-          if (updated[cell.roomId]?.dates[cell.date]) {
-            updated[cell.roomId] = {
-              ...updated[cell.roomId],
-              dates: {
-                ...updated[cell.roomId].dates,
-                [cell.date]: {
-                  ...updated[cell.roomId].dates[cell.date],
-                  available: value,
-                  booked: updated[cell.roomId].dates[cell.date].total - value
-                }
-              }
-            }
-          }
-        })
-        return updated
-      })
+      await applyInventoryUpdates(selectedCells.map(cell => ({ rowId: cell.roomId, date: cell.date, available: value })))
       setShowBulkEdit(false)
       setBulkEditValue('')
       setSelectedCells([])
@@ -286,31 +269,13 @@ export function InventoryGrid({ startDate, endDate, selectedRooms }: InventoryGr
     }
   }
 
-  const handleCopyDown = () => {
+  const handleCopyDown = async () => {
     if (selectedCells.length > 0) {
       const firstCell = selectedCells[0]
       const firstValue = inventoryData[firstCell.roomId]?.dates[firstCell.date]?.available
 
       if (firstValue !== undefined) {
-        setInventoryData(prev => {
-          const updated = { ...prev }
-          selectedCells.forEach(cell => {
-            if (updated[cell.roomId]?.dates[cell.date]) {
-              updated[cell.roomId] = {
-                ...updated[cell.roomId],
-                dates: {
-                  ...updated[cell.roomId].dates,
-                  [cell.date]: {
-                    ...updated[cell.roomId].dates[cell.date],
-                    available: firstValue,
-                    booked: updated[cell.roomId].dates[cell.date].total - firstValue
-                  }
-                }
-              }
-            }
-          })
-          return updated
-        })
+        await applyInventoryUpdates(selectedCells.map(cell => ({ rowId: cell.roomId, date: cell.date, available: firstValue })))
         setSelectedCells([])
       }
     }
@@ -391,36 +356,24 @@ export function InventoryGrid({ startDate, endDate, selectedRooms }: InventoryGr
     }))
   }, [bulkRegisterValues, bulkRegisterWeekdays, selectedRooms])
 
-  const handleBulkRegister = () => {
+  const handleBulkRegister = async () => {
     if (!bulkRegisterStart || !bulkRegisterEnd || !hasBulkRegisterValue()) return
 
-    setInventoryData(prev => {
-      const updated = { ...prev }
-      const start = new Date(bulkRegisterStart)
-      const end = new Date(bulkRegisterEnd)
+    const updates: { rowId: string; date: string; available: number }[] = []
+    const start = new Date(bulkRegisterStart)
+    const end = new Date(bulkRegisterEnd)
 
-      selectedRooms.forEach(room => {
-        for (let d = new Date(start); d <= end; d.setDate(d.getDate() + 1)) {
-          const dateStr = d.toISOString().split('T')[0]
-          const value = parseInt(bulkRegisterValues[d.getDay()] ?? '')
-          if (bulkRegisterWeekdays.includes(d.getDay()) && !isNaN(value) && updated[room.id]?.dates[dateStr]) {
-            updated[room.id] = {
-              ...updated[room.id],
-              dates: {
-                ...updated[room.id].dates,
-                [dateStr]: {
-                  ...updated[room.id].dates[dateStr],
-                  available: value,
-                  booked: updated[room.id].dates[dateStr].total - value
-                }
-              }
-            }
-          }
+    selectedRooms.forEach(room => {
+      for (let d = new Date(start); d <= end; d.setDate(d.getDate() + 1)) {
+        const dateStr = d.toISOString().split('T')[0]
+        const value = parseInt(bulkRegisterValues[d.getDay()] ?? '')
+        if (bulkRegisterWeekdays.includes(d.getDay()) && !isNaN(value) && inventoryData[room.id]?.dates[dateStr]) {
+          updates.push({ rowId: room.id, date: dateStr, available: value })
         }
-      })
-
-      return updated
+      }
     })
+
+    await applyInventoryUpdates(updates)
 
     setShowBulkRegister(false)
     setBulkRegisterStart('')

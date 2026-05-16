@@ -94,6 +94,25 @@ import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from '@
 **TableCell/TableHead Props:**
 - `align`: 'left' | 'center' | 'right' - 텍스트 정렬
 
+### Pagination
+요금제관리 화면에서 사용하는 `variant="simple"` 가운데 정렬 번호형 페이지네이션이 테이블 목록 표준입니다.
+목록/테이블 화면은 별도 사유가 없으면 같은 `variant="simple"` 패턴을 사용합니다.
+
+```tsx
+import { Pagination } from '@creami/ui'
+
+<Pagination
+  variant="simple"
+  currentPage={pagination.currentPage}
+  totalPages={pagination.totalPages}
+  totalElements={pagination.totalElements}
+  pageSize={pagination.pageSize}
+  onPageChange={handlePageChange}
+  onPageSizeChange={handlePageSizeChange}
+  className="mt-md"
+/>
+```
+
 ### Sidebar 컴포넌트 그룹
 사이드바 메뉴 컴포넌트들
 

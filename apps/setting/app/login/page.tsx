@@ -1,10 +1,12 @@
 'use client'
 
-import { FormEvent } from 'react'
-import { Button, Input } from '@creami/ui'
-import { LogIn, Mail } from 'lucide-react'
+import { FormEvent, useState } from 'react'
+import { Alert, Button, Input, notifySaveError, notifySaveSuccess } from '@creami/ui'
+import { Lock, LogIn, Mail } from 'lucide-react'
 import { useTranslations } from 'next-intl'
 import { useRouter } from 'next/navigation'
+import { getDisplayApiErrorMessage } from '../../lib/api/errors'
+import { login } from '../../lib/api/iam'
 
 const socialProviders = [
   {
@@ -36,10 +38,30 @@ const socialProviders = [
 export default function LoginPage() {
   const t = useTranslations()
   const router = useRouter()
+  const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
+  const [isSubmitting, setIsSubmitting] = useState(false)
+  const [errorMessage, setErrorMessage] = useState<string | null>(null)
 
-  const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
-    router.push('/users')
+    setIsSubmitting(true)
+    setErrorMessage(null)
+
+    try {
+      const response = await login(email, password)
+      window.localStorage.setItem('CREAMI_AUTH_TOKEN', response.accessToken)
+      window.localStorage.setItem('CREAMI_AUTH_MEMBER', JSON.stringify(response.member))
+      document.cookie = `CREAMI_AUTH_TOKEN=${response.accessToken}; path=/; max-age=28800; SameSite=Lax`
+      notifySaveSuccess(t('setting.login.success'))
+      router.push('/users')
+    } catch (error) {
+      const nextErrorMessage = getDisplayApiErrorMessage(error, t('setting.login.failed'))
+      setErrorMessage(nextErrorMessage)
+      notifySaveError(nextErrorMessage)
+    } finally {
+      setIsSubmitting(false)
+    }
   }
 
   return (
@@ -57,19 +79,42 @@ export default function LoginPage() {
           </h1>
         </div>
 
+        {errorMessage && (
+          <Alert className="mb-md" variant="error">
+            {errorMessage}
+          </Alert>
+        )}
+
         <form className="grid gap-md" onSubmit={handleSubmit}>
           <label className="grid gap-sm text-base font-medium text-text-primary">
             {t('setting.login.email')}
             <Input
               type="email"
+              value={email}
+              onChange={(event) => setEmail(event.target.value)}
               required
               placeholder={t('setting.login.emailPlaceholder')}
+              autoComplete="username"
+              disabled={isSubmitting}
             />
           </label>
 
-          <Button type="submit" fullWidth>
+          <label className="grid gap-sm text-base font-medium text-text-primary">
+            {t('setting.login.password')}
+            <Input
+              type="password"
+              value={password}
+              onChange={(event) => setPassword(event.target.value)}
+              required
+              placeholder={t('setting.login.passwordPlaceholder')}
+              autoComplete="current-password"
+              disabled={isSubmitting}
+            />
+          </label>
+
+          <Button type="submit" fullWidth disabled={isSubmitting}>
             <Mail className="h-icon-md w-icon-md" />
-            {t('setting.login.emailLogin')}
+            {isSubmitting ? t('setting.login.loggingIn') : t('setting.login.emailLogin')}
           </Button>
         </form>
 
@@ -88,7 +133,7 @@ export default function LoginPage() {
               type="button"
               variant="ghost"
               fullWidth
-              onClick={() => router.push('/users')}
+              disabled
               style={{
                 backgroundColor: provider.background,
                 border: `1px solid ${provider.border}`,
@@ -105,6 +150,11 @@ export default function LoginPage() {
             </Button>
           ))}
         </div>
+
+        <p className="mt-lg flex items-center justify-center gap-xs text-base font-light text-text-tertiary">
+          <Lock className="h-icon-md w-icon-md" />
+          {t('setting.login.localAccountGuide')}
+        </p>
       </section>
     </main>
   )

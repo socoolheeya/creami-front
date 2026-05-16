@@ -1,7 +1,10 @@
+import { API_UNAVAILABLE_ERROR } from './errors'
+import { readAuthToken, redirectToLoginOnUnauthorized } from './authToken'
+
 const IAM_API_BASE_URL =
   process.env.NEXT_PUBLIC_IAM_API_URL ||
   process.env.NEXT_PUBLIC_API_URL ||
-  'http://localhost:8080'
+  'http://localhost:9010'
 
 export type MemberStatus = 'ACTIVE' | 'PENDING' | 'INACTIVE' | 'SUSPENDED'
 export type MemberUiStatus = 'active' | 'inactive' | 'invited'
@@ -37,6 +40,19 @@ export type MemberListResponse = {
   hasPrevious: boolean
 }
 
+export type MemberSearchCondition = {
+  memberId?: string
+  email?: string
+  name?: string
+  phoneNumber?: string
+  roleName?: string
+  status?: MemberStatus
+  isLocked?: boolean
+  page?: number
+  size?: number
+  sort?: string
+}
+
 export type MemberUpdateRequest = {
   name?: string
   phoneNumber?: string | null
@@ -68,13 +84,26 @@ function normalizeMember(rawMember: RawMember): Member {
 }
 
 async function request<T>(endpoint: string, init?: RequestInit): Promise<T> {
-  const response = await fetch(`${IAM_API_BASE_URL}${endpoint}`, {
-    ...init,
-    headers: {
-      'Content-Type': 'application/json',
-      ...init?.headers
-    }
-  })
+  let response: Response
+
+  try {
+    const token = readAuthToken()
+
+    response = await fetch(`${IAM_API_BASE_URL}${endpoint}`, {
+      ...init,
+      headers: {
+        'Content-Type': 'application/json',
+        ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        ...init?.headers
+      }
+    })
+  } catch {
+    throw new Error(API_UNAVAILABLE_ERROR)
+  }
+
+  if (response.status === 401) {
+    redirectToLoginOnUnauthorized()
+  }
 
   if (!response.ok) {
     const errorText = await response.text()
@@ -86,6 +115,11 @@ async function request<T>(endpoint: string, init?: RequestInit): Promise<T> {
   }
 
   return response.json() as Promise<T>
+}
+
+function appendSearchParam(searchParams: URLSearchParams, name: string, value: unknown) {
+  if (value === undefined || value === null || value === '') return
+  searchParams.set(name, String(value))
 }
 
 export function toMemberUiStatus(status: MemberStatus): MemberUiStatus {
@@ -109,8 +143,28 @@ export function formatMemberDate(value?: string | null) {
   return value.slice(0, 16).replace('T', ' ')
 }
 
-export async function getMembers(): Promise<MemberListResponse> {
-  const response = await request<RawMemberListResponse>('/api/v1/members')
+export async function getMembers(
+  condition: MemberSearchCondition = {},
+  init?: RequestInit
+): Promise<MemberListResponse> {
+  const searchParams = new URLSearchParams()
+
+  appendSearchParam(searchParams, 'memberId', condition.memberId?.trim())
+  appendSearchParam(searchParams, 'email', condition.email?.trim())
+  appendSearchParam(searchParams, 'name', condition.name?.trim())
+  appendSearchParam(searchParams, 'phoneNumber', condition.phoneNumber?.trim())
+  appendSearchParam(searchParams, 'roleName', condition.roleName?.trim())
+  appendSearchParam(searchParams, 'status', condition.status)
+  appendSearchParam(searchParams, 'isLocked', condition.isLocked)
+  appendSearchParam(searchParams, 'page', condition.page ?? 0)
+  appendSearchParam(searchParams, 'size', condition.size ?? 20)
+  appendSearchParam(searchParams, 'sort', condition.sort ?? 'createdAt,desc')
+
+  const queryString = searchParams.toString()
+  const response = await request<RawMemberListResponse>(
+    `/api/v1/members${queryString ? `?${queryString}` : ''}`,
+    init
+  )
 
   return {
     ...response,

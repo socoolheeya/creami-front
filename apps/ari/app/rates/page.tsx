@@ -1,67 +1,24 @@
 'use client'
 
 import { DollarSign, Search, ChevronDown, ChevronUp, X, Building2, Bed, Package2 } from 'lucide-react'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useTranslations } from 'next-intl'
-import { mockProperties } from '@/lib/data/mock-properties'
-import { mockRoomTypes } from '@/lib/data/mock-rooms'
-import { mockPackages } from '@/lib/data/mock-packages'
 import { RateGrid } from './components/RateGrid'
-import { Button, DatePicker, Input, SearchableSelect } from '@creami/ui'
+import { Button, DatePicker, Input, SearchableSelect, notification } from '@creami/ui'
+import {
+  fetchAriPackages,
+  fetchAriProperties,
+  fetchAriRates,
+  fetchAriRooms,
+  getDisplayApiErrorMessage,
+  updateAriRates,
+  type AriPackage,
+  type AriProperty,
+  type AriRoom,
+  type RateRow
+} from '@/lib/api/ari'
 
 type CriteriaType = 'package' | 'room'
-type RateType = 'net_rate' | 'sell_rate_no_commission' | 'commission_included' | 'net_and_sell'
-
-const ratePlanPricingSettings: Record<string, {
-  rateType: RateType
-  commission: {
-    type: 'percentage' | 'fixed'
-    value: number
-  }
-}> = {
-  pkg1: {
-    rateType: 'commission_included',
-    commission: {
-      type: 'percentage',
-      value: 10
-    }
-  },
-  pkg2: {
-    rateType: 'net_rate',
-    commission: {
-      type: 'percentage',
-      value: 12
-    }
-  },
-  pkg3: {
-    rateType: 'sell_rate_no_commission',
-    commission: {
-      type: 'percentage',
-      value: 0
-    }
-  },
-  pkg4: {
-    rateType: 'commission_included',
-    commission: {
-      type: 'percentage',
-      value: 12
-    }
-  },
-  pkg5: {
-    rateType: 'net_rate',
-    commission: {
-      type: 'fixed',
-      value: 5000
-    }
-  },
-  pkg6: {
-    rateType: 'commission_included',
-    commission: {
-      type: 'fixed',
-      value: 3000
-    }
-  }
-}
 
 export default function RatesPage() {
   const t = useTranslations()
@@ -85,17 +42,68 @@ export default function RatesPage() {
   const [packageDropdownOpen, setPackageDropdownOpen] = useState(false)
   const [tempSelectedPackageIds, setTempSelectedPackageIds] = useState<string[]>([])
   const [packageSearchQuery, setPackageSearchQuery] = useState('')
+  const [properties, setProperties] = useState<AriProperty[]>([])
+  const [availableRooms, setAvailableRooms] = useState<AriRoom[]>([])
+  const [availablePackages, setAvailablePackages] = useState<AriPackage[]>([])
+  const [rateRows, setRateRows] = useState<RateRow[]>([])
+  const [errorMessage, setErrorMessage] = useState('')
+  const [isLoadingProperties, setIsLoadingProperties] = useState(true)
+  const [isSearching, setIsSearching] = useState(false)
 
-  // Get available data based on property selection
-  const availableRooms = selectedPropertyId
-    ? mockRoomTypes.filter(room => room.propertyId === selectedPropertyId)
-    : []
+  useEffect(() => {
+    let ignore = false
 
-  const availablePackages = selectedPropertyId
-    ? mockPackages.filter(pkg => pkg.propertyId === selectedPropertyId)
-    : []
+    async function loadProperties() {
+      try {
+        setIsLoadingProperties(true)
+        const nextProperties = await fetchAriProperties()
+        if (!ignore) setProperties(nextProperties)
+      } catch (error) {
+        if (!ignore) setErrorMessage(getDisplayApiErrorMessage(error, t('ari.rates.emptyDescription')))
+      } finally {
+        if (!ignore) setIsLoadingProperties(false)
+      }
+    }
 
-  const propertyOptions = mockProperties.map((property) => ({
+    loadProperties()
+
+    return () => {
+      ignore = true
+    }
+  }, [t])
+
+  useEffect(() => {
+    let ignore = false
+
+    async function loadPropertyOptions() {
+      if (!selectedPropertyId) {
+        setAvailableRooms([])
+        setAvailablePackages([])
+        return
+      }
+
+      try {
+        const [nextRooms, nextPackages] = await Promise.all([
+          fetchAriRooms(selectedPropertyId),
+          fetchAriPackages(selectedPropertyId)
+        ])
+        if (!ignore) {
+          setAvailableRooms(nextRooms)
+          setAvailablePackages(nextPackages)
+        }
+      } catch (error) {
+        if (!ignore) setErrorMessage(getDisplayApiErrorMessage(error, t('ari.rates.emptyDescription')))
+      }
+    }
+
+    loadPropertyOptions()
+
+    return () => {
+      ignore = true
+    }
+  }, [selectedPropertyId, t])
+
+  const propertyOptions = properties.map((property) => ({
     value: property.id,
     label: `${property.id} / ${property.name}`,
     searchText: `${property.id} ${property.name} ${property.code}`
@@ -134,10 +142,10 @@ export default function RatesPage() {
   })
 
   // Get selected data for display
-  const selectedRooms = mockRoomTypes.filter(room => selectedRoomIds.includes(room.id))
-  const selectedPackage = mockPackages.find(pkg => pkg.id === selectedPackageId)
-  const selectedPackages = mockPackages.filter(pkg => selectedPackageIds.includes(pkg.id))
-  const selectedProperty = mockProperties.find(p => p.id === selectedPropertyId)
+  const selectedRooms = availableRooms.filter(room => selectedRoomIds.includes(room.id))
+  const selectedPackage = availablePackages.find(pkg => pkg.id === selectedPackageId)
+  const selectedPackages = availablePackages.filter(pkg => selectedPackageIds.includes(pkg.id))
+  const selectedProperty = properties.find(p => p.id === selectedPropertyId)
   const resultRows = criteriaType === 'package'
     ? selectedRooms
     : selectedPackages.map((pkg) => ({ id: pkg.id, name: pkg.name }))
@@ -145,8 +153,8 @@ export default function RatesPage() {
     ? selectedPackage?.name || ''
     : selectedRooms[0]?.name || ''
   const activeRatePlanPricing = criteriaType === 'package'
-    ? ratePlanPricingSettings[selectedPackageId]
-    : ratePlanPricingSettings[selectedPackageIds[0] ?? '']
+    ? selectedPackage
+    : selectedPackages[0]
 
   // Handlers
   const handlePropertyChange = (propertyId: string) => {
@@ -156,6 +164,9 @@ export default function RatesPage() {
     setSelectedRoomIds([])
     setRoomSearchQuery('')
     setPackageSearchQuery('')
+    setRateRows([])
+    setShowResults(false)
+    setIsCollapsed(false)
   }
 
   const handleCriteriaTypeChange = (type: CriteriaType) => {
@@ -165,6 +176,9 @@ export default function RatesPage() {
     setSelectedRoomIds([])
     setRoomSearchQuery('')
     setPackageSearchQuery('')
+    setRateRows([])
+    setShowResults(false)
+    setIsCollapsed(false)
   }
 
   const handlePackageSelect = (packageId: string) => {
@@ -267,13 +281,53 @@ export default function RatesPage() {
     setSelectedQuickRange(days)
   }
 
-  const handleSearch = () => {
+  const handleSearch = async () => {
     const isPackageBased = criteriaType === 'package' && selectedPackageId && selectedRoomIds.length > 0
     const isRoomBased = criteriaType === 'room' && selectedRoomIds.length === 1 && selectedPackageIds.length > 0
 
     if (selectedPropertyId && (isPackageBased || isRoomBased) && startDate && endDate) {
-      setShowResults(true)
-      setIsCollapsed(true)
+      try {
+        setIsSearching(true)
+        setErrorMessage('')
+        const matrix = await fetchAriRates({
+          propertyId: selectedPropertyId,
+          criteriaType,
+          packageId: criteriaType === 'package' ? selectedPackageId : undefined,
+          roomId: criteriaType === 'room' ? selectedRoomIds[0] : undefined,
+          roomIds: criteriaType === 'package' ? selectedRoomIds : undefined,
+          packageIds: criteriaType === 'room' ? selectedPackageIds : undefined,
+          startDate,
+          endDate
+        })
+        setRateRows(matrix.rows)
+        setShowResults(true)
+        setIsCollapsed(true)
+      } catch (error) {
+        setErrorMessage(getDisplayApiErrorMessage(error, t('ari.rates.emptyDescription')))
+      } finally {
+        setIsSearching(false)
+      }
+    }
+  }
+
+  const handleSaveRateUpdates = async (updates: { rowId: string; date: string; rate: number }[]) => {
+    try {
+      await updateAriRates(
+        selectedPropertyId,
+        updates.map(update => ({
+          roomId: criteriaType === 'package' ? update.rowId : selectedRoomIds[0],
+          packageId: criteriaType === 'package' ? selectedPackageId : update.rowId,
+          date: update.date,
+          rate: update.rate
+        }))
+      )
+    } catch (error) {
+      notification.error({
+        message: getDisplayApiErrorMessage(error, t('ari.rates.emptyDescription')),
+        placement: 'top-right',
+        direction: 'right'
+      })
+      throw error
     }
   }
 
@@ -289,6 +343,8 @@ export default function RatesPage() {
     setPackageSearchQuery('')
     setShowResults(false)
     setIsCollapsed(false)
+    setRateRows([])
+    setErrorMessage('')
   }
 
   const toggleCollapse = () => {
@@ -723,6 +779,19 @@ export default function RatesPage() {
         </div>
       </div>
 
+      {errorMessage && (
+        <div
+          className="rounded px-md py-sm text-base"
+          style={{
+            backgroundColor: 'var(--error-bg)',
+            color: 'var(--error)',
+            border: '1px solid var(--error)'
+          }}
+        >
+          {errorMessage}
+        </div>
+      )}
+
       {/* Selection Panel */}
       <div
         className="rounded"
@@ -850,6 +919,7 @@ export default function RatesPage() {
                 <Button
                   onClick={handleSearch}
                   disabled={
+                    isSearching ||
                     !selectedPropertyId ||
                     (criteriaType === 'package' ? !selectedPackageId : selectedPackageIds.length === 0) ||
                     (criteriaType === 'package' ? selectedRoomIds.length === 0 : selectedRoomIds.length !== 1) ||
@@ -860,7 +930,7 @@ export default function RatesPage() {
                   size="sm"
                 >
                   <Search className="h-md w-md" />
-                  {t('ari.common.search')}
+                  {isSearching ? '조회 중' : t('ari.common.search')}
                 </Button>
               </div>
             </div>
@@ -879,6 +949,7 @@ export default function RatesPage() {
                   options={propertyOptions}
                   placeholder={t('ari.rates.propertyPlaceholder')}
                   searchPlaceholder={t('ari.rates.propertySearchPlaceholder')}
+                  disabled={isLoadingProperties}
                 />
               </div>
 
@@ -965,6 +1036,8 @@ export default function RatesPage() {
           endDate={endDate}
           selectedRooms={resultRows}
           packageName={resultContextName}
+          initialRows={rateRows}
+          onSaveRates={handleSaveRateUpdates}
           rowHeaderLabel={criteriaType === 'package' ? t('ari.rates.rowHeaderRoomType') : t('ari.rates.rowHeaderPackage')}
           bulkTargetLabel={criteriaType === 'package' ? t('ari.rates.bulkTargetRoom') : t('ari.rates.bulkTargetPackage')}
           ratePlanPricing={activeRatePlanPricing}

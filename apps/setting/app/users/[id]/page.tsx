@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useMemo, useState } from 'react'
-import { Button, Input, Select, notification } from '@creami/ui'
+import { Button, Input, Select, notifySaveError, notifySaveSuccess } from '@creami/ui'
 import {
   ArrowLeft,
   Building2,
@@ -28,6 +28,7 @@ import {
 import {
   accommodationAccessOptions
 } from '@/lib/data/members'
+import { getDisplayApiErrorMessage } from '@/lib/api/errors'
 
 type MemberForm = {
   name: string
@@ -82,7 +83,7 @@ export default function UserDetailPage() {
       })
       .catch((error: unknown) => {
         if (!isMounted) return
-        setErrorMessage(error instanceof Error ? error.message : 'Member not found.')
+        setErrorMessage(getDisplayApiErrorMessage(error, t('setting.users.detail.notFound')))
       })
       .finally(() => {
         if (isMounted) {
@@ -153,17 +154,9 @@ export default function UserDetailPage() {
 
       setMember(statusSyncedMember)
       setForm(createForm(statusSyncedMember))
-      notification.success({
-        message: '수정이 완료되었습니다.',
-        placement: 'top-right',
-        direction: 'right'
-      })
+      notifySaveSuccess('수정이 완료되었습니다.')
     } catch (error) {
-      notification.error({
-        message: error instanceof Error ? error.message : '저장에 실패했습니다.',
-        placement: 'top-right',
-        direction: 'right'
-      })
+      notifySaveError(getDisplayApiErrorMessage(error, '저장에 실패했습니다.'))
     } finally {
       setIsSaving(false)
     }

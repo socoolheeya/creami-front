@@ -23,7 +23,6 @@ export default function RoomsPage() {
   const {
     data,
     isLoading,
-    error,
     fetchNextPage,
     hasNextPage,
     isFetchingNextPage
@@ -101,11 +100,6 @@ export default function RoomsPage() {
         <div className="flex items-center justify-center py-2xl">
           <div className="text-text-secondary">{commonT('loading')}</div>
         </div>
-      ) : error ? (
-        <Card className="flex flex-col items-center justify-center border-error py-2xl text-center" hover={false}>
-          <p className="text-error">{commonT('loadFailed')}</p>
-          <p className="text-base text-text-secondary">{error.message}</p>
-        </Card>
       ) : rooms.length === 0 ? (
         <Card className="flex flex-col items-center justify-center border-dashed py-3xl text-center" hover={false}>
           <DoorOpen className="h-3xl w-3xl mb-md text-text-tertiary" />

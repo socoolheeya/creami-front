@@ -4,7 +4,7 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { useTranslations } from 'next-intl'
-import { notification } from '@creami/ui'
+import { notifySaveError, notifySaveSuccess } from '@creami/ui'
 import { useCreateRatePlan, useUpdateRatePlan } from '@/hooks/useRatePlans'
 import type {
   RatePlan,
@@ -113,28 +113,16 @@ export default function RatePlanForm({ initialData }: RatePlanFormProps) {
           id: initialData.id,
           data: ratePlanData,
         })
-        notification.success({
-          message: commonT('successUpdated'),
-          placement: 'top-right',
-          direction: 'right'
-        })
+        notifySaveSuccess(commonT('successUpdated'))
         router.push(`/rateplans/${initialData.id}`)
       } else {
         await createRatePlan.mutateAsync(ratePlanData)
-        notification.success({
-          message: commonT('successSaved'),
-          placement: 'top-right',
-          direction: 'right'
-        })
+        notifySaveSuccess(commonT('successSaved'))
         router.push('/rateplans')
       }
     } catch (error) {
       console.error(t('messages.submitLogFailed'), error)
-      notification.error({
-        message: isEdit ? commonT('updateFailed') : commonT('saveFailed'),
-        placement: 'top-right',
-        direction: 'right'
-      })
+      notifySaveError(isEdit ? commonT('updateFailed') : commonT('saveFailed'))
     } finally {
       setIsSubmitting(false)
     }

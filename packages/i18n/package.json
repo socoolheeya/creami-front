@@ -6,6 +6,8 @@
   "types": "./index.ts",
   "exports": {
     ".": "./index.ts",
-    "./messages/*": "./messages/*"
+    "./messages": "./messages",
+    "./messages/*": "./messages/*",
+    "./messages/*.json": "./messages/*.json"
   }
 }

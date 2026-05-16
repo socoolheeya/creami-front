@@ -12,7 +12,7 @@ import { Step3Images } from '../components/wizard/Step3Images'
 import { Step4Policy } from '../components/wizard/Step4Policy'
 import { ArrowLeft } from 'lucide-react'
 import Link from 'next/link'
-import { notification } from '@creami/ui'
+import { notifySaveError, notifySaveSuccess } from '@creami/ui'
 
 const STEPS = ['기본 정보', '상세 설명', '이미지', '요금 정책']
 const STORAGE_KEY = 'accommodation-draft'
@@ -180,21 +180,13 @@ export default function NewAccommodationPage() {
       // 임시 저장 데이터 삭제
       localStorage.removeItem(STORAGE_KEY)
 
-      notification.success({
-        message: '저장이 완료되었습니다.',
-        placement: 'top-right',
-        direction: 'right'
-      })
+      notifySaveSuccess('저장이 완료되었습니다.')
 
       // 목록 페이지로 이동
       router.push('/properties')
     } catch (error) {
       console.error('Failed to create property:', error)
-      notification.error({
-        message: '저장에 실패했습니다.',
-        placement: 'top-right',
-        direction: 'right'
-      })
+      notifySaveError('저장에 실패했습니다.')
     } finally {
       setIsSubmitting(false)
     }

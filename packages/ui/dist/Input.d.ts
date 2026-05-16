@@ -3,5 +3,5 @@ export interface InputProps extends Omit<React.InputHTMLAttributes<HTMLInputElem
     size?: 'large' | 'medium' | 'small' | 'mini';
     showSearchIcon?: boolean;
 }
-export declare function Input({ size, showSearchIcon, className, ...props }: InputProps): import("react/jsx-runtime").JSX.Element;
+export declare const Input: React.ForwardRefExoticComponent<InputProps & React.RefAttributes<HTMLInputElement>>;
 //# sourceMappingURL=Input.d.ts.map

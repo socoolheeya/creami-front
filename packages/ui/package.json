@@ -16,7 +16,7 @@
     "dist"
   ],
   "scripts": {
-    "build": "vite build",
+    "build": "NODE_ENV=production vite build",
     "dev": "vite build --watch",
     "lint": "eslint .",
     "type-check": "tsc --noEmit"

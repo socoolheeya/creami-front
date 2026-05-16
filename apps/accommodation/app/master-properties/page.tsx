@@ -40,8 +40,7 @@ export default function MasterPropertiesPage() {
   }, [submittedQuery])
   const {
     data: parentProperties = [],
-    isLoading,
-    isError
+    isLoading
   } = useParentProperties(searchCondition)
 
   const handleSearch = () => {
@@ -92,16 +91,6 @@ export default function MasterPropertiesPage() {
           <h2 className="mb-xs text-lg font-bold text-text-primary">
             대표숙소를 조회하는 중입니다
           </h2>
-        </Card>
-      ) : isError ? (
-        <Card className="flex flex-col items-center justify-center border-dashed py-2xl text-center" hover={false}>
-          <Building2 className="mb-md h-2xl w-2xl text-text-tertiary" />
-          <h2 className="mb-xs text-lg font-bold text-text-primary">
-            대표숙소 조회에 실패했습니다
-          </h2>
-          <p className="text-base font-light text-text-secondary">
-            백엔드 서버와 API 응답을 확인하세요.
-          </p>
         </Card>
       ) : parentProperties.length === 0 ? (
         <Card className="flex flex-col items-center justify-center border-dashed py-2xl text-center" hover={false}>

@@ -2,6 +2,10 @@
   "name": "creami-front",
   "version": "0.1.0",
   "private": true,
+  "packageManager": "pnpm@8.15.9",
+  "engines": {
+    "node": ">=22.2.0 <23"
+  },
   "scripts": {
     "dev:all": "npm run dev:home & npm run dev:accommodation & npm run dev:ari & npm run dev:discount & npm run dev:booking & npm run dev:invoice & npm run dev:setting & wait",
     "stop:all": "./scripts/stop-all.sh",

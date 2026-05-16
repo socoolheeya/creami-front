@@ -85,8 +85,7 @@ export default function RatePlansPage() {
   const {
     data,
     isLoading,
-    isFetching,
-    error
+    isFetching
   } = useRatePlansPaginated(filters, true)
 
   const ratePlans = data?.ratePlans || []
@@ -182,12 +181,7 @@ export default function RatePlansPage() {
       </div>
 
       {/* Content */}
-      {error ? (
-        <Card className="flex flex-col items-center justify-center border-error py-2xl text-center" hover={false}>
-          <p className="text-error">{commonT('loadFailed')}</p>
-          <p className="text-base text-text-secondary">{error.message}</p>
-        </Card>
-      ) : viewMode === 'table' ? (
+      {viewMode === 'table' ? (
         <>
           <RatePlanTableView
             ratePlans={ratePlans}

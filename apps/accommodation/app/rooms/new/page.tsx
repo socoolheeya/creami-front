@@ -13,7 +13,7 @@ import { Step3Occupancy } from '../components/wizard/Step3Occupancy'
 import { Step4Description } from '../components/wizard/Step4Description'
 import { Step5Features } from '../components/wizard/Step5Features'
 import { Step6Images } from '../components/wizard/Step6Images'
-import { notification } from '@creami/ui'
+import { notifySaveError, notifySaveSuccess } from '@creami/ui'
 
 function NewRoomPageContent() {
   const t = useTranslations('accommodation.rooms')
@@ -98,20 +98,12 @@ function NewRoomPageContent() {
     try {
       await createRoom.mutateAsync(formData)
 
-      notification.success({
-        message: commonT('successSaved'),
-        placement: 'top-right',
-        direction: 'right'
-      })
+      notifySaveSuccess(commonT('successSaved'))
 
       router.push('/rooms')
     } catch (error) {
       console.error('Failed to create room:', error)
-      notification.error({
-        message: commonT('saveFailed'),
-        placement: 'top-right',
-        direction: 'right'
-      })
+      notifySaveError(commonT('saveFailed'))
     } finally {
       setIsSubmitting(false)
     }

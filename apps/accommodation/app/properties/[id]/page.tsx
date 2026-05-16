@@ -23,6 +23,7 @@ import {
 } from 'lucide-react'
 import { Button, Card } from '@creami/ui'
 import { useProperty } from '@/hooks/useProperties'
+import { ErrorTemplate } from '@/components/common/ErrorTemplate'
 import {
   CURRENCY_OPTIONS,
   PROPERTY_STATUS_LABELS,
@@ -82,7 +83,7 @@ function formatDateTime(value: Date) {
 export default function AccommodationDetailPage() {
   const params = useParams<{ id: string }>()
   const propertyId = params.id ?? ''
-  const { data: propertyData, isLoading, isError } = useProperty(propertyId)
+  const { data: propertyData, isLoading } = useProperty(propertyId)
   const [selectedImageIndex, setSelectedImageIndex] = useState(0)
   const [isEditing, setIsEditing] = useState(false)
   const [propertyOverride, setPropertyOverride] = useState<Property | null>(null)
@@ -118,20 +119,13 @@ export default function AccommodationDetailPage() {
     )
   }
 
-  if (isError || !accommodation) {
+  if (!accommodation) {
     return (
-      <div>
-        <Link
-          href="/properties"
-          className="mb-lg inline-flex items-center gap-sm text-base font-medium text-text-secondary no-underline hover:text-primary"
-        >
-          <ArrowLeft className="h-icon-md w-icon-md" />
-          숙소 목록으로
-        </Link>
-        <Card className="p-lg" hover={false}>
-          <h1 className="text-xl font-bold text-text-primary">숙소를 찾을 수 없습니다</h1>
-        </Card>
-      </div>
+      <ErrorTemplate
+        title="숙소를 찾을 수 없습니다"
+        backHref="/properties"
+        backLabel="숙소 목록으로"
+      />
     )
   }
 

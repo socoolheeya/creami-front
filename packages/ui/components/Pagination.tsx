@@ -176,7 +176,7 @@ export function Pagination({
           aria-label="이전 페이지"
           className="px-spacing-xs"
         >
-          <ChevronLeft className="h-4 w-4" />
+          <ChevronLeft className="h-icon-md w-icon-md" />
           이전
         </Button>
 
@@ -202,7 +202,7 @@ export function Pagination({
                 variant={isActive ? 'primary' : 'secondary'}
                 size="sm"
                 onClick={() => onPageChange(pageNumber)}
-                className={`min-w-[2.5rem] ${
+                className={`min-w-control-sm ${
                   isActive
                     ? 'bg-var-primary text-white hover:bg-var-primary-hover'
                     : ''
@@ -223,7 +223,7 @@ export function Pagination({
           className="px-spacing-xs"
         >
           다음
-          <ChevronRight className="h-4 w-4" />
+          <ChevronRight className="h-icon-md w-icon-md" />
         </Button>
       </div>
     </div>

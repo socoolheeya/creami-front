@@ -19,7 +19,15 @@ import {
   User,
   X
 } from 'lucide-react'
-import { Button, Card, Input, Select, TimeRangePicker, notification } from '@creami/ui'
+import {
+  Button,
+  Card,
+  Input,
+  Select,
+  TimeRangePicker,
+  notifySaveError,
+  notifySaveSuccess
+} from '@creami/ui'
 import {
   AMENITY_OPTIONS,
   CURRENCY_OPTIONS,
@@ -314,17 +322,17 @@ export function PropertyEditForm({
       updatedAt: new Date()
     }
 
-    await savePropertyDetail.mutateAsync({
-      id: propertyId,
-      data: nextProperty
-    })
+    try {
+      await savePropertyDetail.mutateAsync({
+        id: propertyId,
+        data: nextProperty
+      })
 
-    notification.success({
-      message: '수정이 완료되었습니다.',
-      placement: 'top-right',
-      direction: 'right'
-    })
-    onSaved(nextProperty)
+      notifySaveSuccess('수정이 완료되었습니다.')
+      onSaved(nextProperty)
+    } catch {
+      notifySaveError('수정에 실패했습니다.')
+    }
   }
 
   return (
