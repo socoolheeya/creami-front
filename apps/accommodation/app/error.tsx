@@ -5,10 +5,10 @@ import { ErrorTemplate } from '@/components/common/ErrorTemplate'
 
 export default function Error({
   error,
-  unstable_retry
+  reset
 }: {
   error: Error & { digest?: string }
-  unstable_retry: () => void
+  reset: () => void
 }) {
   useEffect(() => {
     console.error(error)
@@ -16,7 +16,7 @@ export default function Error({
 
   return (
     <main className="p-xl">
-      <ErrorTemplate onRetry={unstable_retry} />
+      <ErrorTemplate onRetry={reset} />
     </main>
   )
 }

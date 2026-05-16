@@ -1,10 +1,10 @@
 'use client'
 
 import { DollarSign, Search, ChevronDown, ChevronUp, X, Building2, Bed, Package2 } from 'lucide-react'
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { useTranslations } from 'next-intl'
 import { RateGrid } from './components/RateGrid'
-import { Button, DatePicker, Input, SearchableSelect, notification } from '@creami/ui'
+import { Button, DatePicker, ErrorTemplate, Input, SearchableSelect, notification } from '@creami/ui'
 import {
   fetchAriPackages,
   fetchAriProperties,
@@ -50,58 +50,66 @@ export default function RatesPage() {
   const [isLoadingProperties, setIsLoadingProperties] = useState(true)
   const [isSearching, setIsSearching] = useState(false)
 
-  useEffect(() => {
-    let ignore = false
-
-    async function loadProperties() {
-      try {
-        setIsLoadingProperties(true)
-        const nextProperties = await fetchAriProperties()
-        if (!ignore) setProperties(nextProperties)
-      } catch (error) {
-        if (!ignore) setErrorMessage(getDisplayApiErrorMessage(error, t('ari.rates.emptyDescription')))
-      } finally {
-        if (!ignore) setIsLoadingProperties(false)
+  const loadProperties = useCallback(async (isActive: () => boolean = () => true) => {
+    try {
+      setIsLoadingProperties(true)
+      const nextProperties = await fetchAriProperties()
+      if (isActive()) {
+        setProperties(nextProperties)
       }
-    }
-
-    loadProperties()
-
-    return () => {
-      ignore = true
+    } catch (error) {
+      if (isActive()) {
+        setErrorMessage(getDisplayApiErrorMessage(error, t('ari.rates.emptyDescription')))
+      }
+    } finally {
+      if (isActive()) {
+        setIsLoadingProperties(false)
+      }
     }
   }, [t])
 
-  useEffect(() => {
-    let ignore = false
-
-    async function loadPropertyOptions() {
-      if (!selectedPropertyId) {
-        setAvailableRooms([])
-        setAvailablePackages([])
-        return
-      }
-
-      try {
-        const [nextRooms, nextPackages] = await Promise.all([
-          fetchAriRooms(selectedPropertyId),
-          fetchAriPackages(selectedPropertyId)
-        ])
-        if (!ignore) {
-          setAvailableRooms(nextRooms)
-          setAvailablePackages(nextPackages)
-        }
-      } catch (error) {
-        if (!ignore) setErrorMessage(getDisplayApiErrorMessage(error, t('ari.rates.emptyDescription')))
-      }
+  const loadPropertyOptions = useCallback(async (isActive: () => boolean = () => true) => {
+    if (!selectedPropertyId) {
+      setAvailableRooms([])
+      setAvailablePackages([])
+      return
     }
 
-    loadPropertyOptions()
-
-    return () => {
-      ignore = true
+    try {
+      const [nextRooms, nextPackages] = await Promise.all([
+        fetchAriRooms(selectedPropertyId),
+        fetchAriPackages(selectedPropertyId)
+      ])
+      if (isActive()) {
+        setAvailableRooms(nextRooms)
+        setAvailablePackages(nextPackages)
+      }
+    } catch (error) {
+      if (isActive()) {
+        setErrorMessage(getDisplayApiErrorMessage(error, t('ari.rates.emptyDescription')))
+      }
     }
   }, [selectedPropertyId, t])
+
+  useEffect(() => {
+    let active = true
+
+    loadProperties(() => active)
+
+    return () => {
+      active = false
+    }
+  }, [loadProperties])
+
+  useEffect(() => {
+    let active = true
+
+    loadPropertyOptions(() => active)
+
+    return () => {
+      active = false
+    }
+  }, [loadPropertyOptions])
 
   const propertyOptions = properties.map((property) => ({
     value: property.id,
@@ -307,6 +315,24 @@ export default function RatesPage() {
       } finally {
         setIsSearching(false)
       }
+    }
+  }
+
+  const handleRetry = () => {
+    setErrorMessage('')
+
+    if (!properties.length) {
+      void loadProperties()
+      return
+    }
+
+    if (selectedPropertyId && (!availableRooms.length || !availablePackages.length)) {
+      void loadPropertyOptions()
+      return
+    }
+
+    if (showResults) {
+      void handleSearch()
     }
   }
 
@@ -780,16 +806,13 @@ export default function RatesPage() {
       </div>
 
       {errorMessage && (
-        <div
-          className="rounded px-md py-sm text-base"
-          style={{
-            backgroundColor: 'var(--error-bg)',
-            color: 'var(--error)',
-            border: '1px solid var(--error)'
-          }}
-        >
-          {errorMessage}
-        </div>
+        <ErrorTemplate
+          title={t('ari.common.errorTitle')}
+          description={errorMessage || t('ari.common.errorDescription')}
+          retryLabel={t('ari.common.retry')}
+          onRetry={handleRetry}
+          className="items-start text-left"
+        />
       )}
 
       {/* Selection Panel */}

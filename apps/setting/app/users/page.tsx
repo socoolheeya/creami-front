@@ -17,7 +17,7 @@ import {
 } from '@creami/ui'
 import { Mail, Plus, UserCheck, Users } from 'lucide-react'
 import Link from 'next/link'
-import { useEffect, useState } from 'react'
+import { startTransition, useEffect, useState } from 'react'
 import { useTranslations } from 'next-intl'
 import {
   getMemberRoleSummary,
@@ -85,7 +85,9 @@ export default function UsersPage() {
       sort: 'createdAt,desc'
     }
 
-    setIsLoading(true)
+    startTransition(() => {
+      setIsLoading(true)
+    })
     getMembers(condition, { signal: abortController.signal })
       .then((response) => {
         if (!isMounted) return
@@ -108,7 +110,7 @@ export default function UsersPage() {
       isMounted = false
       abortController.abort()
     }
-  }, [filters, pageNumber, pageSize])
+  }, [filters, pageNumber, pageSize, t])
 
   const handleFilterChange = <K extends keyof MemberFilters>(
     field: K,

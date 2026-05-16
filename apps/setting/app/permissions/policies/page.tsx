@@ -13,9 +13,9 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-  TableStateRow,
+  TableStateRow
 } from '@creami/ui'
-import { FileSliders, Plus, Search } from 'lucide-react'
+import { FileSliders, Plus } from 'lucide-react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { useTranslations } from 'next-intl'
 import { KeyboardEvent, startTransition, useEffect, useMemo, useRef, useState } from 'react'
@@ -63,8 +63,6 @@ export default function PolicyManagementPage() {
   const [totalPages, setTotalPages] = useState(1)
   const [isLoading, setIsLoading] = useState(true)
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
-  const [refreshKey, setRefreshKey] = useState(0)
-
   const queryKey = useMemo(() => ({ page, name, status }), [page, name, status])
 
   useEffect(() => {
@@ -102,7 +100,7 @@ export default function PolicyManagementPage() {
       })
 
     return () => abortController.abort()
-  }, [queryKey, refreshKey, t])
+  }, [queryKey, t])
 
   const updateQuery = (
     nextPage: number,
@@ -146,14 +144,10 @@ export default function PolicyManagementPage() {
         </div>
       </div>
 
-      <div className="mb-sm flex justify-end gap-sm">
+      <div className="mb-sm flex justify-end">
         <Button type="button" onClick={() => router.push('/permissions/policies/new')}>
           <Plus className="h-icon-md w-icon-md" />
           {t('setting.policies.addPolicy')}
-        </Button>
-        <Button type="button" size="small" onClick={() => updateQuery(1)}>
-          <Search className="h-icon-md w-icon-md" />
-          {t('setting.policies.actions.search')}
         </Button>
       </div>
 

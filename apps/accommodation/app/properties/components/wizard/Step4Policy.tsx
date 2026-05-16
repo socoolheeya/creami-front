@@ -58,8 +58,9 @@ export function Step4Policy({ data, onChange }: Step4PolicyProps) {
 
   const handleSurchargeToggle = () => {
     if (billingPolicy.surcharge) {
-      const { surcharge, ...rest } = billingPolicy
-      onChange({ billingPolicy: rest })
+      const nextBillingPolicy = { ...billingPolicy }
+      delete nextBillingPolicy.surcharge
+      onChange({ billingPolicy: nextBillingPolicy })
     } else {
       onChange({
         billingPolicy: {
@@ -81,8 +82,9 @@ export function Step4Policy({ data, onChange }: Step4PolicyProps) {
 
   const handleTaxToggle = () => {
     if (billingPolicy.tax) {
-      const { tax, ...rest } = billingPolicy
-      onChange({ billingPolicy: rest })
+      const nextBillingPolicy = { ...billingPolicy }
+      delete nextBillingPolicy.tax
+      onChange({ billingPolicy: nextBillingPolicy })
     } else {
       onChange({
         billingPolicy: {

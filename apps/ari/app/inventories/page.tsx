@@ -1,11 +1,11 @@
 'use client'
 
 import { Package, Search, ChevronDown, ChevronUp, X, Calendar, Building2, DoorOpen } from 'lucide-react'
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { useTranslations } from 'next-intl'
 import { InventoryCalendar } from './components/InventoryCalendar'
 import { InventoryGrid } from './components/InventoryGrid'
-import { Button, DatePicker, Input, SearchableSelect, ViewToggle, notification } from '@creami/ui'
+import { Button, DatePicker, ErrorTemplate, Input, SearchableSelect, ViewToggle, notification } from '@creami/ui'
 import {
   fetchAriInventories,
   fetchAriProperties,
@@ -47,48 +47,56 @@ export default function InventoriesPage() {
       )
     : properties
 
-  useEffect(() => {
-    let ignore = false
-
-    async function loadProperties() {
-      try {
-        const nextProperties = await fetchAriProperties()
-        if (!ignore) setProperties(nextProperties)
-      } catch (error) {
-        if (!ignore) setErrorMessage(getDisplayApiErrorMessage(error, t('ari.inventories.emptyDescription')))
+  const loadProperties = useCallback(async (isActive: () => boolean = () => true) => {
+    try {
+      const nextProperties = await fetchAriProperties()
+      if (isActive()) {
+        setProperties(nextProperties)
       }
-    }
-
-    loadProperties()
-
-    return () => {
-      ignore = true
+    } catch (error) {
+      if (isActive()) {
+        setErrorMessage(getDisplayApiErrorMessage(error, t('ari.inventories.emptyDescription')))
+      }
     }
   }, [t])
 
-  useEffect(() => {
-    let ignore = false
-
-    async function loadRooms() {
-      if (!selectedPropertyId) {
-        setAvailableRooms([])
-        return
-      }
-
-      try {
-        const nextRooms = await fetchAriRooms(selectedPropertyId)
-        if (!ignore) setAvailableRooms(nextRooms)
-      } catch (error) {
-        if (!ignore) setErrorMessage(getDisplayApiErrorMessage(error, t('ari.inventories.emptyDescription')))
-      }
+  const loadRooms = useCallback(async (isActive: () => boolean = () => true) => {
+    if (!selectedPropertyId) {
+      setAvailableRooms([])
+      return
     }
 
-    loadRooms()
-
-    return () => {
-      ignore = true
+    try {
+      const nextRooms = await fetchAriRooms(selectedPropertyId)
+      if (isActive()) {
+        setAvailableRooms(nextRooms)
+      }
+    } catch (error) {
+      if (isActive()) {
+        setErrorMessage(getDisplayApiErrorMessage(error, t('ari.inventories.emptyDescription')))
+      }
     }
   }, [selectedPropertyId, t])
+
+  useEffect(() => {
+    let active = true
+
+    loadProperties(() => active)
+
+    return () => {
+      active = false
+    }
+  }, [loadProperties])
+
+  useEffect(() => {
+    let active = true
+
+    loadRooms(() => active)
+
+    return () => {
+      active = false
+    }
+  }, [loadRooms])
 
   const roomOptions = availableRooms
     .filter(room => !selectedRoomIds.includes(room.id))
@@ -155,6 +163,24 @@ export default function InventoriesPage() {
     }
   }
 
+  const handleRetry = () => {
+    setErrorMessage('')
+
+    if (!properties.length) {
+      void loadProperties()
+      return
+    }
+
+    if (selectedPropertyId && !availableRooms.length) {
+      void loadRooms()
+      return
+    }
+
+    if (showResults) {
+      void handleSearch()
+    }
+  }
+
   const handleSaveInventoryUpdates = async (updates: { rowId: string; date: string; available: number }[]) => {
     try {
       await updateAriInventories(
@@ -208,16 +234,13 @@ export default function InventoriesPage() {
       </div>
 
       {errorMessage && (
-        <div
-          className="rounded px-md py-sm text-base"
-          style={{
-            backgroundColor: 'var(--error-bg)',
-            color: 'var(--error)',
-            border: '1px solid var(--error)'
-          }}
-        >
-          {errorMessage}
-        </div>
+        <ErrorTemplate
+          title={t('ari.common.errorTitle')}
+          description={errorMessage || t('ari.common.errorDescription')}
+          retryLabel={t('ari.common.retry')}
+          onRetry={handleRetry}
+          className="items-start text-left"
+        />
       )}
 
       {/* Selection Panel */}

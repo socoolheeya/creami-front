@@ -1,7 +1,7 @@
 'use client'
 
 import Link from 'next/link'
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { startTransition, useCallback, useEffect, useMemo, useState } from 'react'
 import { useTranslations } from 'next-intl'
 import { usePathname, useSearchParams } from 'next/navigation'
 import { type RatePlanPageSearchCondition, useRatePlansPaginated } from '@/hooks/useRatePlans'
@@ -130,16 +130,20 @@ export default function RatePlansPage() {
   useEffect(() => {
     const page = searchParams.get('page')
     const size = searchParams.get('size')
+    const nextPage = page ? parseInt(page) : currentPage
+    const nextPageSize = size ? parseInt(size) : pageSize
 
-    if (page && parseInt(page) !== currentPage) {
-      setCurrentPage(parseInt(page))
-    }
-    if (size && parseInt(size) !== pageSize) {
-      setPageSize(parseInt(size))
-    }
+    startTransition(() => {
+      if (Number.isFinite(nextPage) && nextPage !== currentPage) {
+        setCurrentPage(nextPage)
+      }
+      if (Number.isFinite(nextPageSize) && nextPageSize !== pageSize) {
+        setPageSize(nextPageSize)
+      }
 
-    setTableFilters(getTableFilters(new URLSearchParams(searchParams.toString())))
-  }, [searchParams])
+      setTableFilters(getTableFilters(new URLSearchParams(searchParams.toString())))
+    })
+  }, [currentPage, pageSize, searchParams])
 
   useEffect(() => {
     const syncStateFromURL = () => {

@@ -9,7 +9,7 @@ import {
 } from '@creami/ui'
 import { Plus, UserMinus, UserPlus, UsersRound } from 'lucide-react'
 import { useTranslations } from 'next-intl'
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { startTransition, useCallback, useEffect, useMemo, useState } from 'react'
 import {
   addIamGroupMember,
   createIamGroup,
@@ -119,15 +119,21 @@ export default function UserGroupsPage() {
   }, [availableSearch, selectedGroupId, t])
 
   useEffect(() => {
-    loadGroups(groupPage)
+    startTransition(() => {
+      void loadGroups(groupPage)
+    })
   }, [groupPage, loadGroups])
 
   useEffect(() => {
-    loadCandidateMembers(selectedGroupId)
+    startTransition(() => {
+      void loadCandidateMembers(selectedGroupId)
+    })
   }, [loadCandidateMembers, selectedGroupId])
 
   useEffect(() => {
-    loadRegisteredMembers(selectedGroupId)
+    startTransition(() => {
+      void loadRegisteredMembers(selectedGroupId)
+    })
   }, [selectedGroupId, loadRegisteredMembers])
 
   const registeredMemberIdSet = useMemo(

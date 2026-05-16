@@ -4,6 +4,9 @@ export type { ButtonProps } from './Button'
 export { Alert } from './Alert'
 export type { AlertProps } from './Alert'
 
+export { ErrorTemplate } from './ErrorTemplate'
+export type { ErrorTemplateProps } from './ErrorTemplate'
+
 export { Input } from './Input'
 export type { InputProps } from './Input'
 

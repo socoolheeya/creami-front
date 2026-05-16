@@ -1,6 +1,6 @@
 'use client'
 
-import { ChangeEvent, useEffect, useRef, useState } from 'react'
+import { ChangeEvent, startTransition, useEffect, useRef, useState } from 'react'
 import Image from 'next/image'
 import { useLocale, useTranslations } from 'next-intl'
 import { Building2, Camera, LockKeyhole, Mail, Moon, Phone, Save, Sun, UserCog } from 'lucide-react'
@@ -105,9 +105,11 @@ export default function ProfilePage() {
     const storedMember = readStoredAuthMember()
     const nextUpdatedAt = formatUpdatedAt(new Date(), locale)
 
-    setProfile(toProfileState(storedMember, nextUpdatedAt))
-    setEmail(storedMember?.email ?? '')
-    setUpdatedAt(nextUpdatedAt)
+    startTransition(() => {
+      setProfile(toProfileState(storedMember, nextUpdatedAt))
+      setEmail(storedMember?.email ?? '')
+      setUpdatedAt(nextUpdatedAt)
+    })
 
     getCurrentAuthMember()
       .then((member) => {

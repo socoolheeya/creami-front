@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { startTransition, useEffect, useState } from 'react'
 import { Alert, Button, Input, Select, notifySaveError, notifySaveSuccess } from '@creami/ui'
 import { ArrowLeft, FileSliders, Plus, Save, ShieldCheck, Trash2 } from 'lucide-react'
 import Link from 'next/link'
@@ -13,10 +13,12 @@ import {
   deactivatePolicy,
   detachPolicy,
   getIamGroups,
+  getPolicyMenuOptions,
   getPolicy,
   getPolicyAttachments,
   type IamGroup,
   type PolicyMenuKey,
+  type PolicyMenuOption,
   type PolicyPermissionKey,
   updatePolicy,
   type Policy,
@@ -37,7 +39,6 @@ type PolicyStatementRow = {
   permission: PolicyPermissionKey | ''
 }
 
-const MENU_OPTIONS: PolicyMenuKey[] = ['users', 'permissions', 'policies', 'subscriptions']
 const PERMISSION_OPTIONS: PolicyPermissionKey[] = ['read', 'write', 'all']
 const ACTION_PREFIX_TO_MENU: Record<string, PolicyMenuKey> = {
   member: 'users',
@@ -63,18 +64,30 @@ function createEmptyStatementRow(index = Date.now()): PolicyStatementRow {
   return { id: `statement-${index}`, menu: '', permission: '' }
 }
 
-function parsePolicyStatements(documentJson?: string | null): PolicyStatementRow[] {
+function parsePolicyStatements(
+  documentJson: string | null | undefined,
+  menuOptions: PolicyMenuOption[]
+): PolicyStatementRow[] {
   if (!documentJson) return [createEmptyStatementRow(1)]
 
   try {
     const parsed = JSON.parse(documentJson) as {
+      menuIds?: Array<string | number>
       statements?: Array<{ actions?: string[] }>
     }
+    const menuById = new Map(menuOptions.map((menuOption) => [menuOption.menuId, menuOption]))
+    const menuByCode = new Map(menuOptions.map((menuOption) => [menuOption.code, menuOption]))
+    const menuIds = parsed.menuIds ?? []
+
     const rows = parsed.statements?.reduce<PolicyStatementRow[]>((result, statement, index) => {
         const firstAction = statement.actions?.[0]
         if (!firstAction) return result
         const [prefix, action] = firstAction.split(':')
-        const menu = ACTION_PREFIX_TO_MENU[prefix]
+        const fallbackMenu = ACTION_PREFIX_TO_MENU[prefix] ?? prefix
+        const menuFromId = menuById.get(String(menuIds[index]))?.code
+        const menu =
+          menuFromId ??
+          (menuByCode.has(fallbackMenu) ? fallbackMenu : '')
         const permission =
           action === '*' ? 'all' :
           action === 'read' ? 'read' :
@@ -106,6 +119,7 @@ export default function PolicyDetailPage() {
   const [isSavingAttachment, setIsSavingAttachment] = useState(false)
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
   const [groups, setGroups] = useState<IamGroup[]>([])
+  const [menuOptions, setMenuOptions] = useState<PolicyMenuOption[]>([])
   const [attachments, setAttachments] = useState<PolicyAttachment[]>([])
   const [selectedGroupId, setSelectedGroupId] = useState('')
   const [statements, setStatements] = useState<PolicyStatementRow[]>([createEmptyStatementRow(1)])
@@ -115,14 +129,15 @@ export default function PolicyDetailPage() {
     const abortController = new AbortController()
 
     async function loadPolicy() {
-      setIsLoading(true)
-      setErrorMessage(null)
+      startTransition(() => {
+        setIsLoading(true)
+        setErrorMessage(null)
+      })
 
       try {
         const nextPolicy = await getPolicy(params.id, { signal: abortController.signal })
         setPolicy(nextPolicy)
         setForm(createPolicyForm(nextPolicy))
-        setStatements(parsePolicyStatements(nextPolicy.documentJson))
       } catch (error) {
         if (abortController.signal.aborted) return
         setPolicy(null)
@@ -144,12 +159,14 @@ export default function PolicyDetailPage() {
 
     async function loadPolicyAttachments() {
       try {
-        const [nextGroups, nextAttachments] = await Promise.all([
+        const [nextGroups, nextAttachments, nextMenuOptions] = await Promise.all([
           getIamGroups(0, 200, { signal: abortController.signal }),
-          getPolicyAttachments(params.id, { signal: abortController.signal })
+          getPolicyAttachments(params.id, { signal: abortController.signal }),
+          getPolicyMenuOptions({ signal: abortController.signal })
         ])
         setGroups(nextGroups.content)
         setAttachments(nextAttachments)
+        setMenuOptions(nextMenuOptions)
       } catch (error) {
         if (abortController.signal.aborted) return
         setErrorMessage(getDisplayApiErrorMessage(error, t('setting.policies.detail.attachmentsLoadFailed')))
@@ -160,6 +177,13 @@ export default function PolicyDetailPage() {
 
     return () => abortController.abort()
   }, [params.id, t])
+
+  useEffect(() => {
+    if (!policy) return
+    startTransition(() => {
+      setStatements(parsePolicyStatements(policy.documentJson, menuOptions))
+    })
+  }, [menuOptions, policy])
 
   const canSave = form.name.trim().length > 0 && Boolean(policy) && form.status !== 'DELETED'
   const attachedGroupIds = new Set(
@@ -189,7 +213,8 @@ export default function PolicyDetailPage() {
     try {
       const selectedStatements = statements.map((statement) => ({
         menu: statement.menu as PolicyMenuKey,
-        permission: statement.permission as PolicyPermissionKey
+        permission: statement.permission as PolicyPermissionKey,
+        menuId: menuOptions.find((option) => option.code === statement.menu)?.menuId
       }))
       const updatedPolicy = await updatePolicy(policy.policyId, {
         name: form.name.trim(),
@@ -206,7 +231,7 @@ export default function PolicyDetailPage() {
 
       setPolicy(statusSyncedPolicy)
       setForm(createPolicyForm(statusSyncedPolicy))
-      setStatements(parsePolicyStatements(statusSyncedPolicy.documentJson))
+      setStatements(parsePolicyStatements(statusSyncedPolicy.documentJson, menuOptions))
       notifySaveSuccess(t('setting.policies.updated'))
     } catch (error) {
       const nextErrorMessage = getDisplayApiErrorMessage(error, t('setting.policies.updateFailed'))
@@ -515,12 +540,17 @@ export default function PolicyDetailPage() {
                   disabled={isLoading || isSaving || form.status === 'DELETED'}
                 >
                   <option value="">{t('setting.policies.form.menuPlaceholder')}</option>
-                  {MENU_OPTIONS.map((menu) => (
-                    <option key={menu} value={menu}>
-                      {t(`setting.policies.menus.${menu}`)}
+                  {menuOptions.map((menu) => (
+                    <option key={menu.menuId} value={menu.code}>
+                      {menu.name}
                     </option>
                   ))}
                 </Select>
+                {menuOptions.length === 0 && (
+                  <p className="text-sm font-light text-text-tertiary">
+                    {t('setting.policies.form.menuOptionsEmpty')}
+                  </p>
+                )}
               </label>
 
               <label className="grid gap-sm text-base font-medium text-text-primary">

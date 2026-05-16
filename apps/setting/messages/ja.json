@@ -266,6 +266,12 @@
       "loading": "役割情報を読み込んでいます。",
       "empty": "該当する役割がありません。",
       "error": "役割情報を読み込めませんでした。",
+      "detail": {
+        "title": "役割詳細",
+        "description": "役割の基本情報とユーザー割り当て状況を確認します。",
+        "loadFailed": "役割詳細情報を読み込めませんでした。",
+        "noDescription": "登録された説明がありません。"
+      },
       "form": {
         "basicInfo": "基本情報",
         "basicInfoDescription": "ロール名と説明を入力します。",
@@ -353,6 +359,8 @@
         "permission": "権限",
         "status": "状態",
         "menuPlaceholder": "メニューを選択してください",
+        "menuOptionsLoading": "メニューオプションを読み込んでいます。",
+        "menuOptionsEmpty": "選択可能なメニューがありません。",
         "permissionPlaceholder": "権限を選択してください",
         "statusPlaceholder": "状態を選択してください",
         "documentPreview": "ポリシードキュメントのプレビュー",

@@ -1,6 +1,7 @@
 'use client'
 
 import { FormEvent, useState } from 'react'
+import Image from 'next/image'
 import { Alert, Button, Input, notifySaveError, notifySaveSuccess } from '@creami/ui'
 import { Lock, LogIn, Mail } from 'lucide-react'
 import { useTranslations } from 'next-intl'
@@ -140,9 +141,11 @@ export default function LoginPage() {
                 color: provider.color
               }}
             >
-              <img
+              <Image
                 src={provider.iconSrc}
                 alt=""
+                width={16}
+                height={16}
                 className="h-icon-md w-icon-md shrink-0 rounded"
                 aria-hidden="true"
               />

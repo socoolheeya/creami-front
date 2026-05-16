@@ -10,7 +10,7 @@ export type PolicyStatus = 'ACTIVE' | 'INACTIVE' | 'DELETED'
 export type PrincipalType = 'MEMBER' | 'GROUP' | 'ROLE'
 export type PolicyDecision = 'ALLOW' | 'DENY'
 export type IamGroupStatus = 'ACTIVE' | 'INACTIVE' | 'DELETED'
-export type PolicyMenuKey = 'users' | 'permissions' | 'policies' | 'subscriptions'
+export type PolicyMenuKey = string
 export type PolicyPermissionKey = 'read' | 'write' | 'all'
 
 export type AuthMember = {
@@ -148,10 +148,20 @@ export type PolicyStatement = {
 export type PolicyStatementPreset = {
   menu: PolicyMenuKey
   permission: PolicyPermissionKey
+  menuId?: string
 }
 
 export type PolicyDocument = {
+  menuIds?: string[]
   statements: PolicyStatement[]
+}
+
+export type PolicyMenuOption = {
+  menuId: string
+  code: string
+  name: string
+  path: string
+  parentMenuId?: string | null
 }
 
 export type RoleSearchCondition = {
@@ -275,14 +285,14 @@ function normalizeAuditLog(auditLog: RawPermissionAuditLog): PermissionAuditLog 
   }
 }
 
-const POLICY_MENU_RESOURCE_MAP: Record<PolicyMenuKey, string> = {
+const POLICY_MENU_RESOURCE_MAP: Record<string, string> = {
   users: 'member:*',
   permissions: 'role:*',
   policies: 'policy:*',
   subscriptions: 'subscription:*'
 }
 
-const POLICY_MENU_ACTION_PREFIX_MAP: Record<PolicyMenuKey, string> = {
+const POLICY_MENU_ACTION_PREFIX_MAP: Record<string, string> = {
   users: 'member',
   permissions: 'role',
   policies: 'policy',
@@ -339,13 +349,16 @@ function createPolicyStatement(
   statement: PolicyStatementPreset,
   sequence?: number
 ): PolicyStatement {
+  const actionPrefix = POLICY_MENU_ACTION_PREFIX_MAP[statement.menu] ?? statement.menu
+  const resource = POLICY_MENU_RESOURCE_MAP[statement.menu] ?? `${statement.menu}:*`
+
   return {
     sid: createPolicyStatementSid(statement.menu, statement.permission, sequence),
     effect: 'ALLOW',
     actions: [
-      `${POLICY_MENU_ACTION_PREFIX_MAP[statement.menu]}:${POLICY_PERMISSION_ACTION_SUFFIX_MAP[statement.permission]}`
+      `${actionPrefix}:${POLICY_PERMISSION_ACTION_SUFFIX_MAP[statement.permission]}`
     ],
-    resources: [POLICY_MENU_RESOURCE_MAP[statement.menu]]
+    resources: [resource]
   }
 }
 
@@ -460,7 +473,12 @@ export function createPolicyDocument(
   permission?: PolicyPermissionKey
 ): PolicyDocument {
   if (Array.isArray(menuOrStatements)) {
+    const menuIds = menuOrStatements
+      .map((statement) => statement.menuId)
+      .filter((menuId): menuId is string => Boolean(menuId))
+
     return {
+      menuIds: menuIds.length > 0 ? menuIds : undefined,
       statements: menuOrStatements.map((statement, index) =>
         createPolicyStatement(statement, menuOrStatements.length > 1 ? index + 1 : undefined)
       )
@@ -482,6 +500,23 @@ export async function activatePolicy(policyId: string): Promise<Policy> {
   })
 
   return normalizePolicy(response)
+}
+
+type RawPolicyMenuOption = Omit<PolicyMenuOption, 'menuId' | 'parentMenuId'> & {
+  menuId: number | string
+  parentMenuId?: number | string | null
+}
+
+export async function getPolicyMenuOptions(init?: RequestInit): Promise<PolicyMenuOption[]> {
+  const response = await request<RawPolicyMenuOption[]>('/api/v1/iam/menus/select-options', init)
+  return response.map((option) => ({
+    ...option,
+    menuId: String(option.menuId),
+    parentMenuId:
+      option.parentMenuId === undefined || option.parentMenuId === null
+        ? null
+        : String(option.parentMenuId)
+  }))
 }
 
 export async function getRoles(
@@ -508,6 +543,11 @@ export async function createRole(input: CreateRoleInput): Promise<Role> {
     body: JSON.stringify(input)
   })
 
+  return normalizeRole(response)
+}
+
+export async function getRole(roleId: string, init?: RequestInit): Promise<Role> {
+  const response = await request<RawRole>(`/api/v1/iam/roles/${roleId}`, init)
   return normalizeRole(response)
 }
 

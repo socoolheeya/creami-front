@@ -266,6 +266,12 @@
       "loading": "Loading roles.",
       "empty": "No roles found.",
       "error": "Failed to load roles.",
+      "detail": {
+        "title": "Role Detail",
+        "description": "Review role information and user assignment status.",
+        "loadFailed": "Failed to load role details.",
+        "noDescription": "No description has been registered."
+      },
       "form": {
         "basicInfo": "Basic Information",
         "basicInfoDescription": "Enter the role name and description.",
@@ -353,6 +359,8 @@
         "permission": "Permission",
         "status": "Status",
         "menuPlaceholder": "Select a menu",
+        "menuOptionsLoading": "Loading menu options.",
+        "menuOptionsEmpty": "No selectable menus are available.",
         "permissionPlaceholder": "Select a permission",
         "statusPlaceholder": "Select a status",
         "documentPreview": "Policy Document Preview",

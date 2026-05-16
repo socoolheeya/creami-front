@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useMemo, useState } from 'react'
+import { startTransition, useEffect, useMemo, useState } from 'react'
 import { Button, Input, Select, notifySaveError, notifySaveSuccess } from '@creami/ui'
 import {
   ArrowLeft,
@@ -73,7 +73,9 @@ export default function UserDetailPage() {
   useEffect(() => {
     let isMounted = true
 
-    setIsLoading(true)
+    startTransition(() => {
+      setIsLoading(true)
+    })
     getMember(params.id)
       .then((response) => {
         if (!isMounted) return
@@ -94,7 +96,7 @@ export default function UserDetailPage() {
     return () => {
       isMounted = false
     }
-  }, [params.id])
+  }, [params.id, t])
 
   const accessibleAccommodations = useMemo(
     () =>

@@ -20,31 +20,31 @@ export interface SwitchProps {
 const switchSizeStyles = {
   medium: {
     track: {
-      width: 'calc(var(--control-height-lg) + var(--spacing-lg))',
-      height: 'var(--control-height-sm)',
-      padding: 'var(--spacing-xs)',
-      borderRadius: 'calc(var(--control-height-sm) * 2)'
+      width: 'calc(var(--control-height-md) + var(--spacing-lg))',
+      height: 'var(--control-height-mini)',
+      padding: 'calc(var(--spacing-xs) / 2)',
+      borderRadius: 'calc(var(--control-height-mini) * 2)'
     },
     thumb: {
-      width: 'calc(var(--control-height-sm) - var(--spacing-xs) - var(--spacing-xs))',
-      height: 'calc(var(--control-height-sm) - var(--spacing-xs) - var(--spacing-xs))',
-      borderRadius: 'calc(var(--control-height-sm) * 2)'
+      width: 'calc(var(--control-height-mini) - var(--spacing-xs))',
+      height: 'calc(var(--control-height-mini) - var(--spacing-xs))',
+      borderRadius: 'calc(var(--control-height-mini) * 2)'
     },
-    checkedTransform: 'translateX(calc(var(--control-height-lg) + var(--spacing-lg) - var(--control-height-sm)))'
+    checkedTransform: 'translateX(calc(var(--control-height-md) + var(--spacing-lg) - var(--control-height-mini)))'
   },
   small: {
     track: {
-      width: 'calc(var(--control-height-md) + var(--spacing-md))',
-      height: 'var(--control-height-mini)',
-      padding: 'var(--spacing-xs)',
-      borderRadius: 'calc(var(--control-height-mini) * 2)'
+      width: 'calc(var(--control-height-sm) + var(--spacing-md))',
+      height: 'calc(var(--control-height-mini) - var(--spacing-xs))',
+      padding: 'calc(var(--spacing-xs) / 2)',
+      borderRadius: 'var(--control-height-mini)'
     },
     thumb: {
-      width: 'calc(var(--control-height-mini) - var(--spacing-xs) - var(--spacing-xs))',
-      height: 'calc(var(--control-height-mini) - var(--spacing-xs) - var(--spacing-xs))',
-      borderRadius: 'calc(var(--control-height-mini) * 2)'
+      width: 'calc(var(--control-height-mini) - var(--spacing-md))',
+      height: 'calc(var(--control-height-mini) - var(--spacing-md))',
+      borderRadius: 'var(--control-height-mini)'
     },
-    checkedTransform: 'translateX(calc(var(--control-height-md) + var(--spacing-md) - var(--control-height-mini)))'
+    checkedTransform: 'translateX(calc(var(--control-height-sm) + var(--spacing-md) - var(--control-height-mini) + var(--spacing-xs)))'
   }
 }
 

@@ -18,7 +18,7 @@ import {
 import { Plus, ShieldCheck } from 'lucide-react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { useTranslations } from 'next-intl'
-import { KeyboardEvent, useEffect, useMemo, useRef, useState } from 'react'
+import { KeyboardEvent, startTransition, useEffect, useMemo, useRef, useState } from 'react'
 import { getRoles, type Role } from '../../lib/api/iam'
 import { getDisplayApiErrorMessage } from '../../lib/api/errors'
 
@@ -62,16 +62,20 @@ export default function PermissionsPage() {
   }, [router, saved, searchParams, t])
 
   useEffect(() => {
-    setNameFilter(name)
-    setDescriptionFilter(description)
+    startTransition(() => {
+      setNameFilter(name)
+      setDescriptionFilter(description)
+    })
   }, [name, description])
 
   useEffect(() => {
     abortControllerRef.current?.abort()
     const abortController = new AbortController()
     abortControllerRef.current = abortController
-    setIsLoading(true)
-    setErrorMessage(null)
+    startTransition(() => {
+      setIsLoading(true)
+      setErrorMessage(null)
+    })
 
     getRoles(
       {
@@ -99,7 +103,7 @@ export default function PermissionsPage() {
       })
 
     return () => abortController.abort()
-  }, [queryKey])
+  }, [queryKey, t])
 
   const updateQuery = (
     nextPage: number,
@@ -117,6 +121,10 @@ export default function PermissionsPage() {
     if (event.key === 'Enter') {
       updateQuery(1)
     }
+  }
+
+  const openRoleDetail = (roleId: string) => {
+    router.push(`/permissions/${roleId}`)
   }
 
   return (
@@ -236,7 +244,18 @@ export default function PermissionsPage() {
               </TableStateRow>
             )}
             {!errorMessage && roles.map((role) => (
-              <TableRow key={role.roleId}>
+              <TableRow
+                key={role.roleId}
+                onClick={() => openRoleDetail(role.roleId)}
+                onKeyDown={(event) => {
+                  if (event.key === 'Enter' || event.key === ' ') {
+                    event.preventDefault()
+                    openRoleDetail(role.roleId)
+                  }
+                }}
+                role="button"
+                tabIndex={0}
+              >
                 <TableCell className="w-permission-col-role-id" truncate titleText={role.roleId}>
                   {role.roleId}
                 </TableCell>

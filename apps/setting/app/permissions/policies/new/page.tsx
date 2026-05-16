@@ -1,6 +1,6 @@
 'use client'
 
-import { type FormEvent, useEffect, useMemo, useState } from 'react'
+import { type FormEvent, startTransition, useEffect, useMemo, useState } from 'react'
 import { Alert, Button, Input, Select, notifySaveError, notifySaveSuccess } from '@creami/ui'
 import { ArrowLeft, FilePlus2, Plus, Save, Trash2 } from 'lucide-react'
 import { useRouter } from 'next/navigation'
@@ -10,8 +10,10 @@ import {
   createPolicyDocument,
   deactivatePolicy,
   getIamGroups,
+  getPolicyMenuOptions,
   type IamGroup,
   type PolicyMenuKey,
+  type PolicyMenuOption,
   type PolicyPermissionKey,
   type PolicyStatementPreset,
   type PolicyStatus
@@ -40,7 +42,6 @@ const INITIAL_STATEMENTS: PolicyStatementRow[] = [
   { id: 'statement-1', menu: '', permission: '' }
 ]
 
-const MENU_OPTIONS: PolicyMenuKey[] = ['users', 'permissions', 'policies', 'subscriptions']
 const PERMISSION_OPTIONS: PolicyPermissionKey[] = ['read', 'write', 'all']
 const STATUS_OPTIONS: Array<Extract<PolicyStatus, 'ACTIVE' | 'INACTIVE'>> = ['ACTIVE', 'INACTIVE']
 
@@ -53,8 +54,10 @@ export default function CreatePolicyPage() {
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
   const [isSaving, setIsSaving] = useState(false)
   const [groups, setGroups] = useState<IamGroup[]>([])
+  const [menuOptions, setMenuOptions] = useState<PolicyMenuOption[]>([])
   const [selectedGroupIds, setSelectedGroupIds] = useState<string[]>([])
   const [isLoadingGroups, setIsLoadingGroups] = useState(true)
+  const [isLoadingMenuOptions, setIsLoadingMenuOptions] = useState(true)
   const [statements, setStatements] = useState<PolicyStatementRow[]>(INITIAL_STATEMENTS)
 
   const documentPreview = useMemo(() => {
@@ -71,9 +74,18 @@ export default function CreatePolicyPage() {
   useEffect(() => {
     const abortController = new AbortController()
 
-    setIsLoadingGroups(true)
-    getIamGroups(0, 200, { signal: abortController.signal })
-      .then((response) => setGroups(response.content))
+    startTransition(() => {
+      setIsLoadingGroups(true)
+      setIsLoadingMenuOptions(true)
+    })
+    Promise.all([
+      getIamGroups(0, 200, { signal: abortController.signal }),
+      getPolicyMenuOptions({ signal: abortController.signal })
+    ])
+      .then(([groupResponse, menuResponse]) => {
+        setGroups(groupResponse.content)
+        setMenuOptions(menuResponse)
+      })
       .catch((error) => {
         if (abortController.signal.aborted) return
         setErrorMessage(getDisplayApiErrorMessage(error, t('setting.policies.groupsLoadFailed')))
@@ -81,6 +93,7 @@ export default function CreatePolicyPage() {
       .finally(() => {
         if (!abortController.signal.aborted) {
           setIsLoadingGroups(false)
+          setIsLoadingMenuOptions(false)
         }
       })
 
@@ -167,7 +180,8 @@ export default function CreatePolicyPage() {
     try {
       const selectedStatements = statements.map((statement) => ({
         menu: statement.menu as PolicyMenuKey,
-        permission: statement.permission as PolicyPermissionKey
+        permission: statement.permission as PolicyPermissionKey,
+        menuId: menuOptions.find((option) => option.code === statement.menu)?.menuId
       }))
 
       const createdPolicy = await createPolicy({
@@ -310,12 +324,22 @@ export default function CreatePolicyPage() {
                       disabled={isSaving}
                     >
                       <option value="">{t('setting.policies.form.menuPlaceholder')}</option>
-                      {MENU_OPTIONS.map((menu) => (
-                        <option key={menu} value={menu}>
-                          {t(`setting.policies.menus.${menu}`)}
+                      {menuOptions.map((menu) => (
+                        <option key={menu.menuId} value={menu.code}>
+                          {menu.name}
                         </option>
                       ))}
                     </Select>
+                    {isLoadingMenuOptions && (
+                      <p className="text-sm font-light text-text-tertiary">
+                        {t('setting.policies.form.menuOptionsLoading')}
+                      </p>
+                    )}
+                    {!isLoadingMenuOptions && menuOptions.length === 0 && (
+                      <p className="text-sm font-light text-text-tertiary">
+                        {t('setting.policies.form.menuOptionsEmpty')}
+                      </p>
+                    )}
                   </div>
 
                   <div className="flex flex-col gap-sm">

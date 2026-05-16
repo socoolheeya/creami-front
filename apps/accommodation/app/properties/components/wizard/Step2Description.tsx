@@ -2,6 +2,8 @@ import { PropertyFormData, AMENITY_OPTIONS } from '../../../../lib/types/propert
 import { Plus, X } from 'lucide-react'
 import { useState } from 'react'
 
+const predefinedAmenities: readonly string[] = AMENITY_OPTIONS
+
 interface Step2DescriptionProps {
   data: PropertyFormData
   onChange: (data: Partial<PropertyFormData>) => void
@@ -151,7 +153,7 @@ export function Step2Description({ data, onChange }: Step2DescriptionProps) {
               선택된 편의시설 ({data.amenities.length}개)
             </p>
             <div className="flex flex-wrap gap-3">
-              {data.amenities.filter(a => !AMENITY_OPTIONS.includes(a as any)).map(amenity => (
+              {data.amenities.filter(a => !predefinedAmenities.includes(a)).map(amenity => (
                 <span
                   key={amenity}
                   className="inline-flex items-center gap-2 px-3 py-1 rounded-lg"

@@ -1,6 +1,6 @@
 'use client'
 
-import { ReactNode, useEffect, useState } from 'react'
+import { ReactNode, startTransition, useEffect, useState } from 'react'
 import { MainLayout as UiMainLayout } from '@creami/ui'
 import { useLocale } from 'next-intl'
 import { APPS, CURRENT_APP_ID } from '@/lib/constants'
@@ -31,7 +31,9 @@ export function MainLayout({ children }: { children: ReactNode }) {
   const [authMember, setAuthMember] = useState<AuthMember | null>(null)
 
   useEffect(() => {
-    setAuthMember(readStoredAuthMember())
+    startTransition(() => {
+      setAuthMember(readStoredAuthMember())
+    })
 
     getCurrentAuthMember()
       .then((member) => {

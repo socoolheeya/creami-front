@@ -1,7 +1,7 @@
 'use client'
 
 import { CreditCard, FileSliders, Handshake, KeyRound, ShieldCheck, UserCog, Users, UsersRound } from 'lucide-react'
-import { useEffect, useState } from 'react'
+import { usePathname } from 'next/navigation'
 import { useTranslations } from 'next-intl'
 import { Sidebar as SidebarComponent, SidebarMenu, SidebarMenuItem, useSidebar } from '@creami/ui'
 
@@ -18,12 +18,8 @@ const menuItems = [
 
 export function Sidebar() {
   const { isCollapsed } = useSidebar()
-  const [resolvedPathname, setResolvedPathname] = useState('')
+  const resolvedPathname = usePathname()
   const t = useTranslations()
-
-  useEffect(() => {
-    setResolvedPathname(window.location.pathname)
-  }, [])
 
   const getIsActive = (href: string) => {
     if (href === '/permissions' || href === '/suppliers') {

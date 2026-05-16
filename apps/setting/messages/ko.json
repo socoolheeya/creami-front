@@ -266,6 +266,12 @@
       "loading": "역할 정보를 불러오는 중입니다.",
       "empty": "조회된 역할이 없습니다.",
       "error": "역할 정보를 불러오지 못했습니다.",
+      "detail": {
+        "title": "역할 상세",
+        "description": "역할 기본 정보와 사용자 배정 현황을 확인합니다.",
+        "loadFailed": "역할 상세 정보를 불러오지 못했습니다.",
+        "noDescription": "등록된 설명이 없습니다."
+      },
       "form": {
         "basicInfo": "기본 정보",
         "basicInfoDescription": "역할명과 설명을 입력합니다.",
@@ -354,6 +360,8 @@
         "permission": "권한",
         "status": "상태",
         "menuPlaceholder": "메뉴를 선택하세요",
+        "menuOptionsLoading": "메뉴 옵션을 불러오는 중입니다.",
+        "menuOptionsEmpty": "선택 가능한 메뉴가 없습니다.",
         "permissionPlaceholder": "권한을 선택하세요",
         "statusPlaceholder": "상태를 선택하세요",
         "documentPreview": "정책 문서 미리보기",
