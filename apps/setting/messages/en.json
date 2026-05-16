@@ -315,7 +315,7 @@
       "description": "Manage read, write, and full permission policies by menu.",
       "addPolicy": "Add Policy",
       "createTitle": "Create Policy",
-      "createDescription": "Create a new policy by selecting a menu, permission, and status.",
+      "createDescription": "Create a new policy by selecting multiple permission statements and user groups.",
       "create": "Create",
       "creating": "Creating",
       "created": "Policy has been created.",
@@ -356,6 +356,10 @@
         "permissionPlaceholder": "Select a permission",
         "statusPlaceholder": "Select a status",
         "documentPreview": "Policy Document Preview",
+        "statements": "Permission Statements",
+        "statementsDescription": "Add multiple menu permissions to include in this policy.",
+        "addStatement": "Add Permission",
+        "removeStatement": "Remove permission {number}",
         "applyGroups": "Apply to User Groups",
         "applyGroupsDescription": "Select the user groups that will use this policy.",
         "groupsLoading": "Loading user groups.",
@@ -385,6 +389,7 @@
         "nameRequired": "Enter a policy name.",
         "menuRequired": "Select a menu.",
         "permissionRequired": "Select a permission.",
+        "statementRequired": "Select a menu and permission for every permission row.",
         "statusRequired": "Select a status."
       },
       "statuses": {

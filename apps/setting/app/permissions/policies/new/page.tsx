@@ -2,7 +2,7 @@
 
 import { type FormEvent, useEffect, useMemo, useState } from 'react'
 import { Alert, Button, Input, Select, notifySaveError, notifySaveSuccess } from '@creami/ui'
-import { ArrowLeft, FilePlus2, Save } from 'lucide-react'
+import { ArrowLeft, FilePlus2, Plus, Save, Trash2 } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import { useTranslations } from 'next-intl'
 import {
@@ -13,6 +13,7 @@ import {
   type IamGroup,
   type PolicyMenuKey,
   type PolicyPermissionKey,
+  type PolicyStatementPreset,
   type PolicyStatus
 } from '@/lib/api/iam'
 import { getDisplayApiErrorMessage } from '@/lib/api/errors'
@@ -20,20 +21,24 @@ import { getDisplayApiErrorMessage } from '@/lib/api/errors'
 type PolicyCreateForm = {
   name: string
   description: string
-  menu: PolicyMenuKey | ''
-  permission: PolicyPermissionKey | ''
   status: Extract<PolicyStatus, 'ACTIVE' | 'INACTIVE'> | ''
 }
 
 type PolicyCreateFormErrors = Partial<Record<keyof PolicyCreateForm, string>>
+type PolicyStatementRow = {
+  id: string
+  menu: PolicyMenuKey | ''
+  permission: PolicyPermissionKey | ''
+}
 
 const INITIAL_FORM: PolicyCreateForm = {
   name: '',
   description: '',
-  menu: '',
-  permission: '',
   status: 'ACTIVE'
 }
+const INITIAL_STATEMENTS: PolicyStatementRow[] = [
+  { id: 'statement-1', menu: '', permission: '' }
+]
 
 const MENU_OPTIONS: PolicyMenuKey[] = ['users', 'permissions', 'policies', 'subscriptions']
 const PERMISSION_OPTIONS: PolicyPermissionKey[] = ['read', 'write', 'all']
@@ -44,20 +49,24 @@ export default function CreatePolicyPage() {
   const router = useRouter()
   const [form, setForm] = useState<PolicyCreateForm>(INITIAL_FORM)
   const [errors, setErrors] = useState<PolicyCreateFormErrors>({})
+  const [statementError, setStatementError] = useState<string | null>(null)
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
   const [isSaving, setIsSaving] = useState(false)
   const [groups, setGroups] = useState<IamGroup[]>([])
   const [selectedGroupIds, setSelectedGroupIds] = useState<string[]>([])
   const [isLoadingGroups, setIsLoadingGroups] = useState(true)
+  const [statements, setStatements] = useState<PolicyStatementRow[]>(INITIAL_STATEMENTS)
 
   const documentPreview = useMemo(() => {
-    if (!form.menu || !form.permission) return ''
+    const completeStatements = statements.filter(
+      (statement): statement is PolicyStatementRow & PolicyStatementPreset =>
+        Boolean(statement.menu && statement.permission)
+    )
 
-    const selectedMenu = form.menu as PolicyMenuKey
-    const selectedPermission = form.permission as PolicyPermissionKey
+    if (completeStatements.length === 0) return ''
 
-    return JSON.stringify(createPolicyDocument(selectedMenu, selectedPermission), null, 2)
-  }, [form.menu, form.permission])
+    return JSON.stringify(createPolicyDocument(completeStatements), null, 2)
+  }, [statements])
 
   useEffect(() => {
     const abortController = new AbortController()
@@ -85,20 +94,19 @@ export default function CreatePolicyPage() {
       nextErrors.name = t('setting.policies.validation.nameRequired')
     }
 
-    if (!form.menu) {
-      nextErrors.menu = t('setting.policies.validation.menuRequired')
-    }
-
-    if (!form.permission) {
-      nextErrors.permission = t('setting.policies.validation.permissionRequired')
-    }
-
     if (!form.status) {
       nextErrors.status = t('setting.policies.validation.statusRequired')
     }
 
+    const hasInvalidStatement = statements.length === 0 || statements.some(
+      (statement) => !statement.menu || !statement.permission
+    )
+    setStatementError(
+      hasInvalidStatement ? t('setting.policies.validation.statementRequired') : null
+    )
+
     setErrors(nextErrors)
-    return Object.keys(nextErrors).length === 0
+    return Object.keys(nextErrors).length === 0 && !hasInvalidStatement
   }
 
   const updateField = <K extends keyof PolicyCreateForm>(field: K, value: PolicyCreateForm[K]) => {
@@ -117,6 +125,35 @@ export default function CreatePolicyPage() {
     )
   }
 
+  const addStatement = () => {
+    setStatements((current) => [
+      ...current,
+      { id: `statement-${Date.now()}`, menu: '', permission: '' }
+    ])
+    setStatementError(null)
+  }
+
+  const removeStatement = (statementId: string) => {
+    setStatements((current) =>
+      current.length === 1
+        ? current
+        : current.filter((statement) => statement.id !== statementId)
+    )
+  }
+
+  const updateStatement = <K extends keyof Omit<PolicyStatementRow, 'id'>>(
+    statementId: string,
+    field: K,
+    value: PolicyStatementRow[K]
+  ) => {
+    setStatements((current) =>
+      current.map((statement) =>
+        statement.id === statementId ? { ...statement, [field]: value } : statement
+      )
+    )
+    setStatementError(null)
+  }
+
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
 
@@ -128,13 +165,15 @@ export default function CreatePolicyPage() {
     setErrorMessage(null)
 
     try {
-      const selectedMenu = form.menu as PolicyMenuKey
-      const selectedPermission = form.permission as PolicyPermissionKey
+      const selectedStatements = statements.map((statement) => ({
+        menu: statement.menu as PolicyMenuKey,
+        permission: statement.permission as PolicyPermissionKey
+      }))
 
       const createdPolicy = await createPolicy({
         name: form.name.trim(),
         description: form.description.trim() || null,
-        documentJson: JSON.stringify(createPolicyDocument(selectedMenu, selectedPermission)),
+        documentJson: JSON.stringify(createPolicyDocument(selectedStatements)),
         attachments: selectedGroupIds.map((groupId) => ({
           principalType: 'GROUP',
           principalId: groupId
@@ -232,57 +271,104 @@ export default function CreatePolicyPage() {
               )}
             </div>
 
-            <div className="flex flex-col gap-sm">
-              <label className="text-base font-medium text-text-primary" htmlFor="policy-menu">
-                {t('setting.policies.form.menu')}
-              </label>
-              <Select
-                id="policy-menu"
-                value={form.menu}
-                onChange={(event) => updateField('menu', event.target.value as PolicyCreateForm['menu'])}
-                aria-invalid={Boolean(errors.menu)}
-                required
-                disabled={isSaving}
-              >
-                <option value="">{t('setting.policies.form.menuPlaceholder')}</option>
-                {MENU_OPTIONS.map((menu) => (
-                  <option key={menu} value={menu}>
-                    {t(`setting.policies.menus.${menu}`)}
-                  </option>
-                ))}
-              </Select>
-              {errors.menu && (
-                <p className="text-base font-light text-error">
-                  {errors.menu}
+          </div>
+
+          <div className="flex flex-col gap-sm">
+            <div className="flex flex-wrap items-center justify-between gap-sm">
+              <div>
+                <h2 className="text-lg font-bold text-text-primary">
+                  {t('setting.policies.form.statements')}
+                </h2>
+                <p className="mt-xs text-base font-light text-text-secondary">
+                  {t('setting.policies.form.statementsDescription')}
                 </p>
-              )}
+              </div>
+              <Button type="button" size="small" onClick={addStatement} disabled={isSaving}>
+                <Plus className="h-icon-md w-icon-md" />
+                {t('setting.policies.form.addStatement')}
+              </Button>
             </div>
 
             <div className="flex flex-col gap-sm">
-              <label className="text-base font-medium text-text-primary" htmlFor="policy-permission">
-                {t('setting.policies.form.permission')}
-              </label>
-              <Select
-                id="policy-permission"
-                value={form.permission}
-                onChange={(event) => updateField('permission', event.target.value as PolicyCreateForm['permission'])}
-                aria-invalid={Boolean(errors.permission)}
-                required
-                disabled={isSaving}
-              >
-                <option value="">{t('setting.policies.form.permissionPlaceholder')}</option>
-                {PERMISSION_OPTIONS.map((permission) => (
-                  <option key={permission} value={permission}>
-                    {t(`setting.policies.permissions.${permission}`)}
-                  </option>
-                ))}
-              </Select>
-              {errors.permission && (
-                <p className="text-base font-light text-error">
-                  {errors.permission}
-                </p>
-              )}
+              {statements.map((statement, index) => (
+                <div
+                  key={statement.id}
+                  className="grid gap-sm rounded border border-border bg-bg-secondary p-md lg:grid-cols-[1fr_1fr_auto]"
+                >
+                  <div className="flex flex-col gap-sm">
+                    <label className="text-base font-medium text-text-primary" htmlFor={`policy-menu-${statement.id}`}>
+                      {t('setting.policies.form.menu')}
+                    </label>
+                    <Select
+                      id={`policy-menu-${statement.id}`}
+                      value={statement.menu}
+                      onChange={(event) =>
+                        updateStatement(statement.id, 'menu', event.target.value as PolicyStatementRow['menu'])
+                      }
+                      aria-invalid={Boolean(statementError && !statement.menu)}
+                      required
+                      disabled={isSaving}
+                    >
+                      <option value="">{t('setting.policies.form.menuPlaceholder')}</option>
+                      {MENU_OPTIONS.map((menu) => (
+                        <option key={menu} value={menu}>
+                          {t(`setting.policies.menus.${menu}`)}
+                        </option>
+                      ))}
+                    </Select>
+                  </div>
+
+                  <div className="flex flex-col gap-sm">
+                    <label
+                      className="text-base font-medium text-text-primary"
+                      htmlFor={`policy-permission-${statement.id}`}
+                    >
+                      {t('setting.policies.form.permission')}
+                    </label>
+                    <Select
+                      id={`policy-permission-${statement.id}`}
+                      value={statement.permission}
+                      onChange={(event) =>
+                        updateStatement(
+                          statement.id,
+                          'permission',
+                          event.target.value as PolicyStatementRow['permission']
+                        )
+                      }
+                      aria-invalid={Boolean(statementError && !statement.permission)}
+                      required
+                      disabled={isSaving}
+                    >
+                      <option value="">{t('setting.policies.form.permissionPlaceholder')}</option>
+                      {PERMISSION_OPTIONS.map((permission) => (
+                        <option key={permission} value={permission}>
+                          {t(`setting.policies.permissions.${permission}`)}
+                        </option>
+                      ))}
+                    </Select>
+                  </div>
+
+                  <div className="flex items-end">
+                    <Button
+                      type="button"
+                      variant="tertiary"
+                      iconOnly
+                      onClick={() => removeStatement(statement.id)}
+                      disabled={isSaving || statements.length === 1}
+                      aria-label={t('setting.policies.form.removeStatement', { number: index + 1 })}
+                    >
+                      <Trash2 className="h-icon-md w-icon-md" />
+                    </Button>
+                  </div>
+                </div>
+              ))}
             </div>
+
+            {statementError && (
+              <p className="text-base font-light text-error">
+                {statementError}
+              </p>
+            )}
           </div>
 
           <div className="flex flex-col gap-sm">

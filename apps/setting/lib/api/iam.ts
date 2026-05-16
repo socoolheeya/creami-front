@@ -143,6 +143,11 @@ export type PolicyStatement = {
   resources: string[]
 }
 
+export type PolicyStatementPreset = {
+  menu: PolicyMenuKey
+  permission: PolicyPermissionKey
+}
+
 export type PolicyDocument = {
   statements: PolicyStatement[]
 }
@@ -316,10 +321,29 @@ export async function getCurrentAuthMember(init?: RequestInit): Promise<AuthMemb
   return normalizeAuthMember(response)
 }
 
-function createPolicyStatementSid(menu: PolicyMenuKey, permission: PolicyPermissionKey) {
-  return `${menu}-${permission}`.replace(/(^\w|-\w)/g, (segment) =>
+function createPolicyStatementSid(
+  menu: PolicyMenuKey,
+  permission: PolicyPermissionKey,
+  sequence?: number
+) {
+  const sid = `${menu}-${permission}`.replace(/(^\w|-\w)/g, (segment) =>
     segment.replace('-', '').toUpperCase()
   )
+  return sequence === undefined ? sid : `${sid}${sequence}`
+}
+
+function createPolicyStatement(
+  statement: PolicyStatementPreset,
+  sequence?: number
+): PolicyStatement {
+  return {
+    sid: createPolicyStatementSid(statement.menu, statement.permission, sequence),
+    effect: 'ALLOW',
+    actions: [
+      `${POLICY_MENU_ACTION_PREFIX_MAP[statement.menu]}:${POLICY_PERMISSION_ACTION_SUFFIX_MAP[statement.permission]}`
+    ],
+    resources: [POLICY_MENU_RESOURCE_MAP[statement.menu]]
+  }
 }
 
 export async function getPolicies(
@@ -426,21 +450,26 @@ export async function deactivatePolicy(
   return normalizePolicy(response)
 }
 
+export function createPolicyDocument(menu: PolicyMenuKey, permission: PolicyPermissionKey): PolicyDocument
+export function createPolicyDocument(statements: PolicyStatementPreset[]): PolicyDocument
 export function createPolicyDocument(
-  menu: PolicyMenuKey,
-  permission: PolicyPermissionKey
+  menuOrStatements: PolicyMenuKey | PolicyStatementPreset[],
+  permission?: PolicyPermissionKey
 ): PolicyDocument {
+  if (Array.isArray(menuOrStatements)) {
+    return {
+      statements: menuOrStatements.map((statement, index) =>
+        createPolicyStatement(statement, menuOrStatements.length > 1 ? index + 1 : undefined)
+      )
+    }
+  }
+
+  if (!permission) {
+    return { statements: [] }
+  }
+
   return {
-    statements: [
-      {
-        sid: createPolicyStatementSid(menu, permission),
-        effect: 'ALLOW',
-        actions: [
-          `${POLICY_MENU_ACTION_PREFIX_MAP[menu]}:${POLICY_PERMISSION_ACTION_SUFFIX_MAP[permission]}`
-        ],
-        resources: [POLICY_MENU_RESOURCE_MAP[menu]]
-      }
-    ]
+    statements: [createPolicyStatement({ menu: menuOrStatements, permission })]
   }
 }
 

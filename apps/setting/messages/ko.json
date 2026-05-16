@@ -316,7 +316,7 @@
       "description": "메뉴별 읽기, 쓰기, 전체 권한 정책을 관리합니다.",
       "addPolicy": "정책 추가",
       "createTitle": "정책 생성",
-      "createDescription": "메뉴별 권한과 상태를 선택해 새 정책을 생성합니다.",
+      "createDescription": "여러 권한 문장과 적용할 사용자 그룹을 선택해 새 정책을 생성합니다.",
       "create": "생성",
       "creating": "생성 중",
       "created": "정책이 생성되었습니다.",
@@ -357,6 +357,10 @@
         "permissionPlaceholder": "권한을 선택하세요",
         "statusPlaceholder": "상태를 선택하세요",
         "documentPreview": "정책 문서 미리보기",
+        "statements": "권한 문장",
+        "statementsDescription": "정책에 포함할 메뉴별 권한을 여러 개 추가할 수 있습니다.",
+        "addStatement": "권한 추가",
+        "removeStatement": "{number}번 권한 삭제",
         "applyGroups": "사용자 그룹 적용",
         "applyGroupsDescription": "이 정책을 사용할 사용자 그룹을 선택합니다.",
         "groupsLoading": "사용자 그룹을 불러오는 중입니다.",
@@ -386,6 +390,7 @@
         "nameRequired": "정책명을 입력하세요.",
         "menuRequired": "메뉴를 선택하세요.",
         "permissionRequired": "권한을 선택하세요.",
+        "statementRequired": "모든 권한 행의 메뉴와 권한을 선택하세요.",
         "statusRequired": "상태를 선택하세요."
       },
       "statuses": {

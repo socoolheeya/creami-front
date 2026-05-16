@@ -315,7 +315,7 @@
       "description": "メニュー別の読み取り、書き込み、全体権限ポリシーを管理します。",
       "addPolicy": "ポリシー追加",
       "createTitle": "ポリシー作成",
-      "createDescription": "メニュー別の権限と状態を選択して新しいポリシーを作成します。",
+      "createDescription": "複数の権限ステートメントと適用するユーザーグループを選択して新しいポリシーを作成します。",
       "create": "作成",
       "creating": "作成中",
       "created": "ポリシーが作成されました。",
@@ -356,6 +356,10 @@
         "permissionPlaceholder": "権限を選択してください",
         "statusPlaceholder": "状態を選択してください",
         "documentPreview": "ポリシードキュメントのプレビュー",
+        "statements": "権限ステートメント",
+        "statementsDescription": "ポリシーに含めるメニュー別権限を複数追加できます。",
+        "addStatement": "権限を追加",
+        "removeStatement": "{number}番目の権限を削除",
         "applyGroups": "ユーザーグループ適用",
         "applyGroupsDescription": "このポリシーを使用するユーザーグループを選択します。",
         "groupsLoading": "ユーザーグループを読み込んでいます。",
@@ -385,6 +389,7 @@
         "nameRequired": "ポリシー名を入力してください。",
         "menuRequired": "メニューを選択してください。",
         "permissionRequired": "権限を選択してください。",
+        "statementRequired": "すべての権限行でメニューと権限を選択してください。",
         "statusRequired": "状態を選択してください。"
       },
       "statuses": {
