@@ -1,10 +1,11 @@
 'use client'
 
 import Link from 'next/link'
-import { useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import { useLocale, useTranslations } from 'next-intl'
 import { CircleDollarSign, FileText, Plus, ReceiptText } from 'lucide-react'
 import {
+  ErrorTemplate,
   Input,
   Select,
   Table,
@@ -14,7 +15,7 @@ import {
   TableHeader,
   TableRow
 } from '@creami/ui'
-import { formatDate, formatMoney, invoices, invoiceStatuses, type InvoiceStatus } from '@/lib/invoices'
+import { fetchInvoices, formatDate, formatMoney, invoiceStatuses, type Invoice, type InvoiceStatus } from '@/lib/invoices'
 
 type StatusFilter = 'all' | InvoiceStatus
 
@@ -39,11 +40,44 @@ export default function InvoicesPage() {
   const locale = useLocale()
   const [query, setQuery] = useState('')
   const [status, setStatus] = useState<StatusFilter>('all')
+  const [invoiceList, setInvoiceList] = useState<Invoice[]>([])
+  const [isLoading, setIsLoading] = useState(true)
+  const [errorMessage, setErrorMessage] = useState<string | null>(null)
+
+  const loadInvoices = useCallback(async (isActive: () => boolean = () => true) => {
+    setIsLoading(true)
+    setErrorMessage(null)
+
+    try {
+      const nextInvoices = await fetchInvoices()
+      if (isActive()) {
+        setInvoiceList(nextInvoices)
+      }
+    } catch {
+      if (isActive()) {
+        setErrorMessage(t('errorDescription'))
+      }
+    } finally {
+      if (isActive()) {
+        setIsLoading(false)
+      }
+    }
+  }, [t])
+
+  useEffect(() => {
+    let active = true
+
+    void Promise.resolve().then(() => loadInvoices(() => active))
+
+    return () => {
+      active = false
+    }
+  }, [loadInvoices])
 
   const filteredInvoices = useMemo(() => {
     const normalizedQuery = query.trim().toLowerCase()
 
-    return invoices.filter((invoice) => {
+    return invoiceList.filter((invoice) => {
       const matchesStatus = status === 'all' || invoice.status === status
       const matchesQuery =
         !normalizedQuery ||
@@ -54,10 +88,10 @@ export default function InvoicesPage() {
 
       return matchesStatus && matchesQuery
     })
-  }, [query, status])
+  }, [invoiceList, query, status])
 
   const summary = useMemo(() => {
-    return invoices.reduce(
+    return invoiceList.reduce(
       (acc, invoice) => {
         acc.total += invoice.totalAmount
         acc.unpaid += invoice.totalAmount - invoice.paidAmount
@@ -68,7 +102,9 @@ export default function InvoicesPage() {
       },
       { total: 0, unpaid: 0, issued: 0, overdue: 0 }
     )
-  }, [])
+  }, [invoiceList])
+
+  const showInitialLoading = isLoading && invoiceList.length === 0 && !errorMessage
 
   return (
     <div>
@@ -84,15 +120,32 @@ export default function InvoicesPage() {
             {t('description')}
           </p>
         </div>
-        <Link
-          href="/invoices/new"
-          className="inline-flex h-control-md items-center justify-center gap-sm rounded bg-primary px-control-px-md text-base font-medium leading-none text-white no-underline"
-        >
-          <Plus className="h-icon-md w-icon-md" />
-          {t('actions.create')}
-        </Link>
+        {!showInitialLoading && !errorMessage && (
+          <Link
+            href="/invoices/new"
+            className="inline-flex h-control-md items-center justify-center gap-sm rounded bg-primary px-control-px-md text-base font-medium leading-none text-white no-underline"
+          >
+            <Plus className="h-icon-md w-icon-md" />
+            {t('actions.create')}
+          </Link>
+        )}
       </div>
 
+      {showInitialLoading ? (
+        <div className="flex items-center justify-center py-2xl">
+          <div className="text-text-secondary">{t('loading')}</div>
+        </div>
+      ) : errorMessage ? (
+        <ErrorTemplate
+          title={t('errorTitle')}
+          description={errorMessage}
+          retryLabel={t('retry')}
+          onRetry={() => {
+            void loadInvoices()
+          }}
+        />
+      ) : (
+      <>
       <div className="mb-lg grid grid-cols-1 gap-lg md:grid-cols-2 xl:grid-cols-4">
         <div className="rounded border border-border bg-bg-primary p-lg shadow">
           <div className="mb-md flex h-control-lg w-control-lg items-center justify-center rounded bg-primary text-white">
@@ -101,7 +154,7 @@ export default function InvoicesPage() {
           <p className="mb-xs text-base font-light text-text-secondary">
             {t('summary.totalCount')}
           </p>
-          <p className="text-2xl font-bold text-text-primary">{invoices.length}</p>
+          <p className="text-2xl font-bold text-text-primary">{invoiceList.length}</p>
         </div>
         <div className="rounded border border-border bg-bg-primary p-lg shadow">
           <div className="mb-md flex h-control-lg w-control-lg items-center justify-center rounded bg-primary text-white">
@@ -210,6 +263,8 @@ export default function InvoicesPage() {
           </div>
         )}
       </div>
+      </>
+      )}
     </div>
   )
 }

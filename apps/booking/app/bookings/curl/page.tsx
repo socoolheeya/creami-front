@@ -3,8 +3,8 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { Terminal, AlertCircle, Check } from 'lucide-react'
-import { createBooking } from '@/lib/api/mock-search'
-import { CreateBookingRequest } from '@/lib/types/search'
+import { createBooking } from '@/lib/api/bookings'
+import type { CreateBookingRequest } from '@/lib/types/search'
 
 export default function CurlBookingPage() {
   const router = useRouter()
@@ -66,9 +66,12 @@ export default function CurlBookingPage() {
   const exampleCurl = `curl -X POST http://localhost:3000/api/bookings \\
   -H "Content-Type: application/json" \\
   --data '{
-    "accommodationId": "ACC001",
-    "roomId": "ROOM001",
-    "ratePlanId": "RP001",
+    "accommodationId": "1",
+    "accommodationName": "CREAMI 호텔",
+    "roomId": "1",
+    "roomName": "디럭스 더블룸",
+    "ratePlanId": "1",
+    "ratePlanName": "기본 요금제",
     "checkIn": "2026-06-01",
     "checkOut": "2026-06-03",
     "occupancies": [
@@ -81,6 +84,7 @@ export default function CurlBookingPage() {
     "guestName": "홍길동",
     "guestEmail": "hong@example.com",
     "guestPhone": "010-1234-5678",
+    "totalPrice": 200000,
     "specialRequests": "금연 객실"
   }'`
 

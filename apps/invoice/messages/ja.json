@@ -15,6 +15,10 @@
     "description": "施設別の請求書発行、支払期限、決済状態を管理します。",
     "results": "合計 {count}件",
     "empty": "請求書が見つかりません。",
+    "loading": "loading..",
+    "errorTitle": "一時的な問題が発生しました",
+    "errorDescription": "請求書一覧を読み込めませんでした。",
+    "retry": "再試行",
     "summary": {
       "totalCount": "全請求書",
       "totalAmount": "請求総額",

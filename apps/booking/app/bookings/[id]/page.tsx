@@ -1,9 +1,10 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useParams, useRouter } from 'next/navigation'
 import { ArrowLeft, Calendar, User, Building2, Phone, Mail, Users, BedDouble, ChevronRight, Plus, Minus, DollarSign, AlertCircle, Shield, Globe, X, Ban } from 'lucide-react'
-import { getBookingById } from '@/lib/data/mock-bookings'
+import { cancelBooking, fetchBookingById, getBookingApiErrorMessage } from '@/lib/api/bookings'
+import type { Booking } from '@/lib/types/booking'
 import { Button } from '@creami/ui'
 
 const DAY_IN_MS = 1000 * 60 * 60 * 24
@@ -13,8 +14,39 @@ export default function BookingDetailPage() {
   const router = useRouter()
   const bookingId = params.id as string
   const [isCancelPopupOpen, setIsCancelPopupOpen] = useState(false)
+  const [booking, setBooking] = useState<Booking | null>(null)
+  const [isLoading, setIsLoading] = useState(true)
+  const [errorMessage, setErrorMessage] = useState<string | null>(null)
 
-  const booking = getBookingById(bookingId)
+  useEffect(() => {
+    let cancelled = false
+
+    async function loadBooking() {
+      setIsLoading(true)
+      setErrorMessage(null)
+
+      try {
+        const result = await fetchBookingById(bookingId)
+        if (!cancelled) {
+          setBooking(result)
+        }
+      } catch (error) {
+        if (!cancelled) {
+          setErrorMessage(getBookingApiErrorMessage(error, '예약 상세를 불러오지 못했습니다.'))
+        }
+      } finally {
+        if (!cancelled) {
+          setIsLoading(false)
+        }
+      }
+    }
+
+    loadBooking()
+
+    return () => {
+      cancelled = true
+    }
+  }, [bookingId])
 
   // Helper function to calculate cancellation deadline date
   const getCancellationDeadline = (checkInDate: string, daysBeforeCheckIn: number): Date => {
@@ -38,12 +70,22 @@ export default function BookingDetailPage() {
     return Math.max(0, Math.ceil((checkInStart.getTime() - todayStart.getTime()) / DAY_IN_MS))
   }
 
-  if (!booking) {
+  if (isLoading) {
+    return (
+      <div className="text-center">
+        <p className="text-base" style={{ color: 'var(--text-secondary)' }}>
+          예약 상세를 불러오는 중입니다.
+        </p>
+      </div>
+    )
+  }
+
+  if (!booking || errorMessage) {
     return (
       <div>
         <div className="text-center">
           <h1 className="text-2xl mb-md" style={{ fontWeight: 'var(--font-bold)', color: 'var(--text-primary)' }}>
-            예약을 찾을 수 없습니다
+            {errorMessage || '예약을 찾을 수 없습니다'}
           </h1>
           <Button type="button" onClick={() => router.push('/bookings')}>
             목록으로 돌아가기
@@ -76,9 +118,21 @@ export default function BookingDetailPage() {
   const cancellationPenaltyAmount = calculatePenaltyAmount(booking.pricing.totalAmount, applicableCancellationRule.refundPercentage)
   const cancellationRefundAmount = booking.pricing.totalAmount - cancellationPenaltyAmount
 
-  const handleConfirmCancellation = () => {
-    setIsCancelPopupOpen(false)
-    alert('예약 취소가 확정되었습니다')
+  const handleConfirmCancellation = async () => {
+    try {
+      await cancelBooking({
+        bookingId: booking.id,
+        bookingAmount: booking.pricing.totalAmount,
+        penaltyAmount: cancellationPenaltyAmount,
+        refundAmount: cancellationRefundAmount,
+        reason: '고객 요청'
+      })
+      setBooking({ ...booking, status: 'cancelled' })
+      setIsCancelPopupOpen(false)
+      alert('예약 취소가 확정되었습니다')
+    } catch (error) {
+      alert(getBookingApiErrorMessage(error, '예약 취소 중 오류가 발생했습니다'))
+    }
   }
 
   return (

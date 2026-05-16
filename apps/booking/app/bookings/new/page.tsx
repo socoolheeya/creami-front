@@ -4,7 +4,7 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { CalendarCheck } from 'lucide-react'
 import { SearchRequest, SearchResponse, AvailableRoomRate, CreateBookingRequest } from '@/lib/types/search'
-import { searchAvailableRooms, createBooking } from '@/lib/api/mock-search'
+import { createBooking, getBookingApiErrorMessage, searchAvailableRooms } from '@/lib/api/bookings'
 import { SearchForm } from './components/SearchForm'
 import { RoomRateTable } from './components/RoomRateTable'
 import { BookingForm } from './components/BookingForm'
@@ -41,14 +41,18 @@ export default function NewBookingPage() {
     try {
       const request: CreateBookingRequest = {
         accommodationId: searchResult.accommodationId, // 검색 결과에서 가져온 실제 ID 사용
+        accommodationName: searchResult.accommodationName,
         roomId: selectedRoomRate.roomId,
+        roomName: selectedRoomRate.roomName,
         ratePlanId: selectedRoomRate.ratePlanId,
+        ratePlanName: selectedRoomRate.ratePlanName,
         checkIn: searchRequest.checkIn,
         checkOut: searchRequest.checkOut,
         occupancies: searchRequest.occupancies,
         guestName: formData.guestName,
         guestEmail: formData.guestEmail,
         guestPhone: formData.guestPhone,
+        totalPrice: selectedRoomRate.totalPrice,
         specialRequests: formData.specialRequests
       }
 
@@ -56,7 +60,7 @@ export default function NewBookingPage() {
       alert(`예약이 완료되었습니다!\n예약번호: ${booking.bookingNumber}`)
       router.push(`/bookings/${booking.id}`)
     } catch (error) {
-      alert('예약 중 오류가 발생했습니다')
+      alert(getBookingApiErrorMessage(error, '예약 중 오류가 발생했습니다'))
       console.error(error)
     } finally {
       setIsBooking(false)

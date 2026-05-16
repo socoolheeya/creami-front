@@ -105,6 +105,7 @@ export function RateGrid({
       }
     })
 
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setRateData(data)
   }, [initialRows])
 

@@ -47,13 +47,17 @@ export interface SearchResponse {
 // 예약 생성 요청 타입
 export interface CreateBookingRequest {
   accommodationId: string
+  accommodationName?: string
   roomId: string
+  roomName?: string
   ratePlanId: string
+  ratePlanName?: string
   checkIn: string
   checkOut: string
   occupancies: RoomOccupancy[]
   guestName: string
   guestEmail: string
   guestPhone: string
+  totalPrice?: number
   specialRequests?: string
 }

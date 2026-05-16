@@ -2,7 +2,7 @@
 
 import { Search, ChevronDown } from 'lucide-react'
 import { SearchRequest, RoomOccupancy } from '@/lib/types/search'
-import { mockAccommodations } from '@/lib/data/mock-accommodations'
+import { AccommodationOption, searchAccommodations } from '@/lib/api/bookings'
 import { OccupancyInput } from './OccupancyInput'
 import { useState, useRef, useEffect } from 'react'
 import { Button, DatePicker } from '@creami/ui'
@@ -18,16 +18,36 @@ export function SearchForm({ onSearch, isLoading }: SearchFormProps) {
   const [showDropdown, setShowDropdown] = useState(false)
   const [checkIn, setCheckIn] = useState('')
   const [checkOut, setCheckOut] = useState('')
+  const [accommodationOptions, setAccommodationOptions] = useState<AccommodationOption[]>([])
   const [occupancies, setOccupancies] = useState<RoomOccupancy[]>([
     { roomNumber: 1, adults: 2, children: [] }
   ])
 
   const dropdownRef = useRef<HTMLDivElement>(null)
 
-  const filteredAccommodations = mockAccommodations.filter(acc =>
-    acc.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    acc.id.toLowerCase().includes(searchQuery.toLowerCase())
-  )
+  useEffect(() => {
+    let cancelled = false
+
+    async function loadAccommodations() {
+      try {
+        const result = await searchAccommodations(searchQuery)
+        if (!cancelled) {
+          setAccommodationOptions(result)
+        }
+      } catch {
+        if (!cancelled) {
+          setAccommodationOptions([])
+        }
+      }
+    }
+
+    loadAccommodations()
+
+    return () => {
+      cancelled = true
+    }
+  }, [searchQuery])
+
 
   // 외부 클릭 시 드롭다운 닫기
   useEffect(() => {
@@ -129,8 +149,8 @@ export function SearchForm({ onSearch, isLoading }: SearchFormProps) {
                 overflowY: 'auto'
               }}
             >
-              {filteredAccommodations.length > 0 ? (
-                filteredAccommodations.map((acc) => (
+              {accommodationOptions.length > 0 ? (
+                accommodationOptions.map((acc) => (
                   <div
                     key={acc.id}
                     onClick={() => handleAccommodationSelect(acc.id, acc.name)}

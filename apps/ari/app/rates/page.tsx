@@ -94,7 +94,7 @@ export default function RatesPage() {
   useEffect(() => {
     let active = true
 
-    loadProperties(() => active)
+    void Promise.resolve().then(() => loadProperties(() => active))
 
     return () => {
       active = false
@@ -104,7 +104,7 @@ export default function RatesPage() {
   useEffect(() => {
     let active = true
 
-    loadPropertyOptions(() => active)
+    void Promise.resolve().then(() => loadPropertyOptions(() => active))
 
     return () => {
       active = false
@@ -191,12 +191,6 @@ export default function RatesPage() {
 
   const handlePackageSelect = (packageId: string) => {
     setSelectedPackageId(packageId)
-  }
-
-  const handleRoomSelect = (roomId: string) => {
-    if (!selectedRoomIds.includes(roomId)) {
-      setSelectedRoomIds([...selectedRoomIds, roomId])
-    }
   }
 
   const handleSingleRoomSelect = (roomId: string) => {
@@ -375,6 +369,28 @@ export default function RatesPage() {
 
   const toggleCollapse = () => {
     setIsCollapsed(!isCollapsed)
+  }
+
+  if (errorMessage) {
+    return (
+      <div className="flex flex-col gap-xl">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-md">
+            <DollarSign className="h-lg w-lg" style={{ color: 'var(--primary)' }} />
+            <h1 className="text-2xl" style={{ fontWeight: 'var(--font-bold)', color: 'var(--text-primary)' }}>
+              {t('ari.rates.title')}
+            </h1>
+          </div>
+        </div>
+
+        <ErrorTemplate
+          title={t('ari.common.errorTitle')}
+          description={errorMessage || t('ari.common.errorDescription')}
+          retryLabel={t('ari.common.retry')}
+          onRetry={handleRetry}
+        />
+      </div>
+    )
   }
 
   const roomSelector = (
@@ -804,16 +820,6 @@ export default function RatesPage() {
           </h1>
         </div>
       </div>
-
-      {errorMessage && (
-        <ErrorTemplate
-          title={t('ari.common.errorTitle')}
-          description={errorMessage || t('ari.common.errorDescription')}
-          retryLabel={t('ari.common.retry')}
-          onRetry={handleRetry}
-          className="items-start text-left"
-        />
-      )}
 
       {/* Selection Panel */}
       <div

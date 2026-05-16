@@ -81,7 +81,7 @@ export default function InventoriesPage() {
   useEffect(() => {
     let active = true
 
-    loadProperties(() => active)
+    void Promise.resolve().then(() => loadProperties(() => active))
 
     return () => {
       active = false
@@ -91,7 +91,7 @@ export default function InventoriesPage() {
   useEffect(() => {
     let active = true
 
-    loadRooms(() => active)
+    void Promise.resolve().then(() => loadRooms(() => active))
 
     return () => {
       active = false
@@ -219,6 +219,28 @@ export default function InventoriesPage() {
     setIsCollapsed(!isCollapsed)
   }
 
+  if (errorMessage) {
+    return (
+      <div className="flex flex-col gap-xl">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-md">
+            <Package className="h-lg w-lg" style={{ color: 'var(--primary)' }} />
+            <h1 className="text-2xl" style={{ fontWeight: 'var(--font-bold)', color: 'var(--text-primary)' }}>
+              {t('ari.inventories.title')}
+            </h1>
+          </div>
+        </div>
+
+        <ErrorTemplate
+          title={t('ari.common.errorTitle')}
+          description={errorMessage || t('ari.common.errorDescription')}
+          retryLabel={t('ari.common.retry')}
+          onRetry={handleRetry}
+        />
+      </div>
+    )
+  }
+
   const selectedProperty = properties.find(p => p.id === selectedPropertyId)
 
   return (
@@ -232,16 +254,6 @@ export default function InventoriesPage() {
           </h1>
         </div>
       </div>
-
-      {errorMessage && (
-        <ErrorTemplate
-          title={t('ari.common.errorTitle')}
-          description={errorMessage || t('ari.common.errorDescription')}
-          retryLabel={t('ari.common.retry')}
-          onRetry={handleRetry}
-          className="items-start text-left"
-        />
-      )}
 
       {/* Selection Panel */}
       <div

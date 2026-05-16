@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useRef, useEffect, useMemo } from 'react'
-import { ChevronLeft, ChevronRight, Edit2, Copy, Save, X, CalendarRange, Calendar as CalendarIcon } from 'lucide-react'
+import { ChevronLeft, ChevronRight, Edit2, Copy, Save, X, CalendarRange } from 'lucide-react'
 import { DatePicker, notification } from '@creami/ui'
 import { useLocale, useTranslations } from 'next-intl'
 import type { InventoryRow } from '@/lib/api/ari'
@@ -72,6 +72,7 @@ export function InventoryGrid({ startDate, endDate, selectedRooms, initialRows, 
       }
     })
 
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setInventoryData(data)
   }, [initialRows])
 

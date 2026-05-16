@@ -2,10 +2,11 @@
 
 import { Tag, Plus } from 'lucide-react'
 import Link from 'next/link'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useTranslations } from 'next-intl'
 import { Button, Input } from '@creami/ui'
-import { mockDiscounts } from '@/lib/data/mock-discounts'
+import { fetchDiscounts } from '@/lib/api/discount'
+import { Discount } from '@/lib/types/discount'
 import { DiscountCard } from './components/DiscountCard'
 import { DiscountTable } from './components/DiscountTable'
 import { ViewToggle } from './components/ViewToggle'
@@ -14,17 +15,42 @@ type ViewMode = 'grid' | 'table'
 
 export default function DiscountsPage() {
   const t = useTranslations()
-  const discounts = mockDiscounts
   const [viewMode, setViewMode] = useState<ViewMode>('grid')
   const [searchQuery, setSearchQuery] = useState('')
+  const [discounts, setDiscounts] = useState<Discount[]>([])
+  const [isLoading, setIsLoading] = useState(true)
+  const [errorMessage, setErrorMessage] = useState('')
 
-  // 검색 필터링
-  const filteredDiscounts = discounts.filter(discount => {
-    const matchesSearch = searchQuery === '' ||
-      discount.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      discount.code.toLowerCase().includes(searchQuery.toLowerCase())
-    return matchesSearch
-  })
+  useEffect(() => {
+    let ignore = false
+
+    const loadDiscounts = async () => {
+      setIsLoading(true)
+      setErrorMessage('')
+
+      try {
+        const response = await fetchDiscounts({ search: searchQuery })
+        if (!ignore) {
+          setDiscounts(response)
+        }
+      } catch {
+        if (!ignore) {
+          setDiscounts([])
+          setErrorMessage(t('discount.discounts.loadError'))
+        }
+      } finally {
+        if (!ignore) {
+          setIsLoading(false)
+        }
+      }
+    }
+
+    loadDiscounts()
+
+    return () => {
+      ignore = true
+    }
+  }, [searchQuery, t])
 
   return (
     <div>
@@ -59,8 +85,33 @@ export default function DiscountsPage() {
         <ViewToggle view={viewMode} onViewChange={setViewMode} />
       </div>
 
-      {/* Discount List */}
-      {filteredDiscounts.length === 0 ? (
+      {isLoading ? (
+        <div
+          className="flex flex-col items-center justify-center rounded py-3xl"
+          style={{
+            backgroundColor: 'var(--bg-primary)',
+            border: '2px dashed var(--border-color)'
+          }}
+        >
+          <Tag className="h-3xl w-3xl mb-md text-text-tertiary" />
+          <h3 className="text-xl mb-sm font-bold text-text-primary">
+            {t('discount.discounts.loading')}
+          </h3>
+        </div>
+      ) : errorMessage ? (
+        <div
+          className="flex flex-col items-center justify-center rounded py-3xl"
+          style={{
+            backgroundColor: 'var(--bg-primary)',
+            border: '2px dashed var(--border-color)'
+          }}
+        >
+          <Tag className="h-3xl w-3xl mb-md text-text-tertiary" />
+          <h3 className="text-xl mb-sm font-bold text-text-primary">
+            {errorMessage}
+          </h3>
+        </div>
+      ) : discounts.length === 0 ? (
         <div
           className="flex flex-col items-center justify-center rounded py-3xl"
           style={{
@@ -88,12 +139,12 @@ export default function DiscountsPage() {
         </div>
       ) : viewMode === 'grid' ? (
         <div className="grid grid-cols-1 gap-lg md:grid-cols-2 lg:grid-cols-3">
-          {filteredDiscounts.map((discount) => (
+          {discounts.map((discount) => (
             <DiscountCard key={discount.id} discount={discount} />
           ))}
         </div>
       ) : (
-        <DiscountTable discounts={filteredDiscounts} />
+        <DiscountTable discounts={discounts} />
       )}
     </div>
   )

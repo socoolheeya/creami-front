@@ -1,13 +1,20 @@
 'use client'
 
 import { Link2, Save, ChevronRight, ChevronLeft, Search } from 'lucide-react'
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useEffect } from 'react'
 import { useLocale, useTranslations } from 'next-intl'
 import { Button, Card, notification } from '@creami/ui'
-import { mockRatePlans, mockDiscountRatePlanMappings } from '@/lib/data/mock-rateplans'
-import { mockDiscounts } from '@/lib/data/mock-discounts'
-import { mockAccommodations } from '@/lib/data/mock-accommodations'
+import {
+  fetchAccommodations,
+  fetchDiscountRatePlanMappings,
+  fetchDiscounts,
+  fetchRatePlans,
+  saveDiscountRatePlanMappings,
+} from '@/lib/api/discount'
+import { Accommodation } from '@/lib/types/accommodation'
+import { Discount } from '@/lib/types/discount'
 import { DiscountRatePlanMapping } from '@/lib/types/rateplan'
+import { RatePlan } from '@/lib/types/rateplan'
 import { AccommodationSelector } from './components/AccommodationSelector'
 import { RatePlanSelector } from './components/RatePlanSelector'
 import { DiscountList } from './components/DiscountList'
@@ -21,32 +28,148 @@ export default function MappingsPage() {
   const locale = useLocale()
   const [selectedAccommodationId, setSelectedAccommodationId] = useState<string | null>(null)
   const [selectedRatePlanIds, setSelectedRatePlanIds] = useState<string[]>([])
-  const [mappings, setMappings] = useState<DiscountRatePlanMapping[]>(mockDiscountRatePlanMappings)
+  const [mappings, setMappings] = useState<DiscountRatePlanMapping[]>([])
+  const [accommodations, setAccommodations] = useState<Accommodation[]>([])
+  const [ratePlans, setRatePlans] = useState<RatePlan[]>([])
+  const [discounts, setDiscounts] = useState<Discount[]>([])
+  const [isLoading, setIsLoading] = useState(true)
+  const [isRatePlanLoading, setIsRatePlanLoading] = useState(false)
+  const [isMappingLoading, setIsMappingLoading] = useState(false)
+  const [isSaving, setIsSaving] = useState(false)
+  const [errorMessage, setErrorMessage] = useState('')
   const [availableDiscountQuery, setAvailableDiscountQuery] = useState('')
   const [availableDiscountLimit, setAvailableDiscountLimit] = useState(AVAILABLE_DISCOUNT_PAGE_SIZE)
   const [selectorOpen, setSelectorOpen] = useState(true)
 
-  // 선택된 숙소의 요금제만 필터링
-  const filteredRatePlans = useMemo(() => {
-    if (!selectedAccommodationId) return []
-    return mockRatePlans.filter(rp => rp.accommodationId === selectedAccommodationId)
-  }, [selectedAccommodationId])
-
   const selectedAccommodation = useMemo(() => {
     if (!selectedAccommodationId) return null
-    return mockAccommodations.find(accommodation => accommodation.id === selectedAccommodationId) ?? null
-  }, [selectedAccommodationId])
+    return accommodations.find(accommodation => accommodation.id === selectedAccommodationId) ?? null
+  }, [accommodations, selectedAccommodationId])
 
   const selectedRatePlans = useMemo(() => {
-    return filteredRatePlans.filter(ratePlan => selectedRatePlanIds.includes(ratePlan.id))
-  }, [filteredRatePlans, selectedRatePlanIds])
+    return ratePlans.filter(ratePlan => selectedRatePlanIds.includes(ratePlan.id))
+  }, [ratePlans, selectedRatePlanIds])
 
   const isMappingReady = selectedAccommodationId !== null && selectedRatePlanIds.length > 0
 
-  // 숙소 변경 시 요금제 선택 초기화
+  useEffect(() => {
+    let ignore = false
+
+    const loadInitialData = async () => {
+      setIsLoading(true)
+      setErrorMessage('')
+
+      try {
+        const [accommodationResponse, discountResponse] = await Promise.all([
+          fetchAccommodations(),
+          fetchDiscounts({ activeOnly: true }),
+        ])
+
+        if (!ignore) {
+          setAccommodations(accommodationResponse)
+          setDiscounts(discountResponse)
+        }
+      } catch {
+        if (!ignore) {
+          setErrorMessage(t('discount.mappings.loadError'))
+        }
+      } finally {
+        if (!ignore) {
+          setIsLoading(false)
+        }
+      }
+    }
+
+    loadInitialData()
+
+    return () => {
+      ignore = true
+    }
+  }, [t])
+
+  useEffect(() => {
+    let ignore = false
+
+    const loadRatePlans = async () => {
+      if (!selectedAccommodationId) {
+        setRatePlans([])
+        return
+      }
+
+      setIsRatePlanLoading(true)
+      setErrorMessage('')
+
+      try {
+        const response = await fetchRatePlans(selectedAccommodationId, selectedAccommodation)
+        if (!ignore) {
+          setRatePlans(response)
+        }
+      } catch {
+        if (!ignore) {
+          setRatePlans([])
+          setErrorMessage(t('discount.mappings.ratePlanLoadError'))
+        }
+      } finally {
+        if (!ignore) {
+          setIsRatePlanLoading(false)
+        }
+      }
+    }
+
+    loadRatePlans()
+
+    return () => {
+      ignore = true
+    }
+  }, [selectedAccommodation, selectedAccommodationId, t])
+
+  useEffect(() => {
+    let ignore = false
+
+    const loadMappings = async () => {
+      if (selectedRatePlanIds.length === 0) {
+        return
+      }
+
+      setIsMappingLoading(true)
+      setErrorMessage('')
+
+      try {
+        const response = await fetchDiscountRatePlanMappings(selectedRatePlanIds)
+        if (!ignore) {
+          setMappings(prev => {
+            const selectedSet = new Set(selectedRatePlanIds)
+            const retainedMappings = prev.filter(mapping => !selectedSet.has(mapping.ratePlanId))
+            const responseRatePlanIds = new Set(response.map(mapping => mapping.ratePlanId))
+            const emptyMappings = selectedRatePlanIds
+              .filter(ratePlanId => !responseRatePlanIds.has(ratePlanId))
+              .map(ratePlanId => ({ ratePlanId, discountIds: [] }))
+
+            return [...retainedMappings, ...response, ...emptyMappings]
+          })
+        }
+      } catch {
+        if (!ignore) {
+          setErrorMessage(t('discount.mappings.mappingLoadError'))
+        }
+      } finally {
+        if (!ignore) {
+          setIsMappingLoading(false)
+        }
+      }
+    }
+
+    loadMappings()
+
+    return () => {
+      ignore = true
+    }
+  }, [selectedRatePlanIds, t])
+
   const handleAccommodationChange = (accommodationId: string | null) => {
     setSelectedAccommodationId(accommodationId)
     setSelectedRatePlanIds([])
+    setMappings([])
     setAvailableDiscountQuery('')
     setAvailableDiscountLimit(AVAILABLE_DISCOUNT_PAGE_SIZE)
     setSelectorOpen(true)
@@ -75,14 +198,7 @@ export default function MappingsPage() {
     return new Set(allMappedIds)
   }, [selectedRatePlanIds, mappings])
 
-  const eligibleDiscounts = useMemo(() => {
-    const now = new Date()
-    return mockDiscounts.filter(discount =>
-      discount.status === 'active' &&
-      discount.startDate <= now &&
-      discount.endDate >= now
-    )
-  }, [])
+  const eligibleDiscounts = discounts
 
   const normalizedAvailableDiscountQuery = normalizeDiscountSearchTerm(availableDiscountQuery)
 
@@ -157,14 +273,35 @@ export default function MappingsPage() {
     })
   }
 
-  const handleSave = () => {
-    // TODO: API 호출하여 저장
-    console.log('Saving mappings:', mappings)
-    notification.success({
-      message: '저장이 완료되었습니다.',
-      placement: 'top-right',
-      direction: 'right'
-    })
+  const handleSave = async () => {
+    if (selectedRatePlanIds.length === 0) return
+
+    setIsSaving(true)
+
+    try {
+      const selectedSet = new Set(selectedRatePlanIds)
+      const payload = mappings.filter(mapping => selectedSet.has(mapping.ratePlanId))
+      const response = await saveDiscountRatePlanMappings(payload)
+
+      setMappings(prev => {
+        const retainedMappings = prev.filter(mapping => !selectedSet.has(mapping.ratePlanId))
+        return [...retainedMappings, ...response]
+      })
+
+      notification.success({
+        message: t('discount.mappings.saveSuccess'),
+        placement: 'top-right',
+        direction: 'right'
+      })
+    } catch {
+      notification.error({
+        message: t('discount.mappings.saveError'),
+        placement: 'top-right',
+        direction: 'right'
+      })
+    } finally {
+      setIsSaving(false)
+    }
   }
 
   return (
@@ -181,7 +318,7 @@ export default function MappingsPage() {
         <Button
           type="button"
           onClick={handleSave}
-          disabled={!selectedAccommodationId || selectedRatePlanIds.length === 0}
+          disabled={!selectedAccommodationId || selectedRatePlanIds.length === 0 || isSaving || isMappingLoading}
           variant="primary"
           size="medium"
         >
@@ -228,7 +365,7 @@ export default function MappingsPage() {
         <div className={`grid grid-cols-1 gap-lg lg:grid-cols-2 ${isMappingReady ? 'mb-md' : 'mb-lg'}`}>
           <div>
             <AccommodationSelector
-              accommodations={mockAccommodations}
+              accommodations={accommodations}
               selectedId={selectedAccommodationId}
               onSelect={handleAccommodationChange}
               compact={selectedAccommodationId !== null}
@@ -237,14 +374,27 @@ export default function MappingsPage() {
           <div>
             <RatePlanSelector
               key={selectedAccommodationId ?? 'no-accommodation'}
-              ratePlans={filteredRatePlans}
+              ratePlans={ratePlans}
               selectedIds={selectedRatePlanIds}
               onSelectionChange={handleRatePlanSelectionChange}
               compact={isMappingReady}
-              disabled={!selectedAccommodationId}
+              disabled={!selectedAccommodationId || isRatePlanLoading}
               onApply={handleApplySelection}
             />
           </div>
+        </div>
+      )}
+
+      {(isLoading || errorMessage) && (
+        <div
+          className="mb-md rounded px-md py-sm text-base font-medium"
+          style={{
+            backgroundColor: 'var(--bg-primary)',
+            border: '1px solid var(--border-color)',
+            color: errorMessage ? 'var(--danger)' : 'var(--text-secondary)',
+          }}
+        >
+          {errorMessage || t('discount.mappings.loading')}
         </div>
       )}
 

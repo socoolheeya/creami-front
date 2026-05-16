@@ -9,6 +9,7 @@ import { Receipt, Plus } from 'lucide-react'
 import { RatePlanTableView, type RatePlanTableFilters } from './components/RatePlanTableView'
 import { RatePlanCardView } from './components/RatePlanCardView'
 import { ViewToggle, Button, Card, Pagination } from '@creami/ui'
+import { ErrorTemplate } from '@/components/common/ErrorTemplate'
 
 type ViewMode = 'grid' | 'table'
 
@@ -85,11 +86,15 @@ export default function RatePlansPage() {
   const {
     data,
     isLoading,
-    isFetching
+    isFetching,
+    isError,
+    error,
+    refetch
   } = useRatePlansPaginated(filters, true)
 
   const ratePlans = data?.ratePlans || []
   const pagination = data?.pagination
+  const errorDescription = error instanceof Error ? error.message : commonT('errorDescription')
 
   // URL 파라미터 업데이트
   const updateURL = useCallback((
@@ -161,6 +166,7 @@ export default function RatePlansPage() {
   }, [])
 
   const showInitialLoading = isLoading && !data
+  const showError = !showInitialLoading && isError
 
   return (
     <div>
@@ -174,24 +180,37 @@ export default function RatePlansPage() {
         </div>
       </div>
 
-      <div className="mb-md flex justify-end gap-sm">
-        <ViewToggle view={viewMode} onViewChange={setViewMode} />
-        <Link href="/rateplans/new">
-          <Button>
-            <Plus className="w-lg h-lg" />
-            {t('new')}
-          </Button>
-        </Link>
-      </div>
+      {!showInitialLoading && !showError && (
+        <div className="mb-md flex justify-end gap-sm">
+          <ViewToggle view={viewMode} onViewChange={setViewMode} />
+          <Link href="/rateplans/new">
+            <Button>
+              <Plus className="w-lg h-lg" />
+              {t('new')}
+            </Button>
+          </Link>
+        </div>
+      )}
 
       {/* Content */}
-      {viewMode === 'table' ? (
+      {showInitialLoading ? (
+        <div className="flex items-center justify-center py-2xl">
+          <div className="text-text-secondary">{commonT('loading')}</div>
+        </div>
+      ) : showError ? (
+        <ErrorTemplate
+          description={errorDescription}
+          onRetry={() => {
+            void refetch()
+          }}
+        />
+      ) : viewMode === 'table' ? (
         <>
           <RatePlanTableView
             ratePlans={ratePlans}
             filters={tableFilters}
             onFiltersChange={handleTableFiltersChange}
-            isFetching={isFetching || showInitialLoading}
+            isFetching={isFetching}
             className={`mb-lg transition-opacity ${isFetching ? 'opacity-70' : 'opacity-100'}`}
           />
 
@@ -208,10 +227,6 @@ export default function RatePlansPage() {
             />
           )}
         </>
-      ) : showInitialLoading ? (
-        <div className="flex items-center justify-center py-2xl">
-          <div className="text-text-secondary">{commonT('loading')}</div>
-        </div>
       ) : ratePlans.length === 0 ? (
         <Card className="flex flex-col items-center justify-center border-dashed py-2xl text-center" hover={false}>
           <Receipt className="h-2xl w-2xl mb-md text-text-tertiary" />

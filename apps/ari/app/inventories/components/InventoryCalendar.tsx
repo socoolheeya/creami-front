@@ -37,10 +37,6 @@ export function InventoryCalendar({ blocks, startDate, endDate, propertyName }: 
   }
 
   const getInventoryForDate = (date: Date): DayInventory => {
-    const dateStr = date.toISOString().split('T')[0]
-    const start = new Date(startDate)
-    const end = new Date(endDate)
-
     // Filter blocks that cover this date
     const relevantBlocks = blocks.filter(block => {
       const blockStart = new Date(block.startDate)

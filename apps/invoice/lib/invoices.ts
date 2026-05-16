@@ -158,6 +158,10 @@ export const invoices: Invoice[] = [
   }
 ]
 
+export async function fetchInvoices(): Promise<Invoice[]> {
+  return invoices
+}
+
 export function formatMoney(amount: number, currency: Invoice['currency'], locale: string) {
   return new Intl.NumberFormat(locale, {
     style: 'currency',

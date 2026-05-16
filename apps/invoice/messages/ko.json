@@ -15,6 +15,10 @@
     "description": "숙소별 송장 발행, 납기, 결제 상태를 관리합니다.",
     "results": "총 {count}건",
     "empty": "조회된 송장이 없습니다.",
+    "loading": "loading..",
+    "errorTitle": "일시적인 문제가 발생했습니다",
+    "errorDescription": "송장 목록을 불러오지 못했습니다.",
+    "retry": "다시 시도",
     "summary": {
       "totalCount": "전체 송장",
       "totalAmount": "총 청구 금액",

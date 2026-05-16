@@ -1,10 +1,11 @@
 'use client'
 
-import { useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import type { ReactNode } from 'react'
 import { Calendar, User, Building2, X } from 'lucide-react'
 import Link from 'next/link'
-import { mockBookings } from '@/lib/data/mock-bookings'
+import { fetchBookings, getBookingApiErrorMessage } from '@/lib/api/bookings'
+import type { Booking } from '@/lib/types/booking'
 import {
   Button,
   DatePicker,
@@ -17,6 +18,7 @@ import {
   TableHeader,
   TableRow
 } from '@creami/ui'
+import { ErrorTemplate } from '@creami/ui'
 
 const BOOKING_LIST_FILTER_ENABLED = true
 
@@ -60,6 +62,9 @@ export default function BookingsPage() {
   const [checkInFilter, setCheckInFilter] = useState('')
   const [checkOutFilter, setCheckOutFilter] = useState('')
   const [statusFilter, setStatusFilter] = useState('all')
+  const [allBookings, setAllBookings] = useState<Booking[]>([])
+  const [isLoading, setIsLoading] = useState(true)
+  const [errorMessage, setErrorMessage] = useState<string | null>(null)
 
   const statusConfig = {
     confirmed: { label: '확정', color: 'var(--success)', bgColor: 'var(--success-bg)' },
@@ -67,12 +72,42 @@ export default function BookingsPage() {
     cancelled: { label: '취소', color: 'var(--error)', bgColor: 'var(--error-bg)' }
   }
 
+  const loadBookings = useCallback(async (isActive: () => boolean = () => true) => {
+    setIsLoading(true)
+    setErrorMessage(null)
+
+    try {
+      const result = await fetchBookings()
+      if (isActive()) {
+        setAllBookings(result)
+      }
+    } catch (error) {
+      if (isActive()) {
+        setErrorMessage(getBookingApiErrorMessage(error, '예약 목록을 불러오지 못했습니다.'))
+      }
+    } finally {
+      if (isActive()) {
+        setIsLoading(false)
+      }
+    }
+  }, [])
+
+  useEffect(() => {
+    let active = true
+
+    void Promise.resolve().then(() => loadBookings(() => active))
+
+    return () => {
+      active = false
+    }
+  }, [loadBookings])
+
   const bookings = useMemo(() => {
     const bookingNumber = bookingNumberFilter.trim().toLowerCase()
     const guestName = guestNameFilter.trim().toLowerCase()
     const stayKeyword = stayFilter.trim().toLowerCase()
 
-    return mockBookings.filter((booking) => {
+    return allBookings.filter((booking) => {
       const matchesBookingNumber = !bookingNumber || booking.bookingNumber.toLowerCase().includes(bookingNumber)
       const matchesGuestName = !guestName || booking.guestName.toLowerCase().includes(guestName)
       const matchesStay = !stayKeyword || [
@@ -87,7 +122,7 @@ export default function BookingsPage() {
 
       return matchesBookingNumber && matchesGuestName && matchesStay && matchesBookingDate && matchesCheckIn && matchesCheckOut && matchesStatus
     })
-  }, [bookingDateFilter, bookingNumberFilter, checkInFilter, checkOutFilter, guestNameFilter, statusFilter, stayFilter])
+  }, [allBookings, bookingDateFilter, bookingNumberFilter, checkInFilter, checkOutFilter, guestNameFilter, statusFilter, stayFilter])
 
   const resetFilters = () => {
     setBookingNumberFilter('')
@@ -98,6 +133,8 @@ export default function BookingsPage() {
     setCheckOutFilter('')
     setStatusFilter('all')
   }
+
+  const showInitialLoading = isLoading && allBookings.length === 0 && !errorMessage
 
   return (
     <div>
@@ -113,13 +150,29 @@ export default function BookingsPage() {
             전체 예약 내역을 확인하고 관리하세요
           </p>
         </div>
-        <Link href="/bookings/new">
-          <Button size="medium">
-            새 예약 추가
-          </Button>
-        </Link>
+        {!showInitialLoading && !errorMessage && (
+          <Link href="/bookings/new">
+            <Button size="medium">
+              새 예약 추가
+            </Button>
+          </Link>
+        )}
       </div>
 
+      {showInitialLoading ? (
+        <div className="flex items-center justify-center py-2xl">
+          <div className="text-text-secondary">loading..</div>
+        </div>
+      ) : errorMessage ? (
+        <ErrorTemplate
+          title="일시적인 문제가 발생했습니다"
+          description={errorMessage}
+          retryLabel="다시 시도"
+          onRetry={() => {
+            void loadBookings()
+          }}
+        />
+      ) : (
       <div
         className="rounded"
         style={{
@@ -351,6 +404,7 @@ export default function BookingsPage() {
           </TableBody>
         </Table>
       </div>
+      )}
     </div>
   )
 }

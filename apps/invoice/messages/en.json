@@ -15,6 +15,10 @@
     "description": "Manage invoice issuance, due dates, and payment status by property.",
     "results": "{count} results",
     "empty": "No invoices found.",
+    "loading": "loading..",
+    "errorTitle": "Something went wrong",
+    "errorDescription": "Failed to load invoices.",
+    "retry": "Retry",
     "summary": {
       "totalCount": "Total Invoices",
       "totalAmount": "Total Billed",
